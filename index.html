@@ -606,22 +606,16 @@
   </footer>
 
   <script>
-    const AIRTABLE_TOKEN = 'patgpNhgfFkQsyQj9.a5ad03a8c5e7a2d36220cb4641160af88dc84a082811b0f3c702789679360d66';
-    const BASE_ID = 'appndrnWrdlgxRJAG';
-    const TABLE_NAME = 'Properties';
-
-    async function fetchProperties() {
-      try {
-        const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}?maxRecords=6&sort[0][field]=Date Added&sort[0][direction]=desc`, {
-          headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-        });
-        const data = await res.json();
-        return data.records || [];
-      } catch (err) {
-        console.error('Airtable fetch error:', err);
-        return [];
-      }
-    }
+  async function fetchProperties() {
+  try {
+    const res = await fetch('/api/properties');
+    const data = await res.json();
+    return data.records || [];
+  } catch (err) {
+    console.error('Fetch error:', err);
+    return [];
+  }
+}
 
     function getImageUrl(record) {
       const images = record.fields['Images'];
