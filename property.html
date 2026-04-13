@@ -372,7 +372,7 @@ function renderDescription(text) {
       const heroImage = images[0] || '';
       const galleryImages = images.slice(1);
       const bookingUrl = f['Booking URL'] || '#';
-      const fullDesc = f['Full Description'] || f['Description'] || '';
+const fullDesc = f['Full description'] || f['Description'] || '';
       const bookingDomain = bookingUrl !== '#' ? new URL(bookingUrl).hostname.replace('www.', '') : '';
       const sleeps = f['Sleeps'] ? `Sleeps ${f['Sleeps']}` : '';
       const country = f['Country'] || '';
