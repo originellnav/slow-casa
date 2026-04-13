@@ -1,0 +1,21 @@
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  const { id } = req.query;
+
+  if (!id) {
+    return res.status(400).json({ error: 'Missing id parameter' });
+  }
+
+  const response = await fetch(
+    `https://api.airtable.com/v0/appndrnWrdlgxRJAG/Properties/${id}`,
+    {
+      headers: {
+        Authorization: 'Bearer patgpNhgfFkQsyQj9.887202d16495ba49fad025cb888cef3eac0a6c34058675dd2516127ad083d8c6'
+      }
+    }
+  );
+
+  const data = await response.json();
+  res.status(200).json(data);
+}
