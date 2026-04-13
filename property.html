@@ -350,11 +350,6 @@ function renderDescription(text) {
       let html = '<div class="gallery">';
       let i = 0;
 
-      if (images[0]) {
-        html += `<div class="gallery-full"><img src="${images[0]}" alt="" loading="lazy" /></div>`;
-        i = 1;
-      }
-
       while (i < images.length) {
         if (images[i] && images[i + 1]) {
           html += `<div class="gallery-pair"><img src="${images[i]}" alt="" loading="lazy" /><img src="${images[i+1]}" alt="" loading="lazy" /></div>`;
@@ -364,7 +359,19 @@ function renderDescription(text) {
           i++;
         }
       }
-
+html += `
+  <div style="text-align:center;padding:32px 0 0;">
+    <button onclick="openLightbox(0)" style="font-family:var(--sans);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;padding:12px 32px;border:0.5px solid var(--black);background:transparent;color:var(--black);cursor:pointer;">
+      All photos
+    </button>
+  </div>
+  <div id="lightbox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1000;align-items:center;justify-content:center;">
+    <img id="lightbox-img" style="max-height:90vh;max-width:90vw;object-fit:contain;" />
+    <button onclick="closeLightbox()" style="position:absolute;top:24px;right:32px;background:none;border:none;color:white;font-size:24px;cursor:pointer;">×</button>
+    <button onclick="prevPhoto()" style="position:absolute;left:32px;background:none;border:none;color:white;font-size:32px;cursor:pointer;">‹</button>
+    <button onclick="nextPhoto()" style="position:absolute;right:32px;background:none;border:none;color:white;font-size:32px;cursor:pointer;">›</button>
+  </div>
+`;
       html += '</div>';
       return html;
     }
@@ -420,6 +427,29 @@ const fullDesc = f['Full description'] || f['Description'] || '';
     }
 
     fetchProperty();
+    let lightboxImages = [];
+let lightboxIndex = 0;
+
+function openLightbox(index) {
+  lightboxImages = Array.from(document.querySelectorAll('.gallery img')).map(img => img.src);
+  lightboxIndex = index;
+  document.getElementById('lightbox').style.display = 'flex';
+  document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+}
+
+function prevPhoto() {
+  lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+  document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+}
+
+function nextPhoto() {
+  lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+  document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+}
   </script>
 
 </body>
