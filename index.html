@@ -14,7 +14,7 @@
       --white: #ffffff;
       --black: #0f0f0f;
       --grey-1: #888888;
-      --grey-2: #bbbbbb;
+      --grey-2: #bbbbbb;nav {
       --grey-3: #e8e8e8;
       --grey-4: #f5f5f3;
       --serif: 'DM Serif Display', Georgia, serif;
@@ -34,26 +34,28 @@
 
     /* NAV */
     nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 28px 48px;
-      border-bottom: 0.5px solid var(--grey-3);
-      position: sticky;
-      top: 0;
-      background: var(--white);
-      z-index: 100;
-    }
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 28px 48px;
+  border-bottom: 0.5px solid var(--grey-3);
+  position: sticky;
+  top: 0;
+  background: var(--white);
+  z-index: 100;
+}
 
-   ..wordmark {
+.nav-left {
+  display: flex;
+  gap: 36px;
+}
+
+   .wordmark {
   font-family: var(--serif);
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  letter-spacing: 0.04em;
+  text-align: center;
 }
 
     .nav-links {
@@ -532,8 +534,9 @@
 <body>
 
   <nav>
-    <span class="wordmark">Slow Casa</span>
-    <ul class="nav-links">
+    <<div class="nav-left"></div>
+<a href="/" class="wordmark">Slow Casa</a>
+<ul class="nav-links">
       <li><a href="#">Directory</a></li>
       <li><a href="#">Places</a></li>
       <li><a href="#">Newsletter</a></li>
