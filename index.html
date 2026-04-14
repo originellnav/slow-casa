@@ -655,7 +655,7 @@ return `
             <p class="card-location">${f['Location label'] || f['Town'] + ' · ' + f['Region'] || ''}</p>
             <p class="card-name">${f['Name'] || ''}</p>
             <p class="card-detail">${f['Description'] ? f['Description'].substring(0, 80) + '...' : ''}</p>
-            ${f['Tags'] ? `<span class="card-tag">${f['Tags']}</span>` : ''}
+            ${f['Tags'] && f['Tags'].length ? `<span class="card-tag">${f['Tags'][0]}</span>` : ''}
             </div>
   </a>
 `;
