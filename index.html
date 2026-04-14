@@ -637,7 +637,7 @@
         return;
       }
 
-      console.log('first record fields:', records[0].fields);
+      console.log('first record fields:', JSON.stringify(records[0].fields));
       grid.innerHTML = records.map((record, i) => {
         const f = record.fields;
         const imgUrl = getImageUrl(record);
