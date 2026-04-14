@@ -629,6 +629,7 @@
     }
 
     function renderProperties(records) {
+      console.log('records received:', records.length, records);
       const grid = document.getElementById('property-grid');
 
       if (!records.length) {
