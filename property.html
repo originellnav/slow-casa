@@ -6,7 +6,7 @@
   <title>Slow Casa</title>
   <meta name="description" content="" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -19,7 +19,7 @@
       --grey-4: #f5f5f3;
       --serif: 'DM Serif Display', Georgia, serif;
       --sans: 'DM Sans', system-ui, sans-serif;
-  
+    }
 
     html { font-size: 16px; -webkit-font-smoothing: antialiased; }
     body { font-family: var(--sans); background: var(--white); color: var(--black); }
@@ -157,7 +157,6 @@
       width: 100%;
       height: 70vh;
       object-fit: cover;
-      object-position: center;
       display: block;
     }
 
@@ -170,9 +169,8 @@
 
     .gallery-pair img {
       width: 100%;
-      height: 340px
+      aspect-ratio: 4/3;
       object-fit: cover;
-      object-position: center;
       display: block;
     }
 
@@ -182,9 +180,8 @@
 
     .gallery-single img {
       width: 100%;
-      height: 500px
+      aspect-ratio: 16/9;
       object-fit: cover;
-      object-position: center;
       display: block;
     }
 
@@ -331,24 +328,16 @@
       }
       return all;
     }
-function renderDescription(text) {
-  if (!text) return '';
-  return text
-    .split('\n')
-    .map(line => {
-      if (line.startsWith('# ')) return `<h2 style="font-family:var(--serif);font-size:28px;font-weight:400;margin:2em 0 0.75em;letter-spacing:-0.01em">${line.slice(2)}</h2>`;
-      if (line.startsWith('## ')) return `<h3 style="font-family:var(--serif);font-size:22px;font-weight:400;margin:2em 0 0.75em">${line.slice(3)}</h3>`;
-      if (line.startsWith('**') && line.endsWith('**')) return `<h3 style="font-family:var(--serif);font-size:22px;font-weight:400;margin:2em 0 0.75em">${line.slice(2,-2)}</h3>`;
-      if (line.startsWith('"') && line.endsWith('"')) return `<p style="font-family:var(--serif);font-size:22px;font-style:italic;line-height:1.5;margin:0 0 2em;color:var(--grey-1)">${line}</p>`;
-      if (line.trim() === '') return '';
-      return `<p style="margin-bottom:1.5em">${line}</p>`;
-    })
-    .join('');
-}
+
     function renderGallery(images) {
       if (!images.length) return '';
       let html = '<div class="gallery">';
       let i = 0;
+
+      if (images[0]) {
+        html += `<div class="gallery-full"><img src="${images[0]}" alt="" loading="lazy" /></div>`;
+        i = 1;
+      }
 
       while (i < images.length) {
         if (images[i] && images[i + 1]) {
@@ -359,19 +348,7 @@ function renderDescription(text) {
           i++;
         }
       }
-html += `
-  <div style="text-align:center;padding:32px 0 0;">
-    <button onclick="openLightbox(0)" style="font-family:var(--sans);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;padding:12px 32px;border:0.5px solid var(--black);background:transparent;color:var(--black);cursor:pointer;">
-      All photos
-    </button>
-  </div>
-  <div id="lightbox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1000;align-items:center;justify-content:center;">
-    <img id="lightbox-img" style="max-height:90vh;max-width:90vw;object-fit:contain;" />
-    <button onclick="closeLightbox()" style="position:absolute;top:24px;right:32px;background:none;border:none;color:white;font-size:24px;cursor:pointer;">×</button>
-    <button onclick="prevPhoto()" style="position:absolute;left:32px;background:none;border:none;color:white;font-size:32px;cursor:pointer;">‹</button>
-    <button onclick="nextPhoto()" style="position:absolute;right:32px;background:none;border:none;color:white;font-size:32px;cursor:pointer;">›</button>
-  </div>
-`;
+
       html += '</div>';
       return html;
     }
@@ -382,7 +359,6 @@ html += `
       const heroImage = images[0] || '';
       const galleryImages = images.slice(1);
       const bookingUrl = f['Booking URL'] || '#';
-const fullDesc = f['Full description'] || f['Description'] || '';
       const bookingDomain = bookingUrl !== '#' ? new URL(bookingUrl).hostname.replace('www.', '') : '';
       const sleeps = f['Sleeps'] ? `Sleeps ${f['Sleeps']}` : '';
       const country = f['Country'] || '';
@@ -411,9 +387,9 @@ const fullDesc = f['Full description'] || f['Description'] || '';
             </div>
           </div>
 
-<div class="description">
-  ${renderDescription(fullDesc)}
-</div>
+          <div class="description">
+            ${f['Description'] ? f['Description'].split('\n').map(p => p ? `<p style="margin-bottom:1.5em">${p}</p>` : '').join('') : ''}
+          </div>
 
           ${renderGallery(galleryImages)}
 
@@ -427,29 +403,6 @@ const fullDesc = f['Full description'] || f['Description'] || '';
     }
 
     fetchProperty();
-    let lightboxImages = [];
-let lightboxIndex = 0;
-
-function openLightbox(index) {
-  lightboxImages = Array.from(document.querySelectorAll('.gallery img')).map(img => img.src);
-  lightboxIndex = index;
-  document.getElementById('lightbox').style.display = 'flex';
-  document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').style.display = 'none';
-}
-
-function prevPhoto() {
-  lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
-  document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
-}
-
-function nextPhoto() {
-  lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
-  document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
-}
   </script>
 
 </body>
