@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deià, Mallorca — Slow Casa</title>
+  <meta name="description" content="A guide to Deià, the mountain village on Mallorca's northwest coast where the Tramuntana meets the sea." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --white: #ffffff; --black: #0f0f0f; --grey-1: #888888; --grey-2: #bbbbbb;
+      --grey-3: #e8e8e8; --grey-4: #f5f5f3;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+    }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--sans); background: var(--white); color: var(--black); }
+    a { color: inherit; text-decoration: none; }
+
+    nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 28px 48px; border-bottom: 0.5px solid var(--grey-3); position: sticky; top: 0; background: var(--white); z-index: 100; }
+    .wordmark { font-family: var(--serif); font-size: 24px; font-weight: 400; letter-spacing: 0.04em; text-align: center; color: var(--black); text-transform: uppercase; }
+    .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
+    .nav-links a { font-size: 13px; color: var(--grey-1); letter-spacing: 0.03em; }
+    .nav-links a:hover { color: var(--black); }
+
+    .hero { width: 100%; height: 70vh; min-height: 400px; overflow: hidden; }
+    .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .article { max-width: 720px; margin: 0 auto; padding: 64px 48px 0; }
+
+    .article-meta { margin-bottom: 40px; padding-bottom: 32px; border-bottom: 0.5px solid var(--grey-3); }
+    .article-series { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 16px; }
+    .article-title { font-family: var(--serif); font-size: 48px; font-weight: 400; line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 20px; }
+    .article-subtitle { font-size: 18px; color: var(--grey-1); line-height: 1.6; font-weight: 300; }
+
+    .article-body { padding: 40px 0; }
+    .article-body p { font-size: 17px; line-height: 1.85; color: var(--black); margin-bottom: 1.5em; }
+    .article-body h2 { font-family: var(--serif); font-size: 28px; font-weight: 400; line-height: 1.25; margin: 2.5em 0 0.75em; letter-spacing: -0.01em; }
+    .article-body h3 { font-size: 14px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-1); margin: 2em 0 0.75em; }
+    .article-body blockquote { font-family: var(--serif); font-size: 24px; font-style: italic; font-weight: 400; line-height: 1.4; color: var(--grey-1); margin: 2em 0; padding-left: 24px; border-left: 2px solid var(--grey-3); }
+
+    .article-img { width: 100vw; margin-left: calc(-50vw + 50%); margin: 2em 0; }
+    .article-img img { width: 100%; max-height: 65vh; object-fit: cover; display: block; }
+    .article-img-caption { max-width: 720px; margin: 0 auto; padding: 10px 48px 0; font-size: 12px; color: var(--grey-2); }
+
+    .places-properties { max-width: 1200px; margin: 0 auto; padding: 0 48px 80px; }
+    .section-header { display: flex; justify-content: space-between; align-items: baseline; border-top: 0.5px solid var(--grey-3); padding-top: 20px; margin-bottom: 40px; margin-top: 64px; }
+    .section-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); }
+    .section-link { font-size: 12px; color: var(--grey-1); }
+    .section-link:hover { color: var(--black); }
+
+    .property-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .property-card { cursor: pointer; }
+    .property-card:hover .card-img img { transform: scale(1.03); }
+    .card-img { width: 100%; aspect-ratio: 4/3; overflow: hidden; margin-bottom: 16px; background: var(--grey-4); }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
+    .card-location { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 6px; }
+    .card-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+    .card-detail { font-size: 13px; color: var(--grey-1); line-height: 1.5; }
+    .no-properties { font-size: 14px; color: var(--grey-1); padding: 32px 0; }
+
+    footer { padding: 32px 48px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; border-top: 0.5px solid var(--grey-3); }
+    .footer-word { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--grey-1); }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a { font-size: 12px; color: var(--grey-1); }
+    .footer-links a:hover { color: var(--black); }
+
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .article { padding: 40px 24px 0; }
+      .article-title { font-size: 32px; }
+      .places-properties { padding: 0 24px 56px; }
+      .property-grid { grid-template-columns: 1fr; gap: 40px; }
+      footer { padding: 24px; flex-direction: column; gap: 20px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div></div>
+    <a href="/" class="wordmark">Slow Casa</a>
+    <ul class="nav-links">
+      <li><a href="/directory">Directory</a></li>
+      <li><a href="/places">Places</a></li>
+      <li><a href="#">Newsletter</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- EDIT: Replace src with your hero image -->
+  <div class="hero">
+    <img src="/images/deia.jpg" alt="Deià, Mallorca" />
+  </div>
+
+  <div class="article">
+    <div class="article-meta">
+      <!-- EDIT: Update series number, location, title, subtitle -->
+      <p class="article-series">100 Slow Living Towns · No. 01 · Mallorca</p>
+      <h1 class="article-title">Deià, and the particular silence of the Tramuntana</h1>
+      <p class="article-subtitle">The mountain village on Mallorca's northwest coast where artists have been coming to disappear for a century — and where it is still possible to do exactly that.</p>
+    </div>
+
+    <div class="article-body">
+      <!-- EDIT: Paste your article content here -->
+      <!-- Available elements: <p>, <h2>, <h3>, <blockquote> -->
+      <!-- For full-width images use: -->
+      <!--
+      <div class="article-img">
+        <img src="/images/your-image.jpg" alt="caption" />
+      </div>
+      <p class="article-img-caption">Optional caption text</p>
+      -->
+
+      <p>The road into Deià drops through terraced olive groves older than any building in the village. There are no chains here, no branded anything. Just stone, sea light, and the sound of water moving somewhere below the road.</p>
+
+      <p>Robert Graves arrived in 1929 and never really left. The poet and novelist found in Deià something that has since become harder to locate in Europe: a place that resists being consumed. The village sits 400 metres above the sea in the Serra de Tramuntana, surrounded by mountains that block the north wind and face the water directly south.</p>
+
+      <blockquote>A place that resists being consumed. The village sits 400 metres above the sea, surrounded by mountains that block the north wind.</blockquote>
+
+      <h2>The village</h2>
+
+      <p>Deià has perhaps 700 permanent residents. The main street takes four minutes to walk end to end. There are two good restaurants, a bar, a small market, and a church at the top of the hill where Graves is buried. That is essentially everything, and it is enough.</p>
+
+      <h2>Getting there</h2>
+
+      <p>Deià is 30 kilometres from Palma along the Ma-10 mountain road. The drive takes around 45 minutes and is one of the finest roads on the island. A car is essential.</p>
+
+      <h3>What to do</h3>
+
+      <p>Swimming at Cala Deià, the rocky cove 20 minutes on foot down the mountain. Eating at Es Racó d'es Teix on a warm evening. Walking the old stone path to Sóller. Reading on a terrace until the light goes.</p>
+
+    </div>
+  </div>
+
+  <!-- Properties auto-populated from Airtable by region -->
+  <div class="places-properties">
+    <div class="section-header">
+      <span class="section-label">Stay in Mallorca</span>
+      <a href="/directory" class="section-link">View all properties</a>
+    </div>
+    <div class="property-grid" id="local-properties">
+      <p class="no-properties">Loading nearby properties...</p>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-word">Slow Casa</span>
+    <div class="footer-links">
+      <a href="/directory">Directory</a>
+      <a href="#">Newsletter</a>
+      <a href="#">Submit a property</a>
+      <a href="#">Instagram</a>
+    </div>
+  </footer>
+
+  <script>
+    // EDIT: Change to match the Region or Country for this guide
+    var FILTER_REGION = 'Mallorca';
+
+    async function fetchLocalProperties() {
+      try {
+        var res = await fetch('/api/properties?all=true');
+        var data = await res.json();
+        return (data.records || []).filter(function(r) {
+          return r.fields['Region'] === FILTER_REGION;
+        });
+      } catch (err) { return []; }
+    }
+
+    function getImageUrl(record) {
+      var images = record.fields['Images'];
+      if (images && images.length > 0) return images[0].url;
+      return null;
+    }
+
+    fetchLocalProperties().then(function(records) {
+      var grid = document.getElementById('local-properties');
+      if (!records.length) {
+        grid.innerHTML = '<p class="no-properties">No properties listed here yet.</p>';
+        return;
+      }
+      grid.innerHTML = records.map(function(record) {
+        var f = record.fields;
+        var imgUrl = getImageUrl(record);
+        return '<a href="/property.html?id=' + record.id + '" style="text-decoration:none;color:inherit;">' +
+          '<div class="property-card">' +
+            '<div class="card-img">' +
+              (imgUrl ? '<img src="' + imgUrl + '" alt="' + (f['Name']||'') + '" loading="lazy"/>' : '<div style="width:100%;height:100%;background:var(--grey-4)"></div>') +
+            '</div>' +
+            '<p class="card-location">' + (f['Location label']||'') + '</p>' +
+            '<p class="card-name">' + (f['Name']||'') + '</p>' +
+            '<p class="card-detail">' + (f['Description'] ? f['Description'].substring(0,80)+'...' : '') + '</p>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+    });
+  </script>
+
+</body>
+</html>
