@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
   const dataset = 'production';
   const apiVersion = '2024-01-01';
 
-  const query = encodeURIComponent(`*[_type == "locationGuide" && slug.current == "${slug}"][0]{
+  const query = `*[_type == "locationGuide" && slug.current == '${slug}'][0]{
     title,
     location,
     region,
@@ -25,9 +25,9 @@ module.exports = async function handler(req, res) {
         caption
       }
     }
-  }`);
+  }`;
 
-  const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/query/${dataset}?query=${query}`;
+  const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
 
   try {
     const response = await fetch(url, {
