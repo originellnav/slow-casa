@@ -3,55 +3,178 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deià, Mallorca — Slow Casa</title>
-  <meta name="description" content="A guide to Deià, the mountain village on Mallorca's northwest coast where the Tramuntana meets the sea." />
+  <title>Our guide to Deià, Mallorca — Slow Casa</title>
+  <meta name="description" content="Where the mountains meet the sea on Mallorca's northwest coast. Our guide to eating, drinking and exploring Deià." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/slow-casa.css" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --white: #ffffff; --black: #0f0f0f; --grey-1: #888888; --grey-2: #bbbbbb;
-      --grey-3: #e8e8e8; --grey-4: #f5f5f3;
-      --serif: 'DM Serif Display', Georgia, serif;
-      --sans: 'DM Sans', system-ui, sans-serif;
-    }
-    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
     body { font-family: var(--sans); background: var(--white); color: var(--black); }
-    a { color: inherit; text-decoration: none; }
 
-    nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 28px 48px; border-bottom: 0.5px solid var(--grey-3); position: sticky; top: 0; background: var(--white); z-index: 100; }
-    .wordmark { font-family: 'Archivo Black', sans-serif; font-size: 22px; font-weight: 400; letter-spacing: 0.06em; text-align: center; color: var(--black); text-transform: uppercase; }
-    .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
-    .nav-links a { font-size: 13px; color: var(--grey-1); letter-spacing: 0.03em; }
+    nav {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 28px 48px;
+      border-bottom: 0.5px solid var(--grey-3);
+      position: sticky;
+      top: 0;
+      background: var(--white);
+      z-index: 100;
+    }
+
+    .nav-links a { color: var(--grey-1); }
     .nav-links a:hover { color: var(--black); }
 
-    .hero { width: 100%; height: 70vh; min-height: 400px; overflow: hidden; }
-    .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* HERO */
+    .hero {
+      width: 100%;
+      height: 80vh;
+      min-height: 480px;
+      overflow: hidden;
+    }
 
-    .article { max-width: 720px; margin: 0 auto; padding: 64px 48px 0; }
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 60%;
+      display: block;
+    }
 
-    .article-meta { margin-bottom: 40px; padding-bottom: 32px; border-bottom: 0.5px solid var(--grey-3); }
-    .article-series { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 16px; }
-    .article-title { font-family: var(--serif); font-size: 48px; font-weight: 400; line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 20px; }
-    .article-subtitle { font-size: 18px; color: var(--grey-1); line-height: 1.6; font-weight: 300; }
+    /* ARTICLE */
+    .article {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 64px 48px 0;
+    }
+
+    .article-meta {
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 0.5px solid var(--grey-3);
+    }
+
+    .article-series {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      margin-bottom: 16px;
+    }
+
+    .article-title {
+      font-family: var(--serif);
+      font-size: 48px;
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+    }
+
+    .article-subtitle {
+      font-size: 18px;
+      color: var(--grey-1);
+      line-height: 1.6;
+      font-weight: 300;
+    }
 
     .article-body { padding: 40px 0; }
-    .article-body p { font-size: 17px; line-height: 1.85; color: var(--black); margin-bottom: 1.5em; }
-    .article-body h2 { font-family: var(--serif); font-size: 28px; font-weight: 400; line-height: 1.25; margin: 2.5em 0 0.75em; letter-spacing: -0.01em; }
-    .article-body h3 { font-size: 14px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-1); margin: 2em 0 0.75em; }
-    .article-body blockquote { font-family: var(--serif); font-size: 24px; font-style: italic; font-weight: 400; line-height: 1.4; color: var(--grey-1); margin: 2em 0; padding-left: 24px; border-left: 2px solid var(--grey-3); }
 
-    .article-img { width: 100vw; margin-left: calc(-50vw + 50%); margin: 2em 0; }
-    .article-img img { width: 100%; max-height: 65vh; object-fit: cover; display: block; }
-    .article-img-caption { max-width: 720px; margin: 0 auto; padding: 10px 48px 0; font-size: 12px; color: var(--grey-2); }
+    .article-body p {
+      font-size: 17px;
+      line-height: 1.85;
+      color: var(--black);
+      margin-bottom: 1.5em;
+    }
 
-    .places-properties { max-width: 1200px; margin: 0 auto; padding: 0 48px 80px; }
-    .section-header { display: flex; justify-content: space-between; align-items: baseline; border-top: 0.5px solid var(--grey-3); padding-top: 20px; margin-bottom: 40px; margin-top: 64px; }
+    .article-body h2 {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1.25;
+      margin: 2.5em 0 0.75em;
+      letter-spacing: -0.01em;
+    }
+
+    .article-body a {
+      color: var(--black);
+      border-bottom: 0.5px solid var(--grey-3);
+      transition: border-color 0.2s;
+    }
+
+    .article-body a:hover { border-color: var(--black); }
+
+    /* FULL WIDTH IMAGE */
+    .article-img {
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      margin-top: 2.5em;
+      margin-bottom: 2.5em;
+    }
+
+    .article-img img {
+      width: 100%;
+      max-height: 65vh;
+      object-fit: cover;
+      display: block;
+    }
+
+    .article-img-caption {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 10px 48px 0;
+      font-size: 12px;
+      color: var(--grey-2);
+      letter-spacing: 0.02em;
+    }
+
+    /* MAP */
+    .map-section {
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      margin-top: 2.5em;
+      margin-bottom: 2.5em;
+    }
+
+    .map-section iframe {
+      width: 100%;
+      height: 420px;
+      border: 0;
+      display: block;
+    }
+
+    .map-label {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 12px 48px 0;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+    }
+
+    /* PROPERTIES SECTION */
+    .places-properties {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px 80px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-top: 0.5px solid var(--grey-3);
+      padding-top: 20px;
+      margin-bottom: 40px;
+      margin-top: 64px;
+    }
+
     .section-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); }
-    .section-link { font-size: 12px; color: var(--grey-1); }
+    .section-link { font-size: 12px; color: var(--grey-1); transition: color 0.2s; }
     .section-link:hover { color: var(--black); }
 
-    .property-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
     .property-card { cursor: pointer; }
     .property-card:hover .card-img img { transform: scale(1.03); }
     .card-img { width: 100%; aspect-ratio: 4/3; overflow: hidden; margin-bottom: 16px; background: var(--grey-4); }
@@ -61,17 +184,14 @@
     .card-detail { font-size: 13px; color: var(--grey-1); line-height: 1.5; }
     .no-properties { font-size: 14px; color: var(--grey-1); padding: 32px 0; }
 
-    footer { padding: 32px 48px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; border-top: 0.5px solid var(--grey-3); }
-    .footer-word { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--grey-1); }
-    .footer-links { display: flex; gap: 28px; }
-    .footer-links a { font-size: 12px; color: var(--grey-1); }
-    .footer-links a:hover { color: var(--black); }
-
     @media (max-width: 768px) {
       nav { padding: 20px 24px; }
       .nav-links { display: none; }
+      .hero { height: 55vh; }
       .article { padding: 40px 24px 0; }
       .article-title { font-size: 32px; }
+      .article-img-caption { padding: 10px 24px 0; }
+      .map-label { padding: 12px 24px 0; }
       .places-properties { padding: 0 24px 56px; }
       .property-grid { grid-template-columns: 1fr; gap: 40px; }
       footer { padding: 24px; flex-direction: column; gap: 20px; text-align: center; }
@@ -92,52 +212,86 @@
     </ul>
   </nav>
 
-  <!-- EDIT: Replace src with your hero image -->
   <div class="hero">
-    <img src="/images/deia.jpg" alt="Deià, Mallorca" />
+    <img src="https://res.cloudinary.com/dw1wmo2go/image/upload/q_auto/f_auto/v1776242052/deia_hero_vbulob.jpg" alt="Deià, Mallorca" />
   </div>
 
   <div class="article">
     <div class="article-meta">
-      <!-- EDIT: Update series number, location, title, subtitle -->
-      <p class="article-series">100 Slow Living Towns · No. 01 · Mallorca</p>
-      <h1 class="article-title">Deià, and the particular silence of the Tramuntana</h1>
-      <p class="article-subtitle">The mountain village on Mallorca's northwest coast where artists have been coming to disappear for a century — and where it is still possible to do exactly that.</p>
+      <p class="article-series">Places · Mallorca</p>
+      <h1 class="article-title">Our guide to Deià, where the mountains meet the sea on Mallorca's majestic northwest coast</h1>
     </div>
 
     <div class="article-body">
-      <!-- EDIT: Paste your article content here -->
-      <!-- Available elements: <p>, <h2>, <h3>, <blockquote> -->
-      <!-- For full-width images use: -->
-      <!--
-      <div class="article-img">
-        <img src="/images/your-image.jpg" alt="caption" />
-      </div>
-      <p class="article-img-caption">Optional caption text</p>
-      -->
 
-      <p>The road into Deià drops through terraced olive groves older than any building in the village. There are no chains here, no branded anything. Just stone, sea light, and the sound of water moving somewhere below the road.</p>
+      <p>The road into Deià from Valldemossa is one of the finest drives in Europe. It drops through terraced olive groves older than any building in the village, past dry stone walls that have been repaired and re-repaired for centuries, through hairpin bends where the mountain falls away to a sea that is somehow both very far below and very close. You arrive not with a sense of destination but of gradual immersion.</p>
 
-      <p>Robert Graves arrived in 1929 and never really left. The poet and novelist found in Deià something that has since become harder to locate in Europe: a place that resists being consumed. The village sits 400 metres above the sea in the Serra de Tramuntana, surrounded by mountains that block the north wind and face the water directly south.</p>
+      <p>Deià has perhaps 700 permanent residents. The main street takes four minutes to walk end to end. There is a church at the top of the hill where Robert Graves is buried, a small market, a handful of restaurants, and very little else. The poet arrived in 1929, found something here that resisted being consumed, and stayed until he died in 1985. The village has been attracting artists, writers and people who want to disappear from the world ever since. It does so without trying.</p>
 
-      <blockquote>A place that resists being consumed. The village sits 400 metres above the sea, surrounded by mountains that block the north wind.</blockquote>
-
-      <h2>The village</h2>
-
-      <p>Deià has perhaps 700 permanent residents. The main street takes four minutes to walk end to end. There are two good restaurants, a bar, a small market, and a church at the top of the hill where Graves is buried. That is essentially everything, and it is enough.</p>
+      <p>The Tramuntana mountains give the village its particular quality of light and silence. They block the north wind, face the water south, and produce a microclimate that is cooler and more forested than the rest of Mallorca. The houses are built from local sandstone that changes colour through the day. Grey in the early morning, amber by noon, something approaching gold in the hour before sunset.</p>
 
       <h2>Getting there</h2>
 
-      <p>Deià is 30 kilometres from Palma along the Ma-10 mountain road. The drive takes around 45 minutes and is one of the finest roads on the island. A car is essential.</p>
+      <p>A car is essential. Deià sits on the Ma-10, the mountain road that follows Mallorca's northwest coast. From Palma airport the drive takes around 45 minutes and is one of the best roads on the island: narrow, dramatic, lined with olive groves and punctuated by views of the sea far below. The road demands your attention and rewards it.</p>
 
-      <h3>What to do</h3>
+      <p>From Sóller the drive is twenty minutes. From the port of Sóller you can also take the vintage tram to Sóller town and hire a car or taxi from there, though having your own transport is the difference between staying in the village and actually being able to use it.</p>
 
-      <p>Swimming at Cala Deià, the rocky cove 20 minutes on foot down the mountain. Eating at Es Racó d'es Teix on a warm evening. Walking the old stone path to Sóller. Reading on a terrace until the light goes.</p>
+      <p>We recommend <a href="https://www.offugo.com" target="_blank" rel="noopener">Offugo</a> for car hire. Use our link to get 10% off your trip.</p>
+
+      <div class="map-section">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d12500!2d2.6483!3d39.7481!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2ses!4v1700000000000!5m2!1sen!2ses"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+      <p class="map-label">Deià · Serra de Tramuntana · Mallorca</p>
+
+      <h2>Eat</h2>
+
+      <p><a href="https://www.esracodesteix.es" target="_blank" rel="noopener">Es Racó d'Es Teix</a> is the Michelin-starred anchor of the Deià dining scene, run by Josef Sauerschell and his wife Leonore Payeras out of an 18th-century former stable with a terrace overlooking the mountains. The menu is Mediterranean-Mallorcan with precision, the kind of meal that justifies planning your day around it. Book well in advance in summer.</p>
+
+      <p><a href="https://caspatromarch.myrestoo.net" target="_blank" rel="noopener">Ca's Patro March</a> is the beach restaurant at Cala Deià: simple, utterly perfect for lunch, built into the rocks at the water's edge so that the sea is close enough to hear between courses. The seafood is very good. Arrive early or accept whatever table you're given. Reservations open at midnight Mallorca time, two to three weeks ahead. Plan accordingly.</p>
+
+      <p><a href="https://www.restaurantnama.com" target="_blank" rel="noopener">Nama</a> has become a cult address since it opened: Asian-influenced cooking on a terrace with sweeping views over the village. The cooking is confident and the setting is hard to argue with. Book ahead.</p>
+
+      <p><a href="https://www.bensdavall.com" target="_blank" rel="noopener">Bens d'Avall</a>, technically between Deià and Sóller, is worth the short drive. A cliff-top restaurant with views of the west coast and one of the longest-running serious kitchens in the area, open since 1971. It holds both a Michelin star and a green star for sustainability. Chef Jaume Vicens works with seasonal Balearic produce: Sóller prawns, Tramuntana lamb. The result is food that tastes specifically of this place and no other.</p>
+
+      <p><a href="https://www.instagram.com/demonio.deia" target="_blank" rel="noopener">De Moniö</a> is the daytime option: a small café-deli with natural wines, preserved goods, and the right kind of unhurried atmosphere for a slow morning. Worth a coffee at the very least.</p>
+
+      <div class="article-img">
+        <img src="https://res.cloudinary.com/dw1wmo2go/image/upload/q_auto/f_auto/v1776242050/nama_lkfsxo.jpg" alt="Nama restaurant, Deià" />
+      </div>
+      <p class="article-img-caption">Nama, Deià</p>
+
+      <h2>Drink</h2>
+
+      <p><a href="https://safondadeia.com" target="_blank" rel="noopener">Sa Fonda</a> is the village bar, which means it is the place where everyone eventually ends up. Locals, visitors, the owner of the house you're renting: the mix is genuinely democratic in a way that very few places in Mallorca manage. Go late, stay late.</p>
+
+      <p>The bar at Belmond La Residencia is worth knowing about for the opposite reason. It is calm, beautifully arranged, and expensive in a way that feels justified once you're sitting in it. Useful on a quiet evening when you want to be still and comfortable rather than social.</p>
+
+      <div class="article-img">
+        <img src="https://res.cloudinary.com/dw1wmo2go/image/upload/q_auto/f_auto/v1776242050/elolivo_ny1gij.jpg" alt="El Olivo terrace at Belmond La Residencia, Deià" />
+      </div>
+      <p class="article-img-caption">El Olivo at Belmond La Residencia</p>
+
+      <h2>Explore</h2>
+
+      <p>Cala Deià is the village beach: rocky, intimate, reached on foot from the village in about twenty minutes down a path through the olive groves. It is not a beach for lying on. It is a beach for swimming in clear water off flat rocks while the mountains rise immediately behind you. Go in the morning before it fills up.</p>
+
+      <div class="article-img">
+        <img src="https://res.cloudinary.com/dw1wmo2go/image/upload/q_auto/f_auto/v1776242050/cala_deia_yyxa8n.jpg" alt="Cala Deià" />
+      </div>
+      <p class="article-img-caption">Cala Deià</p>
+
+      <p>The walk to Sóller follows the old stone path through the terraces and takes around two hours. It is one of the classic Tramuntana walks and deservedly so. The path is ancient, well-maintained, and passes through landscape that has changed very little in centuries. Sóller at the end of it, with its market square and orange trees, is a good reason to have a car waiting.</p>
+
+      <p><a href="https://www.sonmarroig.com" target="_blank" rel="noopener">Son Marroig</a>, a few kilometres along the coast road toward Valldemossa, is the former residence of Archduke Ludwig Salvator: the 19th-century polymath who spent decades documenting the Balearic Islands and helped preserve much of what makes the northwest coast worth visiting today. The gardens and the views from the clifftop belvedere are as good as anything on the island.</p>
 
     </div>
   </div>
 
-  <!-- Properties auto-populated from Airtable by region -->
   <div class="places-properties">
     <div class="section-header">
       <span class="section-label">Stay in Mallorca</span>
@@ -159,7 +313,6 @@
   </footer>
 
   <script>
-    // EDIT: Change to match the Region or Country for this guide
     var FILTER_REGION = 'Mallorca';
 
     async function fetchLocalProperties() {
@@ -174,7 +327,10 @@
 
     function getImageUrl(record) {
       var images = record.fields['Images'];
-      if (images && images.length > 0) return images[0].url;
+      if (images && images.length > 0) {
+        if (images[0].thumbnails && images[0].thumbnails.full) return images[0].thumbnails.full.url;
+        return images[0].url;
+      }
       return null;
     }
 
