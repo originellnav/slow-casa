@@ -2,8 +2,8 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   const slug = req.query.slug;
-  const projectId = process.env.SANITY_PROJECT_ID;
-  const token = process.env.SANITY_TOKEN;
+  const projectId = 'hchp27po';
+const token = process.env.SANITY_TOKEN;
   const dataset = 'production';
   const apiVersion = '2024-01-01';
 
