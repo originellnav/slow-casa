@@ -2,10 +2,6 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   const slug = req.query.slug;
-  if (!slug) {
-    return res.status(400).json({ error: 'slug required' });
-  }
-
   const projectId = process.env.SANITY_PROJECT_ID;
   const token = process.env.SANITY_TOKEN;
   const dataset = 'production';
@@ -15,7 +11,6 @@ module.exports = async function handler(req, res) {
     title,
     location,
     region,
-    publishedAt,
     "heroImage": heroImage.asset->url,
     body[]{
       ...,
@@ -35,10 +30,18 @@ module.exports = async function handler(req, res) {
         Authorization: `Bearer ${token}`
       }
     });
-    const data = await response.json();
-    res.status(200).json(data.result || null);
+    const raw = await response.json();
+    res.status(200).json({
+      debug: {
+        slug,
+        projectId,
+        hasToken: !!token,
+        url,
+        status: response.status
+      },
+      raw
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch guide' });
+    res.status(500).json({ error: err.message });
   }
 }
