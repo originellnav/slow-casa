@@ -4,66 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Slow Casa</title>
-  <meta name="description" content="" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/slow-casa.css" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --white: #ffffff;
-      --black: #0f0f0f;
-      --grey-1: #888888;
-      --grey-2: #bbbbbb;
-      --grey-3: #e8e8e8;
-      --grey-4: #f5f5f3;
-      --serif: 'DM Serif Display', Georgia, serif;
-      --sans: 'DM Sans', system-ui, sans-serif;
-    }
-
-    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
     body { font-family: var(--sans); background: var(--white); color: var(--black); }
-    a { color: inherit; text-decoration: none; }
 
-    /* NAV */
+    /* NAV — sticky white on property page */
     nav {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
       padding: 28px 48px;
-      position: absolute;
-      top: 0; left: 0; right: 0;
+      border-bottom: 0.5px solid var(--grey-3);
+      position: sticky;
+      top: 0;
+      background: var(--white);
       z-index: 100;
     }
 
-    .wordmark {
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--white);
-      mix-blend-mode: normal;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 36px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-size: 13px;
-      color: rgba(255,255,255,0.8);
-      letter-spacing: 0.03em;
-    }
+    .nav-links a { color: var(--grey-1); }
+    .nav-links a:hover { color: var(--black); }
 
     /* HERO */
     .hero {
       width: 100%;
-      height: 90vh;
-      min-height: 500px;
+      height: 75vh;
+      min-height: 400px;
       background: var(--grey-4);
-      position: relative;
       overflow: hidden;
     }
 
@@ -71,6 +39,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       display: block;
     }
 
@@ -90,9 +59,7 @@
       padding: 64px 48px 0;
     }
 
-    .property-meta {
-      margin-bottom: 40px;
-    }
+    .property-meta { margin-bottom: 40px; }
 
     .location-label {
       font-size: 11px;
@@ -133,64 +100,154 @@
       background: var(--grey-3);
     }
 
-    /* DESCRIPTION */
+    /* FULL DESCRIPTION */
     .description {
       padding: 40px 0;
-      font-size: 17px;
-      line-height: 1.85;
-      color: var(--black);
       border-bottom: 0.5px solid var(--grey-3);
     }
 
-    /* GALLERY */
+    .description p {
+      font-size: 17px;
+      line-height: 1.85;
+      color: var(--black);
+      margin-bottom: 1.5em;
+    }
+
+    .description h2 {
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 400;
+      line-height: 1.25;
+      margin: 2.5em 0 0.75em;
+      letter-spacing: -0.01em;
+    }
+
+    .description blockquote {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-style: italic;
+      line-height: 1.4;
+      color: var(--grey-1);
+      margin: 2em 0;
+      padding-left: 24px;
+      border-left: 2px solid var(--grey-3);
+    }
+
+    /* GALLERY GRID — 4 images max then more photos */
     .gallery {
       padding: 40px 0;
+      border-bottom: 0.5px solid var(--grey-3);
     }
 
-    .gallery-full {
-      width: 100vw;
-      margin-left: calc(-50vw + 50%);
-      margin-bottom: 8px;
-    }
-
-    .gallery-full img {
-      width: 100%;
-      height: 70vh;
-      object-fit: cover;
-      display: block;
-    }
-
-    .gallery-pair {
+    .gallery-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
     }
 
-    .gallery-pair img {
+    .gallery-grid img {
       width: 100%;
       aspect-ratio: 4/3;
       object-fit: cover;
       display: block;
+      cursor: pointer;
+      transition: opacity 0.2s;
     }
 
-    .gallery-single {
-      margin-bottom: 8px;
-    }
+    .gallery-grid img:hover { opacity: 0.9; }
 
-    .gallery-single img {
-      width: 100%;
+    .gallery-grid img.gallery-first {
+      grid-column: 1 / -1;
       aspect-ratio: 16/9;
-      object-fit: cover;
+    }
+
+    .more-photos-btn {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      border: 0.5px solid var(--grey-3);
+      background: transparent;
+      color: var(--grey-1);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .more-photos-btn:hover {
+      border-color: var(--black);
+      color: var(--black);
+    }
+
+    /* LIGHTBOX */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox.open { display: flex; }
+
+    .lightbox-img {
+      max-width: 90vw;
+      max-height: 85vh;
+      object-fit: contain;
       display: block;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: var(--sans);
+    }
+
+    .lightbox-close:hover { color: var(--white); }
+
+    .lightbox-prev, .lightbox-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-size: 32px;
+      cursor: pointer;
+      padding: 16px;
+      line-height: 1;
+    }
+
+    .lightbox-prev:hover, .lightbox-next:hover { color: var(--white); }
+    .lightbox-prev { left: 16px; }
+    .lightbox-next { right: 16px; }
+
+    .lightbox-counter {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.1em;
     }
 
     /* CTA */
     .cta-section {
       padding: 64px 0 80px;
       text-align: center;
-      border-top: 0.5px solid var(--grey-3);
-      margin-top: 40px;
     }
 
     .cta-label {
@@ -213,44 +270,9 @@
       color: var(--black);
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
-      margin-bottom: 16px;
     }
 
-    .cta-button:hover {
-      background: var(--black);
-      color: var(--white);
-    }
-
-    .cta-context {
-      display: block;
-      font-size: 12px;
-      color: var(--grey-1);
-    }
-
-    /* FOOTER */
-    .footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 24px 48px;
-      border-top: 0.5px solid var(--grey-3);
-      max-width: 100%;
-    }
-
-    .footer-word {
-      font-size: 11px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--grey-1);
-    }
-
-    .footer-back {
-      font-size: 12px;
-      color: var(--grey-1);
-      cursor: pointer;
-    }
-
-    .footer-back:hover { color: var(--black); }
+    .cta-button:hover { background: var(--black); color: var(--white); }
 
     /* LOADING */
     .loading-state {
@@ -265,23 +287,24 @@
     @media (max-width: 768px) {
       nav { padding: 20px 24px; }
       .nav-links { display: none; }
-      .hero { height: 60vh; }
+      .hero { height: 55vh; }
       .content { padding: 40px 24px 0; }
       .property-name { font-size: 32px; }
-      .gallery-full img { height: 50vh; }
-      .gallery-pair { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .gallery-grid img.gallery-first { aspect-ratio: 4/3; }
       .cta-section { padding: 48px 0 64px; }
-      .footer { padding: 24px; flex-direction: column; gap: 12px; }
+      footer { padding: 24px; flex-direction: column; gap: 12px; }
     }
   </style>
 </head>
 <body>
 
   <nav>
+    <div></div>
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
-      <li><a href="/#directory">Directory</a></li>
-      <li><a href="#">Places</a></li>
+      <li><a href="/directory">Directory</a></li>
+      <li><a href="/places">Places</a></li>
       <li><a href="#">Newsletter</a></li>
       <li><a href="#">About</a></li>
     </ul>
@@ -291,13 +314,26 @@
     <div class="loading-state">Loading...</div>
   </div>
 
-  <footer class="footer">
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" onclick="closeLightbox()">Close ✕</button>
+    <button class="lightbox-prev" onclick="lightboxNav(-1)">&#8592;</button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="" />
+    <button class="lightbox-next" onclick="lightboxNav(1)">&#8594;</button>
+    <span class="lightbox-counter" id="lightbox-counter"></span>
+  </div>
+
+  <footer>
     <span class="footer-word">Slow Casa</span>
-    <a href="/" class="footer-back">← Back to directory</a>
+    <div class="footer-links">
+      <a href="/directory">← Back to directory</a>
+    </div>
   </footer>
 
   <script>
-    const RECORD_ID = new URLSearchParams(window.location.search).get('id');
+    var RECORD_ID = new URLSearchParams(window.location.search).get('id');
+    var allImages = [];
+    var lightboxIndex = 0;
 
     async function fetchProperty() {
       if (!RECORD_ID) {
@@ -305,101 +341,169 @@
         return;
       }
       try {
-        const res = await fetch(`/api/property?id=${RECORD_ID}`);
-        const data = await res.json();
+        var res = await fetch('/api/property?id=' + RECORD_ID);
+        var data = await res.json();
         if (data && data.fields) {
           renderProperty(data);
         } else {
           document.getElementById('app').innerHTML = '<div class="loading-state">Property not found.</div>';
         }
       } catch (err) {
-        console.error(err);
         document.getElementById('app').innerHTML = '<div class="loading-state">Something went wrong.</div>';
       }
     }
 
+    function getBestImageUrl(img) {
+      // Use full resolution — prefer thumbnails.full if available, else main url
+      if (img.thumbnails && img.thumbnails.full && img.thumbnails.full.url) {
+        return img.thumbnails.full.url;
+      }
+      return img.url;
+    }
+
     function getImages(fields) {
-      const all = [];
+      var all = [];
       if (fields['Images'] && fields['Images'].length) {
-        fields['Images'].forEach(img => all.push(img.url));
+        fields['Images'].forEach(function(img) { all.push(getBestImageUrl(img)); });
       }
       if (fields['Gallery'] && fields['Gallery'].length) {
-        fields['Gallery'].forEach(img => all.push(img.url));
+        fields['Gallery'].forEach(function(img) { all.push(getBestImageUrl(img)); });
       }
       return all;
     }
 
+    function parseFullDescription(text) {
+      if (!text) return '';
+      var html = '';
+      var lines = text.split('\n');
+      var inParagraph = false;
+
+      lines.forEach(function(line) {
+        line = line.trim();
+        if (!line) {
+          if (inParagraph) { html += '</p>'; inParagraph = false; }
+          return;
+        }
+        if (line.startsWith('## ')) {
+          if (inParagraph) { html += '</p>'; inParagraph = false; }
+          html += '<h2>' + line.replace('## ', '') + '</h2>';
+        } else if (line.startsWith('> ') || (line.startsWith('"') && line.endsWith('"'))) {
+          if (inParagraph) { html += '</p>'; inParagraph = false; }
+          html += '<blockquote>' + line.replace(/^> /, '').replace(/^"|"$/g, '') + '</blockquote>';
+        } else {
+          if (!inParagraph) { html += '<p>'; inParagraph = true; }
+          else { html += ' '; }
+          html += line;
+        }
+      });
+
+      if (inParagraph) html += '</p>';
+      return html;
+    }
+
     function renderGallery(images) {
       if (!images.length) return '';
-      let html = '<div class="gallery">';
-      let i = 0;
+      allImages = images;
 
-      if (images[0]) {
-        html += `<div class="gallery-full"><img src="${images[0]}" alt="" loading="lazy" /></div>`;
-        i = 1;
-      }
+      // Show max 4 images
+      var displayImages = images.slice(0, 4);
+      var hasMore = images.length > 4;
 
-      while (i < images.length) {
-        if (images[i] && images[i + 1]) {
-          html += `<div class="gallery-pair"><img src="${images[i]}" alt="" loading="lazy" /><img src="${images[i+1]}" alt="" loading="lazy" /></div>`;
-          i += 2;
-        } else if (images[i]) {
-          html += `<div class="gallery-single"><img src="${images[i]}" alt="" loading="lazy" /></div>`;
-          i++;
-        }
+      var html = '<div class="gallery">';
+      html += '<div class="gallery-grid">';
+
+      displayImages.forEach(function(url, i) {
+        var cls = i === 0 ? 'gallery-first' : '';
+        html += '<img src="' + url + '" alt="" loading="lazy" class="' + cls + '" onclick="openLightbox(' + i + ')" />';
+      });
+
+      html += '</div>';
+
+      if (hasMore) {
+        html += '<button class="more-photos-btn" onclick="openLightbox(0)">+ ' + (images.length - 4) + ' more photos</button>';
       }
 
       html += '</div>';
       return html;
     }
 
+    function openLightbox(index) {
+      lightboxIndex = index;
+      document.getElementById('lightbox-img').src = allImages[lightboxIndex];
+      document.getElementById('lightbox-counter').textContent = (lightboxIndex + 1) + ' / ' + allImages.length;
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function lightboxNav(dir) {
+      lightboxIndex = (lightboxIndex + dir + allImages.length) % allImages.length;
+      document.getElementById('lightbox-img').src = allImages[lightboxIndex];
+      document.getElementById('lightbox-counter').textContent = (lightboxIndex + 1) + ' / ' + allImages.length;
+    }
+
+    // Close lightbox on background click
+    document.getElementById('lightbox').addEventListener('click', function(e) {
+      if (e.target === this) closeLightbox();
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('lightbox').classList.contains('open')) return;
+      if (e.key === 'ArrowLeft') lightboxNav(-1);
+      if (e.key === 'ArrowRight') lightboxNav(1);
+      if (e.key === 'Escape') closeLightbox();
+    });
+
     function renderProperty(record) {
-      const f = record.fields;
-      const images = getImages(f);
-      const heroImage = images[0] || '';
-      const galleryImages = images.slice(1);
-      const bookingUrl = f['Booking URL'] || '#';
-      const bookingDomain = bookingUrl !== '#' ? new URL(bookingUrl).hostname.replace('www.', '') : '';
-      const sleeps = f['Sleeps'] ? `Sleeps ${f['Sleeps']}` : '';
-      const country = f['Country'] || '';
-      const tag = f['Tags'] ? (Array.isArray(f['Tags']) ? f['Tags'][0] : f['Tags']) : '';
+      var f = record.fields;
+      var images = getImages(f);
+      var heroImage = images[0] || '';
+      var galleryImages = images.slice(1);
+      var bookingUrl = f['Booking URL'] || '#';
+      var sleeps = f['Sleeps'] ? 'Sleeps ' + f['Sleeps'] : '';
+      var country = f['Country'] || '';
+      var tag = f['Tags'] ? (Array.isArray(f['Tags']) ? f['Tags'][0] : f['Tags']) : '';
 
-      document.title = `${f['Name'] || 'Property'} — Slow Casa`;
+      // Use Full description if available, fall back to Description
+      var bodyText = f['Full description'] || f['Description'] || '';
 
-      document.getElementById('app').innerHTML = `
-        <div class="hero">
-          ${heroImage
-            ? `<img src="${heroImage}" alt="${f['Name'] || ''}" />`
-            : `<div class="hero-skeleton"></div>`
-          }
-        </div>
+      document.title = (f['Name'] || 'Property') + ' — Slow Casa';
 
-        <div class="content">
-          <div class="property-meta">
-            <p class="location-label">${f['Location Label'] || ''}</p>
-            <h1 class="property-name">${f['Name'] || ''}</h1>
-            <div class="property-details">
-              ${sleeps ? `<span class="detail-item">${sleeps}</span>` : ''}
-              ${sleeps && country ? `<div class="detail-dot"></div>` : ''}
-              ${country ? `<span class="detail-item">${country}</span>` : ''}
-              ${tag && (sleeps || country) ? `<div class="detail-dot"></div>` : ''}
-              ${tag ? `<span class="detail-item">${tag}</span>` : ''}
-            </div>
-          </div>
+      var detailsHtml = '';
+      if (sleeps) detailsHtml += '<span class="detail-item">' + sleeps + '</span>';
+      if (sleeps && country) detailsHtml += '<div class="detail-dot"></div>';
+      if (country) detailsHtml += '<span class="detail-item">' + country + '</span>';
+      if (tag && (sleeps || country)) detailsHtml += '<div class="detail-dot"></div>';
+      if (tag) detailsHtml += '<span class="detail-item">' + tag + '</span>';
 
-          <div class="description">
-            ${f['Description'] ? f['Description'].split('\n').map(p => p ? `<p style="margin-bottom:1.5em">${p}</p>` : '').join('') : ''}
-          </div>
+      document.getElementById('app').innerHTML =
+        '<div class="hero">' +
+          (heroImage
+            ? '<img src="' + heroImage + '" alt="' + (f['Name'] || '') + '" />'
+            : '<div class="hero-skeleton"></div>') +
+        '</div>' +
 
-          ${renderGallery(galleryImages)}
+        '<div class="content">' +
+          '<div class="property-meta">' +
+            '<p class="location-label">' + (f['Location label'] || '') + '</p>' +
+            '<h1 class="property-name">' + (f['Name'] || '') + '</h1>' +
+            '<div class="property-details">' + detailsHtml + '</div>' +
+          '</div>' +
 
-          <div class="cta-section">
-            <p class="cta-label">Ready to stay here?</p>
-            <a href="${bookingUrl}" target="_blank" rel="noopener" class="cta-button">Book this property</a>
-            ${bookingDomain ? `<span class="cta-context">Book direct via ${bookingDomain}</span>` : ''}
-          </div>
-        </div>
-      `;
+          '<div class="description">' + parseFullDescription(bodyText) + '</div>' +
+
+          renderGallery(galleryImages) +
+
+          '<div class="cta-section">' +
+            '<p class="cta-label">Ready to stay here?</p>' +
+            '<a href="' + bookingUrl + '" target="_blank" rel="noopener" class="cta-button">Book this property</a>' +
+          '</div>' +
+        '</div>';
     }
 
     fetchProperty();
