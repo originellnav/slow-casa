@@ -106,6 +106,40 @@
 
     #latest-section .section-header { border-top: none; }
 
+    .criteria-section {
+      background: var(--grey-4);
+      padding: 96px 48px;
+      text-align: center;
+      border-bottom: 0.5px solid var(--grey-3);
+    }
+
+    .criteria-body {
+      font-family: var(--sans);
+      font-size: 18px;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--black);
+      max-width: 640px;
+      margin: 0 auto 36px;
+    }
+
+    .criteria-btn {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      border: 0.5px solid var(--black);
+      background: transparent;
+      color: var(--black);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+
+    .criteria-btn:hover { background: var(--black); color: var(--white); }
+
     .editorial { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
     .editorial-img { width: 100%; aspect-ratio: 4/3; background: var(--grey-4); overflow: hidden; }
     .editorial-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -294,6 +328,11 @@
         <div class="loading">Loading properties...</div>
       </div>
     </div>
+  </div>
+
+  <div class="criteria-section">
+    <p class="criteria-body">Slow Casa is an exclusive directory of exceptional homes in European nature. Drawn to design-first spaces and the people who shape them, we travel slowly and select carefully so you never have to.</p>
+    <a href="/criteria" class="criteria-btn">Our Criteria</a>
   </div>
 
   <div class="section">
