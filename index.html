@@ -13,7 +13,7 @@
       height: 85vh;
       min-height: 400px;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .hero-img {
@@ -67,21 +67,42 @@
       margin: 0 auto 32px;
     }
 
+    .try-form {
+      display: flex;
+      gap: 0;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .try-email {
+      flex: 1;
+      font-family: var(--sans);
+      font-size: 14px;
+      padding: 14px 18px;
+      border: 0.5px solid var(--black);
+      border-right: none;
+      background: transparent;
+      color: var(--black);
+      outline: none;
+    }
+
+    .try-email::placeholder { color: var(--grey-1); }
+
     .try-btn {
-      display: inline-block;
       font-family: var(--sans);
       font-size: 11px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      padding: 14px 36px;
+      padding: 14px 28px;
       border: 0.5px solid var(--black);
-      background: transparent;
-      color: var(--black);
+      background: var(--black);
+      color: var(--white);
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
     }
 
-    .try-btn:hover { background: var(--black); color: var(--white); }
+    .try-btn:hover { background: var(--white); color: var(--black); }
 
     .editorial { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
     .editorial-img { width: 100%; aspect-ratio: 4/3; background: var(--grey-4); overflow: hidden; }
@@ -114,6 +135,16 @@
       max-width: 540px;
       padding: 0 24px;
       z-index: 10;
+    }
+
+    .hero-subheadline {
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      color: rgba(255,255,255,0.85);
+      text-align: center;
+      margin-bottom: 14px;
     }
 
     .search-wrap { position: relative; }
@@ -149,9 +180,9 @@
       right: 0;
       background: var(--white);
       border-top: 0.5px solid var(--grey-3);
-      z-index: 200;
+      z-index: 9999;
       display: none;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     }
 
     .search-dropdown.open { display: block; }
@@ -180,28 +211,7 @@
 
     .dropdown-item:hover { background: var(--grey-4); }
 
-    .popular-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-      justify-content: center;
-    }
 
-    .chip {
-      font-family: var(--sans);
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 6px 14px;
-      background: rgba(255,255,255,0.15);
-      border: 0.5px solid rgba(255,255,255,0.5);
-      color: var(--white);
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .chip:hover { background: rgba(255,255,255,0.3); }
 
     @media (max-width: 768px) {
       .hero-headline { font-size: 48px; }
@@ -236,8 +246,9 @@
       <h1 class="hero-headline">Peace is the new luxury.</h1>
     </div>
     <div class="hero-search">
+      <p class="hero-subheadline">Modern vacation homes, rooted in nature</p>
       <div class="search-wrap">
-        <input class="search-input" type="text" placeholder="Discover your happy place" id="hero-search" autocomplete="off" />
+        <input class="search-input" type="text" placeholder="Where do you want to go?" id="hero-search" autocomplete="off" />
         <span class="search-arrow">&rarr;</span>
         <div class="search-dropdown" id="search-dropdown">
           <p class="dropdown-label">Popular locations</p>
@@ -250,21 +261,15 @@
           <button class="dropdown-item" onclick="goToLocation('Corsica')">Corsica</button>
         </div>
       </div>
-      <div class="popular-chips">
-        <button class="chip" onclick="goToLocation('Mallorca')">Mallorca</button>
-        <button class="chip" onclick="goToLocation('Ibiza')">Ibiza</button>
-        <button class="chip" onclick="goToLocation('Menorca')">Menorca</button>
-        <button class="chip" onclick="goToLocation('Catalonia')">Catalonia</button>
-        <button class="chip" onclick="goToLocation('Algarve')">Algarve</button>
-        <button class="chip" onclick="goToLocation('Puglia')">Puglia</button>
-        <button class="chip" onclick="goToLocation('Corsica')">Corsica</button>
-      </div>
     </div>
   </div>
 
   <div class="try-section">
-    <h2 class="try-headline">Try before you buy. Vacation homes rooted in nature and modern design.</h2>
-    <a href="/directory" class="try-btn">Discover new places every week</a>
+    <h2 class="try-headline">Try before you buy. Get design-first homes on your radar. One email every Thursday.</h2>
+    <form class="try-form" onsubmit="handleTrySubscribe(event)">
+      <input class="try-email" type="email" placeholder="Your email address" required />
+      <button class="try-btn" type="submit">Sign up</button>
+    </form>
   </div>
 
   <div style="padding-top:80px;">
@@ -373,6 +378,12 @@
 
     function handleSubscribe() {
       window.open('https://slowcasa.beehiiv.com/subscribe', '_blank');
+    }
+
+    function handleTrySubscribe(e) {
+      e.preventDefault();
+      var email = e.target.querySelector('.try-email').value;
+      window.open('https://slowcasa.beehiiv.com/subscribe?email=' + encodeURIComponent(email), '_blank');
     }
 
     fetchProperties().then(renderProperties);
