@@ -92,7 +92,7 @@
 
   <script>
     var params = new URLSearchParams(window.location.search);
-    var slug = params.get('slug');
+    var slug = params.get('slug') || window.location.pathname.split('/').pop();
     var category = params.get('category') || 'places';
 
     function renderBlock(block) {
