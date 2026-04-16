@@ -1,8 +1,8 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/journal/places/:slug", "destination": "/journal/place.html?slug=:slug&category=places" },
-    { "source": "/journal/interviews/:slug", "destination": "/journal/place.html?slug=:slug&category=interviews" },
-    { "source": "/journal/stories/:slug", "destination": "/journal/place.html?slug=:slug&category=stories" }
+    { "source": "/journal/places/:slug", "destination": "/journal/place?slug=:slug&category=places" },
+    { "source": "/journal/interviews/:slug", "destination": "/journal/place?slug=:slug&category=interviews" },
+    { "source": "/journal/stories/:slug", "destination": "/journal/place?slug=:slug&category=stories" }
   ]
 }
