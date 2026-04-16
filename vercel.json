@@ -1,6 +1,8 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/places/:slug", "destination": "/places/place.html?slug=:slug" }
+    { "source": "/journal/places/:slug", "destination": "/journal/place.html?slug=:slug&category=places" },
+    { "source": "/journal/interviews/:slug", "destination": "/journal/place.html?slug=:slug&category=interviews" },
+    { "source": "/journal/stories/:slug", "destination": "/journal/place.html?slug=:slug&category=stories" }
   ]
 }
