@@ -2,8 +2,11 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   const slug = req.query.slug;
+  if (!slug) {
+    return res.status(400).json({ error: 'slug required' });
+  }
+
   const projectId = 'hchp27po';
-const token = process.env.SANITY_TOKEN;
   const dataset = 'production';
   const apiVersion = '2024-01-01';
 
@@ -11,6 +14,7 @@ const token = process.env.SANITY_TOKEN;
     title,
     location,
     region,
+    publishedAt,
     "heroImage": heroImage.asset->url,
     body[]{
       ...,
@@ -22,26 +26,14 @@ const token = process.env.SANITY_TOKEN;
     }
   }`;
 
-  const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
+  const url = `https://${projectId}.apicdn.sanity.io/v${apiVersion}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    const raw = await response.json();
-    res.status(200).json({
-      debug: {
-        slug,
-        projectId,
-        hasToken: !!token,
-        url,
-        status: response.status
-      },
-      raw
-    });
+    const response = await fetch(url);
+    const data = await response.json();
+    res.status(200).json(data.result || null);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch guide' });
   }
 }
