@@ -25,4 +25,172 @@
     .article-body h2 { font-family: var(--serif); font-size: 28px; font-weight: 400; line-height: 1.25; margin: 2.5em 0 0.75em; letter-spacing: -0.01em; }
     .article-body h3 { font-size: 14px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-1); margin: 2em 0 0.75em; }
     .article-body a { color: var(--black); border-bottom: 0.5px solid var(--grey-3); transition: border-color 0.2s; }
-    .article-
+    .article-body a:hover { border-color: var(--black); }
+    .article-body strong { font-weight: 500; }
+    .article-body em { font-style: italic; }
+    .article-img { width: 100%; margin-top: 2.5em; margin-bottom: 0.75em; }
+    .article-img img { width: 100%; max-height: 480px; object-fit: cover; display: block; }
+    .article-img-caption { font-size: 12px; color: var(--grey-2); letter-spacing: 0.02em; margin-bottom: 2em; }
+    .places-properties { max-width: 1200px; margin: 0 auto; padding: 0 48px 80px; }
+    .section-header { display: flex; justify-content: space-between; align-items: baseline; border-top: 0.5px solid var(--grey-3); padding-top: 20px; margin-bottom: 40px; margin-top: 64px; }
+    .section-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); }
+    .section-link { font-size: 12px; color: var(--grey-1); transition: color 0.2s; }
+    .section-link:hover { color: var(--black); }
+    .property-card { cursor: pointer; }
+    .property-card:hover .card-img img { transform: scale(1.03); }
+    .card-img { width: 100%; aspect-ratio: 4/3; overflow: hidden; margin-bottom: 16px; background: var(--grey-4); }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
+    .card-location { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 6px; }
+    .card-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+    .card-detail { font-size: 13px; color: var(--grey-1); line-height: 1.5; }
+    .no-properties { font-size: 14px; color: var(--grey-1); padding: 32px 0; }
+    .loading-state { text-align: center; padding: 120px 48px; font-size: 13px; color: var(--grey-1); letter-spacing: 0.06em; }
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .hero { height: 55vh; }
+      .article { padding: 40px 24px 0; }
+      .article-title { font-size: 32px; }
+      .places-properties { padding: 0 24px 56px; }
+      .property-grid { grid-template-columns: 1fr; gap: 40px; }
+      footer { padding: 24px; flex-direction: column; gap: 20px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div></div>
+    <a href="/" class="wordmark">Slow Casa</a>
+    <ul class="nav-links">
+      <li><a href="/directory">Directory</a></li>
+      <li><a href="/journal">Journal</a></li>
+      <li><a href="#">Newsletter</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+  </nav>
+
+  <div id="app"><div class="loading-state">Loading...</div></div>
+
+  <div class="places-properties" id="properties-section" style="display:none">
+    <div class="section-header">
+      <span class="section-label" id="properties-label">Nearby properties</span>
+      <a href="/directory" class="section-link">View all properties</a>
+    </div>
+    <div class="property-grid" id="local-properties"></div>
+  </div>
+
+  <footer>
+    <span class="footer-word">Slow Casa</span>
+    <div class="footer-links">
+      <a href="/directory">Directory</a>
+      <a href="/journal">Journal</a>
+      <a href="#">Newsletter</a>
+      <a href="#">Instagram</a>
+    </div>
+  </footer>
+
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get('slug');
+    var category = params.get('category') || 'places';
+
+    function renderBlock(block) {
+      if (block._type === 'image') {
+        var html = '<div class="article-img"><img src="' + block.imageUrl + '" alt="' + (block.caption || '') + '" loading="lazy" /></div>';
+        if (block.caption) html += '<p class="article-img-caption">' + block.caption + '</p>';
+        return html;
+      }
+      if (block._type !== 'block') return '';
+      var tag = 'p';
+      if (block.style === 'h2') tag = 'h2';
+      if (block.style === 'h3') tag = 'h3';
+      var text = (block.children || []).map(function(child) {
+        var t = (child.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        if (child.marks && child.marks.length && block.markDefs) {
+          block.markDefs.forEach(function(def) {
+            if (child.marks.indexOf(def._key) !== -1 && def._type === 'link') {
+              t = '<a href="' + def.href + '" target="_blank" rel="noopener">' + t + '</a>';
+            }
+          });
+          if (child.marks.indexOf('strong') !== -1) t = '<strong>' + t + '</strong>';
+          if (child.marks.indexOf('em') !== -1) t = '<em>' + t + '</em>';
+        }
+        return t;
+      }).join('');
+      if (!text.trim()) return '';
+      return '<' + tag + '>' + text + '</' + tag + '>';
+    }
+
+    async function fetchGuide() {
+      if (!slug) { document.getElementById('app').innerHTML = '<div class="loading-state">Guide not found.</div>'; return; }
+      try {
+        var res = await fetch('/api/guide?slug=' + slug);
+        var data = await res.json();
+        if (data && data.title) { renderGuide(data); }
+        else { document.getElementById('app').innerHTML = '<div class="loading-state">Guide not found.</div>'; }
+      } catch (err) { document.getElementById('app').innerHTML = '<div class="loading-state">Something went wrong.</div>'; }
+    }
+
+    function categoryLabel(cat) {
+      if (cat === 'places') return 'Places';
+      if (cat === 'interviews') return 'Interviews';
+      return 'Journal';
+    }
+
+    function renderGuide(guide) {
+      document.title = guide.title + ' — Slow Casa';
+      var bodyHtml = (guide.body || []).map(renderBlock).join('');
+      document.getElementById('app').innerHTML =
+        '<div class="hero">' +
+          (guide.heroImage ? '<img src="' + guide.heroImage + '" alt="' + guide.title + '" />' : '<div class="hero-skeleton"></div>') +
+        '</div>' +
+        '<div class="article">' +
+          '<div class="article-meta">' +
+            '<p class="article-series">Journal · ' + categoryLabel(category) + (guide.location ? ' · ' + guide.location : '') + '</p>' +
+            '<h1 class="article-title">' + guide.title + '</h1>' +
+          '</div>' +
+          '<div class="article-body">' + bodyHtml + '</div>' +
+        '</div>';
+      if (guide.region) {
+        document.getElementById('properties-label').textContent = 'Stay in ' + guide.region;
+        document.getElementById('properties-section').style.display = 'block';
+        fetchLocalProperties(guide.region);
+      }
+    }
+
+    function getImageUrl(record) {
+      var images = record.fields['Images'];
+      if (images && images.length > 0) {
+        if (images[0].thumbnails && images[0].thumbnails.full) return images[0].thumbnails.full.url;
+        return images[0].url;
+      }
+      return null;
+    }
+
+    async function fetchLocalProperties(region) {
+      try {
+        var res = await fetch('/api/properties?all=true');
+        var data = await res.json();
+        var records = (data.records || []).filter(function(r) { return r.fields['Region'] === region; });
+        var grid = document.getElementById('local-properties');
+        if (!records.length) { grid.innerHTML = '<p class="no-properties">No properties listed here yet.</p>'; return; }
+        grid.innerHTML = records.map(function(record) {
+          var f = record.fields;
+          var imgUrl = getImageUrl(record);
+          return '<a href="/property.html?id=' + record.id + '" style="text-decoration:none;color:inherit;">' +
+            '<div class="property-card">' +
+              '<div class="card-img">' + (imgUrl ? '<img src="' + imgUrl + '" alt="' + (f['Name']||'') + '" loading="lazy"/>' : '<div style="width:100%;height:100%;background:var(--grey-4)"></div>') + '</div>' +
+              '<p class="card-location">' + (f['Location label']||'') + '</p>' +
+              '<p class="card-name">' + (f['Name']||'') + '</p>' +
+              '<p class="card-detail">' + (f['Description'] ? f['Description'].substring(0,80)+'...' : '') + '</p>' +
+            '</div>' +
+          '</a>';
+        }).join('');
+      } catch (err) { console.error(err); }
+    }
+
+    fetchGuide();
+  </script>
+</body>
+</html>
