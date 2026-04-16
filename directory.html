@@ -167,8 +167,8 @@
     <div></div>
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
-      <li><a href="/directory.html">Directory</a></li>
-      <li><a href="#">Places</a></li>
+      <li><a href="/directory">Directory</a></li>
+      <li><a href="/journal">Journal</a></li>
       <li><a href="#">Newsletter</a></li>
       <li><a href="#">About</a></li>
     </ul>
@@ -200,7 +200,7 @@
   <footer>
     <span class="footer-word" style="font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:#888888;">Slow Casa</span>
     <div class="footer-links">
-      <a href="/directory.html">Directory</a>
+      <a href="/directory">Directory</a>
       <a href="#">Newsletter</a>
       <a href="#">Submit a property</a>
       <a href="#">Instagram</a>
@@ -210,6 +210,7 @@
   <script>
     var allRecords = [];
     var activeFilter = 'all';
+    var locationQuery = new URLSearchParams(window.location.search).get('location') || '';
 
     async function fetchProperties() {
       try {
@@ -239,12 +240,31 @@
       var grid = document.getElementById('property-grid');
       var count = document.getElementById('property-count');
 
-      var filtered = activeFilter === 'all' ? records : records.filter(function(r) {
-        var tags = r.fields['Tags'];
-        return tags && tags.indexOf(activeFilter) !== -1;
-      });
+      var filtered = records;
 
-      count.textContent = filtered.length + (filtered.length === 1 ? ' property' : ' properties');
+      // Apply location search
+      if (locationQuery) {
+        var q = locationQuery.toLowerCase();
+        filtered = filtered.filter(function(r) {
+          var f = r.fields;
+          return (f['Region'] || '').toLowerCase().includes(q) ||
+                 (f['Country'] || '').toLowerCase().includes(q) ||
+                 (f['Town'] || '').toLowerCase().includes(q) ||
+                 (f['Location label'] || '').toLowerCase().includes(q);
+        });
+      }
+
+      // Apply tag filter
+      if (activeFilter !== 'all') {
+        filtered = filtered.filter(function(r) {
+          var tags = r.fields['Tags'];
+          return tags && tags.indexOf(activeFilter) !== -1;
+        });
+      }
+
+      var countText = filtered.length + (filtered.length === 1 ? ' property' : ' properties');
+      if (locationQuery) countText = filtered.length + (filtered.length === 1 ? ' property' : ' properties') + ' in ' + locationQuery;
+      count.textContent = countText;
 
       if (!filtered.length) {
         grid.innerHTML = '<div class="no-results"><p>No properties found.</p></div>';
