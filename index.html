@@ -104,8 +104,108 @@
     .newsletter-submit:hover { background: var(--black); color: var(--white); }
     .newsletter-small { font-size: 11px; color: var(--grey-2); }
 
+    /* SEARCH */
+    .hero-search {
+      position: absolute;
+      bottom: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 540px;
+      padding: 0 24px;
+      z-index: 10;
+    }
+
+    .search-wrap { position: relative; }
+
+    .search-input {
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 15px;
+      padding: 16px 48px 16px 20px;
+      border: none;
+      background: rgba(255,255,255,0.95);
+      color: var(--black);
+      outline: none;
+      letter-spacing: 0.01em;
+    }
+
+    .search-input::placeholder { color: var(--grey-1); }
+
+    .search-arrow {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--grey-1);
+      pointer-events: none;
+      font-size: 18px;
+    }
+
+    .search-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border-top: 0.5px solid var(--grey-3);
+      z-index: 200;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    .search-dropdown.open { display: block; }
+
+    .dropdown-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      padding: 12px 20px 6px;
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 10px 20px;
+      font-size: 14px;
+      color: var(--black);
+      cursor: pointer;
+      transition: background 0.15s;
+      text-align: left;
+      border: none;
+      background: none;
+      font-family: var(--sans);
+    }
+
+    .dropdown-item:hover { background: var(--grey-4); }
+
+    .popular-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+
+    .chip {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.15);
+      border: 0.5px solid rgba(255,255,255,0.5);
+      color: var(--white);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .chip:hover { background: rgba(255,255,255,0.3); }
+
     @media (max-width: 768px) {
       .hero-headline { font-size: 48px; }
+      .hero-search { bottom: 32px; }
       .try-section { padding: 64px 24px; }
       .try-headline { font-size: 22px; }
       .editorial { grid-template-columns: 1fr; gap: 32px; }
@@ -123,7 +223,7 @@
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
       <li><a href="/directory">Directory</a></li>
-      <li><a href="/places">Places</a></li>
+      <li><a href="/journal">Journal</a></li>
       <li><a href="#">Newsletter</a></li>
       <li><a href="#">About</a></li>
     </ul>
@@ -134,6 +234,31 @@
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <h1 class="hero-headline">Peace is the new luxury.</h1>
+    </div>
+    <div class="hero-search">
+      <div class="search-wrap">
+        <input class="search-input" type="text" placeholder="Discover your happy place" id="hero-search" autocomplete="off" />
+        <span class="search-arrow">&rarr;</span>
+        <div class="search-dropdown" id="search-dropdown">
+          <p class="dropdown-label">Popular locations</p>
+          <button class="dropdown-item" onclick="goToLocation('Mallorca')">Mallorca</button>
+          <button class="dropdown-item" onclick="goToLocation('Ibiza')">Ibiza</button>
+          <button class="dropdown-item" onclick="goToLocation('Menorca')">Menorca</button>
+          <button class="dropdown-item" onclick="goToLocation('Catalonia')">Catalonia</button>
+          <button class="dropdown-item" onclick="goToLocation('Algarve')">Algarve</button>
+          <button class="dropdown-item" onclick="goToLocation('Puglia')">Puglia</button>
+          <button class="dropdown-item" onclick="goToLocation('Corsica')">Corsica</button>
+        </div>
+      </div>
+      <div class="popular-chips">
+        <button class="chip" onclick="goToLocation('Mallorca')">Mallorca</button>
+        <button class="chip" onclick="goToLocation('Ibiza')">Ibiza</button>
+        <button class="chip" onclick="goToLocation('Menorca')">Menorca</button>
+        <button class="chip" onclick="goToLocation('Catalonia')">Catalonia</button>
+        <button class="chip" onclick="goToLocation('Algarve')">Algarve</button>
+        <button class="chip" onclick="goToLocation('Puglia')">Puglia</button>
+        <button class="chip" onclick="goToLocation('Corsica')">Corsica</button>
+      </div>
     </div>
   </div>
 
@@ -157,7 +282,7 @@
   <div class="section">
     <div class="section-header">
       <span class="section-label">From the journal · 100 towns</span>
-      <a href="/places" class="section-link">All towns</a>
+      <a href="/journal" class="section-link">All towns</a>
     </div>
     <div class="editorial">
       <div class="editorial-img">
@@ -167,7 +292,7 @@
         <p class="editorial-label">Town No. 01 · Mallorca</p>
         <h2 class="editorial-title">Deià, and the particular silence of the Tramuntana</h2>
         <p class="editorial-body">The road into Deià drops through terraced olive groves older than any building in the village. There are no chains here, no branded anything. Just stone, sea light, and the sound of water moving somewhere below the road.</p>
-        <a href="/places/deia" class="editorial-link">Read more</a>
+        <a href="/journal/places/deia" class="editorial-link">Read more</a>
       </div>
     </div>
   </div>
@@ -251,6 +376,34 @@
     }
 
     fetchProperties().then(renderProperties);
+
+    // Search
+    var searchInput = document.getElementById('hero-search');
+    var searchDropdown = document.getElementById('search-dropdown');
+
+    searchInput.addEventListener('focus', function() {
+      searchDropdown.classList.add('open');
+    });
+
+    searchInput.addEventListener('input', function() {
+      searchDropdown.classList.add('open');
+    });
+
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && searchInput.value.trim()) {
+        goToLocation(searchInput.value.trim());
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.search-wrap')) {
+        searchDropdown.classList.remove('open');
+      }
+    });
+
+    function goToLocation(location) {
+      window.location.href = '/directory?location=' + encodeURIComponent(location);
+    }
   </script>
 
 </body>
