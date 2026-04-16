@@ -104,6 +104,8 @@
 
     .try-btn:hover { background: var(--white); color: var(--black); }
 
+    #latest-section .section-header { border-top: none; }
+
     .editorial { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
     .editorial-img { width: 100%; aspect-ratio: 4/3; background: var(--grey-4); overflow: hidden; }
     .editorial-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -154,7 +156,7 @@
       width: 100%;
       font-family: var(--sans);
       font-size: 15px;
-      padding: 16px 48px 16px 20px;
+      padding: 16px 90px 16px 20px;
       border: none;
       background: rgba(255,255,255,0.95);
       color: var(--black);
@@ -164,15 +166,24 @@
 
     .search-input::placeholder { color: var(--grey-1); }
 
-    .search-arrow {
+    .search-btn {
       position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--grey-1);
-      pointer-events: none;
-      font-size: 18px;
+      right: 0;
+      top: 0;
+      height: 100%;
+      padding: 0 20px;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #8B7355;
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
     }
+
+    .search-btn:hover { background: #6B5635; }
 
     .search-dropdown {
       position: absolute;
@@ -244,13 +255,13 @@
     <img class="hero-img" src="/hero.jpg" alt="Slow Casa" />
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1 class="hero-headline">Peace is the new luxury.</h1>
+      <h1 class="hero-headline">Peace is the new luxury</h1>
     </div>
     <div class="hero-search">
-      <p class="hero-subheadline">Modern vacation homes, rooted in nature</p>
+      <p class="hero-subheadline">Modern vacation homes, rooted in nature.</p>
       <div class="search-wrap">
         <input class="search-input" type="text" placeholder="Where do you want to go?" id="hero-search" autocomplete="off" />
-        <span class="search-arrow">&rarr;</span>
+        <button class="search-btn" onclick="goToLocation(document.getElementById('hero-search').value || '')">Search</button>
         <div class="search-dropdown" id="search-dropdown">
           <p class="dropdown-label">Popular locations</p>
           <button class="dropdown-item" onclick="goToLocation('Mallorca')">Mallorca</button>
@@ -274,7 +285,7 @@
   </div>
 
   <div style="padding-top:80px;">
-    <div class="section">
+    <div class="section" id="latest-section">
       <div class="section-header">
         <span class="section-label">Latest additions</span>
         <a href="/directory" class="section-link">View all</a>
@@ -287,20 +298,10 @@
 
   <div class="section">
     <div class="section-header">
-      <span class="section-label">From the journal · 100 towns</span>
-      <a href="/journal" class="section-link">All towns</a>
+      <span class="section-label">From the Journal</span>
+      <a href="/journal" class="section-link">View all</a>
     </div>
-    <div class="editorial">
-      <div class="editorial-img">
-        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" alt="Mallorca" onerror="this.parentElement.style.background='#f5f5f3'" />
-      </div>
-      <div>
-        <p class="editorial-label">Town No. 01 · Mallorca</p>
-        <h2 class="editorial-title">Deià, and the particular silence of the Tramuntana</h2>
-        <p class="editorial-body">The road into Deià drops through terraced olive groves older than any building in the village. There are no chains here, no branded anything. Just stone, sea light, and the sound of water moving somewhere below the road.</p>
-        <a href="/journal/places/deia" class="editorial-link">Read more</a>
-      </div>
-    </div>
+    <div class="editorial" id="journal-feature"><div class="loading" style="grid-column:1/-1;padding:40px 0;font-size:13px;color:var(--grey-1);letter-spacing:0.06em;">Loading...</div></div>
   </div>
 
   <div class="newsletter-strip">
@@ -308,7 +309,7 @@
       <div>
         <p class="newsletter-label">The newsletter</p>
         <h2 class="newsletter-title">New homes and slow places, every week.</h2>
-        <p class="newsletter-sub">Five handpicked properties added to the directory each week, plus a deep dive on one town worth knowing about.</p>
+        <p class="newsletter-sub">Get our latest, handpicked homes and slow living travel intel. One email. Every Thursday.</p>
       </div>
       <div class="newsletter-form">
         <input class="newsletter-input" type="email" placeholder="your@email.com" />
@@ -322,9 +323,9 @@
     <span class="footer-word">Slow Casa</span>
     <div class="footer-links">
       <a href="/directory">Directory</a>
-      <a href="#">Newsletter</a>
-      <a href="#">Submit a property</a>
-      <a href="#">Instagram</a>
+      <a href="/journal">Journal</a>
+      <a href="https://slowcasa.beehiiv.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
     </div>
   </footer>
 
@@ -388,6 +389,29 @@
     }
 
     fetchProperties().then(renderProperties);
+
+    // Fetch latest journal post
+    async function fetchLatestPost() {
+      try {
+        var res = await fetch('/api/journal');
+        var posts = await res.json();
+        if (!posts || !posts.length) return;
+        var post = posts[0];
+        var url = '/journal/' + (post.category || 'places') + '/' + post.slug;
+        var feature = document.getElementById('journal-feature');
+        feature.innerHTML =
+          '<div class="editorial-img"><a href="' + url + '">' +
+            (post.heroImage ? '<img src="' + post.heroImage + '" alt="' + post.title + '" loading="lazy" />' : '') +
+          '</a></div>' +
+          '<div>' +
+            '<p class="editorial-label">Places · ' + (post.location || '') + '</p>' +
+            '<h2 class="editorial-title">' + post.title + '</h2>' +
+            '<a href="' + url + '" class="editorial-link">Read more</a>' +
+          '</div>';
+      } catch (err) { console.error(err); }
+    }
+
+    fetchLatestPost();
 
     // Search
     var searchInput = document.getElementById('hero-search');
