@@ -403,7 +403,7 @@
         var name = f['Name'] || '';
         var desc = f['Description'] ? f['Description'].substring(0, 80) + '...' : '';
         var tag = f['Tags'] && f['Tags'].length ? f['Tags'][0] : '';
-        return '<a href="/property.html?id=' + record.id + '" style="text-decoration:none;color:inherit;">' +
+        var slug = record.fields && record.fields['Slug']; var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id; return '<a href="' + url + '" style="text-decoration:none;color:inherit;">' +
           '<div class="property-card fade-in ' + delay + '">' +
             '<div class="card-img">' +
               (imgUrl ? '<img src="' + imgUrl + '" alt="' + name + '" loading="lazy" />' : '<div class="card-img-placeholder skeleton"></div>') +
