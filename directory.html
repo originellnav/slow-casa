@@ -122,8 +122,12 @@
     .property-card { cursor: pointer; }
     .property-card:hover .card-img img { transform: scale(1.03); }
 
-    .card-img { width: 100%; aspect-ratio: 4/3; overflow: hidden; margin-bottom: 16px; background: var(--grey-4); }
-    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
+    .card-img { width: 100%; aspect-ratio: 4/3; overflow: hidden; margin-bottom: 16px; background: var(--grey-4); position: relative; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; top: 0; left: 0; transition: opacity 0.4s ease; }
+    .card-img img.img-primary { opacity: 1; }
+    .card-img img.img-secondary { opacity: 0; }
+    .property-card:hover .card-img img.img-primary { opacity: 0; }
+    .property-card:hover .card-img img.img-secondary { opacity: 1; }
     .card-img-placeholder { width: 100%; height: 100%; background: var(--grey-4); }
 
     .card-location { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 6px; }
@@ -281,7 +285,8 @@
 
       grid.innerHTML = filtered.map(function(record, i) {
         var f = record.fields;
-        var imgUrl = getImageUrl(record);
+        var imgUrl = getImageUrl(record, 0);
+        var imgUrl2 = getImageUrl(record, 1) || imgUrl;
         var location = f['Location label'] || '';
         var name = f['Name'] || '';
         var desc = f['Description'] ? f['Description'].substring(0, 80) + '...' : '';
