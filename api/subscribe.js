@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.beehiiv.com/v2/publications/98ef614b-1c4e-46df-b312-dce94dc248c9/subscriptions', {
+    const response = await fetch('https://api.beehiiv.com/v2/publications/pub_98ef614b-1c4e-46df-b312-dce94dc248c9/subscriptions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
