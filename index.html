@@ -437,7 +437,7 @@
         });
         if (res.ok) {
           input.value = '';
-          btn.textContent = 'You're in!';
+          btn.textContent = "You're in!";
           setTimeout(function() { btn.textContent = 'Subscribe — it's free'; btn.disabled = false; }, 3000);
         } else {
           btn.textContent = 'Subscribe — it's free';
@@ -463,7 +463,7 @@
           body: JSON.stringify({ email: email })
         });
         if (res.ok) {
-          input.parentElement.innerHTML = '<p style="font-size:14px;color:var(--grey-1);letter-spacing:0.02em;">You're in. See you Thursday.</p>';
+          input.parentElement.innerHTML = '<p style="font-size:14px;color:var(--grey-1);letter-spacing:0.02em;">You\'re in. See you Thursday.</p>';
         } else {
           btn.textContent = 'Sign up';
           btn.disabled = false;
