@@ -265,11 +265,13 @@
       var delay = i < 6 ? 'style="animation-delay:' + (i * 0.05) + 's"' : '';
       var slug = f['Slug'];
       var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id;
+      var isNew = f['Date added'] && (new Date() - new Date(f['Date added'])) < 7 * 24 * 60 * 60 * 1000;
       return '<a href="' + url + '" style="text-decoration:none;color:inherit;">' +
         '<div class="property-card fade-in" ' + delay + '>' +
           '<div class="card-img">' +
             (imgUrl ? '<img src="' + imgUrl + '" alt="' + name + '" loading="lazy" class="img-primary" />' : '') +
             (imgUrl2 ? '<img src="' + imgUrl2 + '" alt="' + name + '" loading="lazy" class="img-secondary" />' : '') +
+            (isNew ? '<span class="card-new-badge">New</span>' : '') +
           '</div>' +
           '<p class="card-location">' + location + '</p>' +
           '<p class="card-name">' + name + '</p>' +
