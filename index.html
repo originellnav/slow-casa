@@ -391,9 +391,10 @@
       } catch (err) { return []; }
     }
 
-    function getImageUrl(record) {
+    function getImageUrl(record, index) {
+      index = index || 0;
       var images = record.fields['Images'];
-      if (images && images.length > 0) return images[0].url;
+      if (images && images.length > index) return images[index].url;
       return null;
     }
 
@@ -405,7 +406,8 @@
       }
       grid.innerHTML = records.map(function(record, i) {
         var f = record.fields;
-        var imgUrl = getImageUrl(record);
+        var imgUrl = getImageUrl(record, 0);
+        var imgUrl2 = getImageUrl(record, 1) || imgUrl;
         var delay = i < 3 ? 'delay-' + (i + 1) : '';
         var location = f['Location label'] || '';
         var name = f['Name'] || '';
@@ -414,7 +416,8 @@
         var slug = record.fields && record.fields['Slug']; var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id; return '<a href="' + url + '" style="text-decoration:none;color:inherit;">' +
           '<div class="property-card fade-in ' + delay + '">' +
             '<div class="card-img">' +
-              (imgUrl ? '<img src="' + imgUrl + '" alt="' + name + '" loading="lazy" />' : '<div class="card-img-placeholder skeleton"></div>') +
+              (imgUrl ? '<img src="' + imgUrl + '" alt="' + name + '" loading="lazy" class="img-primary" />' : '') +
+              (imgUrl2 ? '<img src="' + imgUrl2 + '" alt="' + name + '" loading="lazy" class="img-secondary" />' : '') +
             '</div>' +
             '<p class="card-location">' + location + '</p>' +
             '<p class="card-name">' + name + '</p>' +
