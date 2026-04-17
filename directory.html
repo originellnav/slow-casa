@@ -222,6 +222,9 @@
     var allRecords = [];
     var activeFilter = 'all';
     var locationQuery = new URLSearchParams(window.location.search).get('location') || '';
+    var PAGE_SIZE = 30;
+    var currentPage = 0;
+    var currentFiltered = [];
 
     async function fetchProperties() {
       try {
@@ -251,11 +254,46 @@
       renderProperties(allRecords);
     }
 
+    function renderCard(record, i) {
+      var f = record.fields;
+      var imgUrl = getImageUrl(record, 0);
+      var imgUrl2 = getImageUrl(record, 1) || imgUrl;
+      var location = f['Location label'] || '';
+      var name = f['Name'] || '';
+      var desc = f['Description'] ? f['Description'].substring(0, 80) + '...' : '';
+      var tag = f['Tags'] && f['Tags'].length ? f['Tags'][0] : '';
+      var delay = i < 6 ? 'style="animation-delay:' + (i * 0.05) + 's"' : '';
+      var slug = f['Slug'];
+      var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id;
+      return '<a href="' + url + '" style="text-decoration:none;color:inherit;">' +
+        '<div class="property-card fade-in" ' + delay + '>' +
+          '<div class="card-img">' +
+            (imgUrl ? '<img src="' + imgUrl + '" alt="' + name + '" loading="lazy" class="img-primary" />' : '') +
+            (imgUrl2 ? '<img src="' + imgUrl2 + '" alt="' + name + '" loading="lazy" class="img-secondary" />' : '') +
+          '</div>' +
+          '<p class="card-location">' + location + '</p>' +
+          '<p class="card-name">' + name + '</p>' +
+          '<p class="card-detail">' + desc + '</p>' +
+          (tag ? '<span class="card-tag">' + tag + '</span>' : '') +
+        '</div>' +
+      '</a>';
+    }
+
     function renderProperties(records) {
       var grid = document.getElementById('property-grid');
       var count = document.getElementById('property-count');
 
-      var filtered = records;
+      // Remove blank records
+      var filtered = records.filter(function(r) {
+        return r.fields['Name'] && r.fields['Images'] && r.fields['Images'].length > 0;
+      });
+
+      // Sort by Date added descending
+      filtered.sort(function(a, b) {
+        var da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
+        var db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
+        return db - da;
+      });
 
       // Apply location search
       if (locationQuery) {
@@ -277,38 +315,41 @@
         });
       }
 
+      currentFiltered = filtered;
+      currentPage = 0;
+
       var countText = filtered.length + (filtered.length === 1 ? ' property' : ' properties');
-      if (locationQuery) countText = filtered.length + (filtered.length === 1 ? ' property' : ' properties') + ' in ' + locationQuery;
+      if (locationQuery) countText = filtered.length + ' ' + (filtered.length === 1 ? 'property' : 'properties') + ' in ' + locationQuery;
       count.textContent = countText;
 
       if (!filtered.length) {
         grid.innerHTML = '<div class="no-results"><p>No properties found.</p></div>';
+        document.getElementById('load-more-wrap').style.display = 'none';
         return;
       }
 
-      grid.innerHTML = filtered.map(function(record, i) {
-        var f = record.fields;
-        var imgUrl = getImageUrl(record, 0);
-        var imgUrl2 = getImageUrl(record, 1) || imgUrl;
-        var location = f['Location label'] || '';
-        var name = f['Name'] || '';
-        var desc = f['Description'] ? f['Description'].substring(0, 80) + '...' : '';
-        var tag = f['Tags'] && f['Tags'].length ? f['Tags'][0] : '';
-        var delay = i < 6 ? 'style="animation-delay:' + (i * 0.05) + 's"' : '';
+      var page = filtered.slice(0, PAGE_SIZE);
+      grid.innerHTML = page.map(renderCard).join('');
+      updateLoadMore();
+    }
 
-        var slug = record.fields['Slug']; var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id; return '<a href="' + url + '" style="text-decoration:none;color:inherit;">' +
-          '<div class="property-card fade-in" ' + delay + '>' +
-            '<div class="card-img">' +
-              '<img src="' + imgUrl + '" alt="' + name + '" loading="lazy" class="img-primary" />' +
-              '<img src="' + imgUrl2 + '" alt="' + name + '" loading="lazy" class="img-secondary" />' +
-            '</div>' +
-            '<p class="card-location">' + location + '</p>' +
-            '<p class="card-name">' + name + '</p>' +
-            '<p class="card-detail">' + desc + '</p>' +
-            (tag ? '<span class="card-tag">' + tag + '</span>' : '') +
-          '</div>' +
-        '</a>';
-      }).join('');
+    function updateLoadMore() {
+      var wrap = document.getElementById('load-more-wrap');
+      var shown = (currentPage + 1) * PAGE_SIZE;
+      if (shown < currentFiltered.length) {
+        wrap.style.display = 'block';
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+
+    function loadMore() {
+      currentPage++;
+      var grid = document.getElementById('property-grid');
+      var start = currentPage * PAGE_SIZE;
+      var nextPage = currentFiltered.slice(start, start + PAGE_SIZE);
+      grid.innerHTML += nextPage.map(renderCard).join('');
+      updateLoadMore();
     }
 
     fetchProperties().then(function(records) {
