@@ -182,6 +182,7 @@
       color: rgba(255,255,255,0.9);
       text-align: center;
       margin-bottom: 20px;
+      transition: opacity 0.4s ease;
     }
 
     .search-wrap { position: relative; }
@@ -300,7 +301,7 @@
       <h1 class="hero-headline">Peace is the new luxury</h1>
     </div>
     <div class="hero-search">
-      <p class="hero-subheadline">Modern vacation homes, rooted in nature.</p>
+      <p class="hero-subheadline" id="hero-sub">Modern vacation homes, rooted in nature.</p>
       <div class="search-wrap">
         <input class="search-input" type="text" placeholder="Where do you want to go?" id="hero-search" autocomplete="off" />
         <button class="search-btn" onclick="goToLocation(document.getElementById('hero-search').value || '')">Search</button>
@@ -487,6 +488,23 @@
     }
 
     fetchProperties().then(renderProperties);
+
+    // Rotating subheadline
+    var sublines = [
+      'Modern vacation homes, rooted in nature.',
+      'Handpicked architectural homes across Europe.',
+      'Try slow living, second home locations before you buy.'
+    ];
+    var subIndex = 0;
+    var subEl = document.getElementById('hero-sub');
+    setInterval(function() {
+      subEl.style.opacity = '0';
+      setTimeout(function() {
+        subIndex = (subIndex + 1) % sublines.length;
+        subEl.textContent = sublines[subIndex];
+        subEl.style.opacity = '1';
+      }, 400);
+    }, 4000);
 
     // Fetch latest journal post
     async function fetchLatestPost() {
