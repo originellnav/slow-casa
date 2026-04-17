@@ -7,6 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/slow-casa.css" />
+  <meta name="description" content="Design-first vacation homes in European nature. Slow Casa." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Slow Casa" />
   <style>
     body { font-family: var(--sans); background: var(--white); color: var(--black); }
 
@@ -443,7 +446,28 @@
       var bodyText = f['Full description'] || f['Description'] || '';
       var quote = extractQuote(bodyText);
 
-      document.title = (f['Name'] || 'Property') + ' — Slow Casa';
+      var metaTitle = (f['Name'] || 'Property') + ' · ' + (f['Location label'] || '') + ' — Slow Casa';
+      document.title = metaTitle;
+
+      // Meta description
+      var metaDesc = f['Description'] || '';
+      if (metaDesc.length > 155) metaDesc = metaDesc.substring(0, 152) + '...';
+      var descTag = document.querySelector('meta[name="description"]');
+      if (!descTag) { descTag = document.createElement('meta'); descTag.name = 'description'; document.head.appendChild(descTag); }
+      descTag.content = metaDesc;
+
+      // OG tags
+      var ogTitle = document.querySelector('meta[property="og:title"]');
+      if (!ogTitle) { ogTitle = document.createElement('meta'); ogTitle.setAttribute('property', 'og:title'); document.head.appendChild(ogTitle); }
+      ogTitle.content = metaTitle;
+
+      var ogDesc = document.querySelector('meta[property="og:description"]');
+      if (!ogDesc) { ogDesc = document.createElement('meta'); ogDesc.setAttribute('property', 'og:description'); document.head.appendChild(ogDesc); }
+      ogDesc.content = metaDesc;
+
+      var ogImg = document.querySelector('meta[property="og:image"]');
+      if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property', 'og:image'); document.head.appendChild(ogImg); }
+      ogImg.content = heroImage || '';
 
       document.getElementById('app').innerHTML =
         '<div class="hero" style="overflow:visible;position:relative;">' +
