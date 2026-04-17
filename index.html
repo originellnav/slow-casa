@@ -438,13 +438,13 @@
         if (res.ok) {
           input.value = '';
           btn.textContent = "You're in!";
-          setTimeout(function() { btn.textContent = 'Subscribe — it's free'; btn.disabled = false; }, 3000);
+          setTimeout(function() { btn.textContent = 'Subscribe — it\'s free'; btn.disabled = false; }, 3000);
         } else {
-          btn.textContent = 'Subscribe — it's free';
+          btn.textContent = 'Subscribe — it\'s free';
           btn.disabled = false;
         }
       } catch (err) {
-        btn.textContent = 'Subscribe — it's free';
+        btn.textContent = 'Subscribe — it\'s free';
         btn.disabled = false;
       }
     }
