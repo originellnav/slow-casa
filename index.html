@@ -352,7 +352,7 @@
       </div>
       <div class="newsletter-form">
         <input class="newsletter-input" type="email" placeholder="your@email.com" />
-        <button class="newsletter-submit" onclick="handleSubscribe()">Subscribe — it's free</button>
+        <button class="newsletter-submit" onclick="handleNewsletterSubscribe(event)">Subscribe — it's free</button>
         <p class="newsletter-small">No spam. Unsubscribe any time.</p>
       </div>
     </div>
@@ -421,10 +421,58 @@
       window.open('https://slowcasa.beehiiv.com/subscribe', '_blank');
     }
 
-    function handleTrySubscribe(e) {
+    async function handleNewsletterSubscribe(e) {
       e.preventDefault();
-      var email = e.target.querySelector('.try-email').value;
-      window.open('https://slowcasa.beehiiv.com/subscribe?email=' + encodeURIComponent(email), '_blank');
+      var input = document.querySelector('.newsletter-input');
+      var btn = e.target;
+      var email = input.value;
+      if (!email || !email.includes('@')) return;
+      btn.textContent = 'Subscribing...';
+      btn.disabled = true;
+      try {
+        var res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        if (res.ok) {
+          input.value = '';
+          btn.textContent = 'You're in!';
+          setTimeout(function() { btn.textContent = 'Subscribe — it's free'; btn.disabled = false; }, 3000);
+        } else {
+          btn.textContent = 'Subscribe — it's free';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        btn.textContent = 'Subscribe — it's free';
+        btn.disabled = false;
+      }
+    }
+
+    async function handleTrySubscribe(e) {
+      e.preventDefault();
+      var form = e.target;
+      var email = form.querySelector('.try-email').value;
+      var btn = form.querySelector('.try-btn');
+      btn.textContent = 'Subscribing...';
+      btn.disabled = true;
+      try {
+        var res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        if (res.ok) {
+          form.innerHTML = '<p style="font-size:14px;color:var(--grey-1);letter-spacing:0.02em;">You're in. See you Thursday.</p>';
+        } else {
+          btn.textContent = 'Sign up';
+          btn.disabled = false;
+          alert('Something went wrong — please try again.');
+        }
+      } catch (err) {
+        btn.textContent = 'Sign up';
+        btn.disabled = false;
+      }
     }
 
     fetchProperties().then(renderProperties);
