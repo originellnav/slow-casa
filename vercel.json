@@ -1,6 +1,7 @@
 {
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/properties/:slug", "destination": "/property?slug=:slug" },
     { "source": "/journal/places/:slug", "destination": "/journal/place?slug=:slug&category=places" },
     { "source": "/journal/interviews/:slug", "destination": "/journal/place?slug=:slug&category=interviews" },
