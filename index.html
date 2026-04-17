@@ -463,7 +463,6 @@
           body: JSON.stringify({ email: email })
         });
         var json = await res.json();
-        console.log('subscribe response:', res.status, json);
         if (res.ok) {
           input.parentElement.innerHTML = '<p style="font-size:14px;color:var(--grey-1);letter-spacing:0.02em;">You\'re in. See you Thursday.</p>';
         } else {
