@@ -234,9 +234,13 @@
       }
     }
 
-    function getImageUrl(record) {
+    function getImageUrl(record, index) {
+      index = index || 0;
       var images = record.fields['Images'];
-      if (images && images.length > 0) return images[0].url;
+      if (images && images.length > index) {
+        if (images[index].thumbnails && images[index].thumbnails.full) return images[index].thumbnails.full.url;
+        return images[index].url;
+      }
       return null;
     }
 
