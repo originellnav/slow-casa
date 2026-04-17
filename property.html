@@ -290,18 +290,25 @@
   </footer>
 
   <script>
-    var RECORD_ID = new URLSearchParams(window.location.search).get('id');
+    var params = new URLSearchParams(window.location.search);
+    var RECORD_ID = params.get('id');
+    var SLUG = params.get('slug') || window.location.pathname.split('/').pop();
     var allImages = [];
     var lightboxIndex = 0;
 
     async function fetchProperty() {
-      if (!RECORD_ID) {
-        document.getElementById('app').innerHTML = '<div class="loading-state">Property not found.</div>';
-        return;
-      }
       try {
-        var res = await fetch('/api/property?id=' + RECORD_ID);
-        var data = await res.json();
+        var res, data;
+        if (SLUG && !RECORD_ID) {
+          res = await fetch('/api/property-by-slug?slug=' + SLUG);
+          data = await res.json();
+        } else if (RECORD_ID) {
+          res = await fetch('/api/property?id=' + RECORD_ID);
+          data = await res.json();
+        } else {
+          document.getElementById('app').innerHTML = '<div class="loading-state">Property not found.</div>';
+          return;
+        }
         if (data && data.fields) { renderProperty(data); }
         else { document.getElementById('app').innerHTML = '<div class="loading-state">Property not found.</div>'; }
       } catch (err) {
@@ -493,7 +500,9 @@
           var f = r.fields;
           var img = f['Hero Image'] || (f['Images'] && f['Images'].length ? (f['Images'][0].thumbnails && f['Images'][0].thumbnails.full ? f['Images'][0].thumbnails.full.url : f['Images'][0].url) : '');
           var desc = f['Description'] ? f['Description'].substring(0, 80) + '...' : '';
-          return '<a href="/property.html?id=' + r.id + '" style="text-decoration:none;color:inherit;">' +
+          var relSlug = r.fields['Slug'];
+          var relUrl = relSlug ? '/properties/' + relSlug : '/property.html?id=' + r.id;
+          return '<a href="' + relUrl + '" style="text-decoration:none;color:inherit;">' +
             '<div class="related-card">' +
               '<div class="related-img">' +
                 (img ? '<img src="' + img + '" alt="' + (f['Name']||'') + '" loading="lazy" />' : '') +
