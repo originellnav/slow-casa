@@ -26,11 +26,12 @@ module.exports = async function handler(req, res) {
     });
 
     const data = await response.json();
+    console.log('Beehiiv status:', response.status, 'body:', JSON.stringify(data));
 
     if (response.ok) {
       return res.status(200).json({ success: true });
     } else {
-      return res.status(400).json({ error: data.message || 'Subscription failed' });
+      return res.status(400).json({ error: data.message || 'Subscription failed', detail: data });
     }
   } catch (err) {
     return res.status(500).json({ error: 'Server error' });
