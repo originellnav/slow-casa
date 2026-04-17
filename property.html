@@ -153,6 +153,81 @@
 
     .loading-state { text-align: center; padding: 120px 48px; font-size: 13px; color: var(--grey-1); letter-spacing: 0.06em; }
 
+    /* RELATED PROPERTIES */
+    .related-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px 80px;
+      border-top: 0.5px solid var(--grey-3);
+    }
+
+    .related-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 20px 0 40px;
+    }
+
+    .related-label {
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+    }
+
+    .related-link {
+      font-size: 13px;
+      color: var(--grey-1);
+      transition: color 0.2s;
+    }
+
+    .related-link:hover { color: var(--black); }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .related-card { cursor: pointer; }
+    .related-card:hover .related-img img { transform: scale(1.03); }
+
+    .related-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: var(--grey-4);
+    }
+
+    .related-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+      display: block;
+    }
+
+    .related-location {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      margin-bottom: 6px;
+    }
+
+    .related-name {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .related-desc {
+      font-size: 13px;
+      color: var(--grey-1);
+      line-height: 1.5;
+    }
+
     @media (max-width: 768px) {
       nav { padding: 20px 24px; }
       .nav-links { display: none; }
@@ -162,6 +237,8 @@
       .property-quote { font-size: 18px; }
       .gallery-grid { grid-template-columns: 1fr; }
       .cta-section { padding: 48px 0 64px; }
+      .related-section { padding: 0 24px 56px; }
+      .related-grid { grid-template-columns: 1fr; gap: 40px; }
       footer { padding: 24px; flex-direction: column; gap: 12px; }
     }
   </style>
@@ -190,6 +267,14 @@
     <img class="lightbox-img" id="lightbox-img" src="" alt="" />
     <button class="lightbox-next" onclick="lightboxNav(1)">&#8594;</button>
     <span class="lightbox-counter" id="lightbox-counter"></span>
+  </div>
+
+  <div class="related-section" id="related-section" style="display:none">
+    <div class="related-header">
+      <span class="related-label">Related Properties</span>
+      <a href="/directory" class="related-link">View all</a>
+    </div>
+    <div class="related-grid" id="related-grid"></div>
   </div>
 
   <footer>
@@ -369,9 +454,53 @@
 
       // Set allImages for lightbox after hero is rendered
       allImages = images;
+
+      // Fetch related properties
+      fetchRelated(record.id, f['Region'] || '', f['Country'] || '');
     }
 
     fetchProperty();
+
+    async function fetchRelated(currentId, region, country) {
+      try {
+        var res = await fetch('/api/properties?all=true');
+        var data = await res.json();
+        var records = (data.records || []).filter(function(r) {
+          if (r.id === currentId) return false;
+          var f = r.fields;
+          return f['Region'] === region || f['Country'] === country;
+        });
+
+        // Sort by Date added descending
+        records.sort(function(a, b) {
+          var da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
+          var db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
+          return db - da;
+        });
+
+        var top3 = records.slice(0, 3);
+        if (!top3.length) return;
+
+        var grid = document.getElementById('related-grid');
+        grid.innerHTML = top3.map(function(r) {
+          var f = r.fields;
+          var img = f['Hero Image'] || (f['Images'] && f['Images'].length ? (f['Images'][0].thumbnails && f['Images'][0].thumbnails.full ? f['Images'][0].thumbnails.full.url : f['Images'][0].url) : '');
+          var desc = f['Description'] ? f['Description'].substring(0, 80) + '...' : '';
+          return '<a href="/property.html?id=' + r.id + '" style="text-decoration:none;color:inherit;">' +
+            '<div class="related-card">' +
+              '<div class="related-img">' +
+                (img ? '<img src="' + img + '" alt="' + (f['Name']||'') + '" loading="lazy" />' : '') +
+              '</div>' +
+              '<p class="related-location">' + (f['Location label']||'') + '</p>' +
+              '<p class="related-name">' + (f['Name']||'') + '</p>' +
+              '<p class="related-desc">' + desc + '</p>' +
+            '</div>' +
+          '</a>';
+        }).join('');
+
+        document.getElementById('related-section').style.display = 'block';
+      } catch (err) { console.error(err); }
+    }
   </script>
 
 </body>
