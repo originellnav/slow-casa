@@ -10,19 +10,7 @@
   <style>
     body { font-family: var(--sans); background: var(--white); color: var(--black); }
 
-    /* NAV — sticky white on property page */
-    nav {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      padding: 28px 48px;
-      border-bottom: 0.5px solid var(--grey-3);
-      position: sticky;
-      top: 0;
-      background: var(--white);
-      z-index: 100;
-    }
-
+    nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 28px 48px; border-bottom: 0.5px solid var(--grey-3); position: sticky; top: 0; background: var(--white); z-index: 100; }
     .nav-links a { color: var(--grey-1); }
     .nav-links a:hover { color: var(--black); }
 
@@ -32,7 +20,8 @@
       height: 75vh;
       min-height: 400px;
       background: var(--grey-4);
-      overflow: hidden;
+      overflow: visible;
+      position: relative;
     }
 
     .hero img {
@@ -43,31 +32,30 @@
       display: block;
     }
 
-    .hero-skeleton {
-      width: 100%;
-      height: 100%;
-      background: var(--grey-4);
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
+    .hero-skeleton { width: 100%; height: 100%; background: var(--grey-4); animation: pulse 1.5s ease-in-out infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-    /* CONTENT */
-    .content {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 64px 48px 0;
-    }
-
-    .property-meta { margin-bottom: 40px; }
-
-    .location-label {
+    .hero-more-photos {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-family: var(--sans);
       font-size: 11px;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--grey-1);
-      margin-bottom: 16px;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      color: var(--black);
+      cursor: pointer;
+      transition: background 0.2s;
+      z-index: 10;
     }
+
+    .hero-more-photos:hover { background: var(--white); }
+
+    /* CONTENT */
+    .content { max-width: 720px; margin: 0 auto; padding: 48px 48px 0; }
 
     .property-name {
       font-family: var(--serif);
@@ -75,78 +63,48 @@
       font-weight: 400;
       line-height: 1.1;
       letter-spacing: -0.01em;
+      margin-bottom: 16px;
+    }
+
+    .property-quote {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--black);
       margin-bottom: 24px;
     }
 
-    .property-details {
-      display: flex;
-      gap: 24px;
-      align-items: center;
-      padding-bottom: 32px;
-      border-bottom: 0.5px solid var(--grey-3);
-    }
-
-    .detail-item {
-      font-size: 12px;
-      color: var(--grey-1);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .detail-dot {
-      width: 3px;
-      height: 3px;
-      border-radius: 50%;
-      background: var(--grey-3);
-    }
-
     /* FULL DESCRIPTION */
-    .description {
-      padding: 40px 0;
-      border-bottom: 0.5px solid var(--grey-3);
-    }
+    .description { padding: 0 0 40px; border-bottom: 0.5px solid var(--grey-3); }
 
-    .description p {
-      font-size: 17px;
-      line-height: 1.85;
-      color: var(--black);
-      margin-bottom: 1.5em;
-    }
+    .description p { font-size: 17px; line-height: 1.85; color: var(--black); margin-bottom: 1.5em; }
 
     .description h2 {
       font-family: var(--serif);
       font-size: 26px;
       font-weight: 400;
       line-height: 1.25;
-      margin: 2.5em 0 0.75em;
+      margin: 2em 0 0.6em;
       letter-spacing: -0.01em;
     }
 
-    .description blockquote {
-      font-family: var(--serif);
-      font-size: 22px;
-      font-style: italic;
-      line-height: 1.4;
-      color: var(--grey-1);
-      margin: 2em 0;
-      padding-left: 24px;
-      border-left: 2px solid var(--grey-3);
-    }
-
-    /* GALLERY GRID — 4 images max then more photos */
-    .gallery {
-      padding: 40px 0;
-      border-bottom: 0.5px solid var(--grey-3);
-    }
+    /* GALLERY — 4 equal images, bottom-right has overlay button */
+    .gallery { padding: 40px 0; border-bottom: 0.5px solid var(--grey-3); }
 
     .gallery-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 6px;
     }
 
-    .gallery-grid img {
+    .gallery-cell {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery-cell img {
       width: 100%;
       aspect-ratio: 4/3;
       object-fit: cover;
@@ -155,143 +113,54 @@
       transition: opacity 0.2s;
     }
 
-    .gallery-grid img:hover { opacity: 0.9; }
+    .gallery-cell img:hover { opacity: 0.9; }
 
-    .gallery-grid img.gallery-first {
-      grid-column: 1 / -1;
-      aspect-ratio: 16/9;
-    }
-
-    .more-photos-btn {
-      display: inline-block;
+    .gallery-more-overlay {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
       font-family: var(--sans);
       font-size: 11px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      padding: 10px 24px;
-      border: 0.5px solid var(--grey-3);
-      background: transparent;
-      color: var(--grey-1);
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      color: var(--black);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background 0.2s;
     }
 
-    .more-photos-btn:hover {
-      border-color: var(--black);
-      color: var(--black);
-    }
+    .gallery-more-overlay:hover { background: var(--white); }
 
     /* LIGHTBOX */
-    .lightbox {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.95);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-
+    .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }
     .lightbox.open { display: flex; }
-
-    .lightbox-img {
-      max-width: 90vw;
-      max-height: 85vh;
-      object-fit: contain;
-      display: block;
-    }
-
-    .lightbox-close {
-      position: absolute;
-      top: 24px;
-      right: 32px;
-      color: rgba(255,255,255,0.7);
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-family: var(--sans);
-    }
-
+    .lightbox-img { max-width: 90vw; max-height: 85vh; object-fit: contain; display: block; }
+    .lightbox-close { position: absolute; top: 24px; right: 32px; color: rgba(255,255,255,0.7); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; background: none; border: none; font-family: var(--sans); }
     .lightbox-close:hover { color: var(--white); }
-
-    .lightbox-prev, .lightbox-next {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.6);
-      font-size: 32px;
-      cursor: pointer;
-      padding: 16px;
-      line-height: 1;
-    }
-
+    .lightbox-prev, .lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.6); font-size: 32px; cursor: pointer; padding: 16px; line-height: 1; }
     .lightbox-prev:hover, .lightbox-next:hover { color: var(--white); }
     .lightbox-prev { left: 16px; }
     .lightbox-next { right: 16px; }
-
-    .lightbox-counter {
-      position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0.1em;
-    }
+    .lightbox-counter { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 0.1em; }
 
     /* CTA */
-    .cta-section {
-      padding: 64px 0 80px;
-      text-align: center;
-    }
-
-    .cta-label {
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--grey-1);
-      margin-bottom: 24px;
-    }
-
-    .cta-button {
-      display: inline-block;
-      font-family: var(--sans);
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 16px 48px;
-      border: 0.5px solid var(--black);
-      background: transparent;
-      color: var(--black);
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-
+    .cta-section { padding: 64px 0 80px; text-align: center; }
+    .cta-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 24px; }
+    .cta-button { display: inline-block; font-family: var(--sans); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; padding: 16px 48px; border: 0.5px solid var(--black); background: transparent; color: var(--black); cursor: pointer; transition: background 0.2s, color 0.2s; }
     .cta-button:hover { background: var(--black); color: var(--white); }
 
-    /* LOADING */
-    .loading-state {
-      text-align: center;
-      padding: 120px 48px;
-      font-size: 13px;
-      color: var(--grey-1);
-      letter-spacing: 0.06em;
-    }
+    .loading-state { text-align: center; padding: 120px 48px; font-size: 13px; color: var(--grey-1); letter-spacing: 0.06em; }
 
-    /* MOBILE */
     @media (max-width: 768px) {
       nav { padding: 20px 24px; }
       .nav-links { display: none; }
       .hero { height: 55vh; }
-      .content { padding: 40px 24px 0; }
+      .content { padding: 32px 24px 0; }
       .property-name { font-size: 32px; }
+      .property-quote { font-size: 18px; }
       .gallery-grid { grid-template-columns: 1fr; }
-      .gallery-grid img.gallery-first { aspect-ratio: 4/3; }
       .cta-section { padding: 48px 0 64px; }
       footer { padding: 24px; flex-direction: column; gap: 12px; }
     }
@@ -304,7 +173,7 @@
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
       <li><a href="/directory">Directory</a></li>
-      <li><a href="/places">Places</a></li>
+      <li><a href="/journal">Journal</a></li>
       <li><a href="https://slowcasa.beehiiv.com/subscribe" target="_blank" rel="noopener">Newsletter</a></li>
       <li><a href="/criteria">About</a></li>
     </ul>
@@ -343,32 +212,22 @@
       try {
         var res = await fetch('/api/property?id=' + RECORD_ID);
         var data = await res.json();
-        if (data && data.fields) {
-          renderProperty(data);
-        } else {
-          document.getElementById('app').innerHTML = '<div class="loading-state">Property not found.</div>';
-        }
+        if (data && data.fields) { renderProperty(data); }
+        else { document.getElementById('app').innerHTML = '<div class="loading-state">Property not found.</div>'; }
       } catch (err) {
         document.getElementById('app').innerHTML = '<div class="loading-state">Something went wrong.</div>';
       }
     }
 
     function getBestImageUrl(img) {
-      // Use full resolution — prefer thumbnails.full if available, else main url
-      if (img.thumbnails && img.thumbnails.full && img.thumbnails.full.url) {
-        return img.thumbnails.full.url;
-      }
+      if (img.thumbnails && img.thumbnails.full && img.thumbnails.full.url) return img.thumbnails.full.url;
       return img.url;
     }
 
     function getImages(fields) {
       var all = [];
-      if (fields['Images'] && fields['Images'].length) {
-        fields['Images'].forEach(function(img) { all.push(getBestImageUrl(img)); });
-      }
-      if (fields['Gallery'] && fields['Gallery'].length) {
-        fields['Gallery'].forEach(function(img) { all.push(getBestImageUrl(img)); });
-      }
+      if (fields['Images'] && fields['Images'].length) fields['Images'].forEach(function(img) { all.push(getBestImageUrl(img)); });
+      if (fields['Gallery'] && fields['Gallery'].length) fields['Gallery'].forEach(function(img) { all.push(getBestImageUrl(img)); });
       return all;
     }
 
@@ -377,6 +236,7 @@
       var html = '';
       var lines = text.split('\n');
       var inParagraph = false;
+      var firstQuoteDone = false;
 
       lines.forEach(function(line) {
         line = line.trim();
@@ -387,9 +247,12 @@
         if (line.startsWith('## ')) {
           if (inParagraph) { html += '</p>'; inParagraph = false; }
           html += '<h2>' + line.replace('## ', '') + '</h2>';
-        } else if (line.startsWith('> ') || (line.startsWith('"') && line.endsWith('"'))) {
+        } else if (!firstQuoteDone && (line.startsWith('"') && line.endsWith('"'))) {
+          // Skip the quote — it's rendered separately above the description
+          firstQuoteDone = true;
+        } else if (line.startsWith('> ')) {
           if (inParagraph) { html += '</p>'; inParagraph = false; }
-          html += '<blockquote>' + line.replace(/^> /, '').replace(/^"|"$/g, '') + '</blockquote>';
+          // skip blockquotes in body too
         } else {
           if (!inParagraph) { html += '<p>'; inParagraph = true; }
           else { html += ' '; }
@@ -401,29 +264,36 @@
       return html;
     }
 
+    function extractQuote(text) {
+      if (!text) return '';
+      var lines = text.split('\n');
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        if (line.startsWith('"') && line.endsWith('"')) {
+          return line.replace(/^"|"$/g, '');
+        }
+      }
+      return '';
+    }
+
     function renderGallery(images) {
       if (!images.length) return '';
       allImages = images;
-
-      // Show max 4 images
-      var displayImages = images.slice(0, 4);
+      var display = images.slice(0, 4);
       var hasMore = images.length > 4;
 
-      var html = '<div class="gallery">';
-      html += '<div class="gallery-grid">';
+      var html = '<div class="gallery"><div class="gallery-grid">';
 
-      displayImages.forEach(function(url, i) {
-        var cls = i === 0 ? 'gallery-first' : '';
-        html += '<img src="' + url + '" alt="" loading="lazy" class="' + cls + '" onclick="openLightbox(' + i + ')" />';
+      display.forEach(function(url, i) {
+        html += '<div class="gallery-cell">';
+        html += '<img src="' + url + '" alt="" loading="lazy" onclick="openLightbox(' + i + ')" />';
+        if (i === 3 && hasMore) {
+          html += '<button class="gallery-more-overlay" onclick="openLightbox(0)">More Photos</button>';
+        }
+        html += '</div>';
       });
 
-      html += '</div>';
-
-      if (hasMore) {
-        html += '<button class="more-photos-btn" onclick="openLightbox(0)">+ ' + (images.length - 4) + ' more photos</button>';
-      }
-
-      html += '</div>';
+      html += '</div></div>';
       return html;
     }
 
@@ -446,12 +316,10 @@
       document.getElementById('lightbox-counter').textContent = (lightboxIndex + 1) + ' / ' + allImages.length;
     }
 
-    // Close lightbox on background click
     document.getElementById('lightbox').addEventListener('click', function(e) {
       if (e.target === this) closeLightbox();
     });
 
-    // Keyboard navigation
     document.addEventListener('keydown', function(e) {
       if (!document.getElementById('lightbox').classList.contains('open')) return;
       if (e.key === 'ArrowLeft') lightboxNav(-1);
@@ -465,45 +333,32 @@
       var heroImage = images[0] || '';
       var galleryImages = images.slice(1);
       var bookingUrl = f['Booking URL'] || '#';
-      var sleeps = f['Sleeps'] ? 'Sleeps ' + f['Sleeps'] : '';
-      var country = f['Country'] || '';
-      var tag = f['Tags'] ? (Array.isArray(f['Tags']) ? f['Tags'][0] : f['Tags']) : '';
-
-      // Use Full description if available, fall back to Description
       var bodyText = f['Full description'] || f['Description'] || '';
+      var quote = extractQuote(bodyText);
 
       document.title = (f['Name'] || 'Property') + ' — Slow Casa';
 
-      var detailsHtml = '';
-      if (sleeps) detailsHtml += '<span class="detail-item">' + sleeps + '</span>';
-      if (sleeps && country) detailsHtml += '<div class="detail-dot"></div>';
-      if (country) detailsHtml += '<span class="detail-item">' + country + '</span>';
-      if (tag && (sleeps || country)) detailsHtml += '<div class="detail-dot"></div>';
-      if (tag) detailsHtml += '<span class="detail-item">' + tag + '</span>';
-
       document.getElementById('app').innerHTML =
-        '<div class="hero">' +
+        '<div class="hero" style="overflow:visible;position:relative;">' +
           (heroImage
             ? '<img src="' + heroImage + '" alt="' + (f['Name'] || '') + '" />'
             : '<div class="hero-skeleton"></div>') +
+          (images.length > 1 ? '<button class="hero-more-photos" onclick="openLightbox(0)">More Photos</button>' : '') +
         '</div>' +
 
         '<div class="content">' +
-          '<div class="property-meta">' +
-            '<p class="location-label">' + (f['Location label'] || '') + '</p>' +
-            '<h1 class="property-name">' + (f['Name'] || '') + '</h1>' +
-            '<div class="property-details">' + detailsHtml + '</div>' +
-          '</div>' +
-
+          '<h1 class="property-name">' + (f['Name'] || '') + '</h1>' +
+          (quote ? '<p class="property-quote">"' + quote + '"</p>' : '') +
           '<div class="description">' + parseFullDescription(bodyText) + '</div>' +
-
           renderGallery(galleryImages) +
-
           '<div class="cta-section">' +
             '<p class="cta-label">Ready to stay here?</p>' +
             '<a href="' + bookingUrl + '" target="_blank" rel="noopener" class="cta-button">Book this property</a>' +
           '</div>' +
         '</div>';
+
+      // Set allImages for lightbox after hero is rendered
+      allImages = images;
     }
 
     fetchProperty();
