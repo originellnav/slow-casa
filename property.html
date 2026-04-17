@@ -234,9 +234,21 @@
     function parseFullDescription(text) {
       if (!text) return '';
       var html = '';
+      var firstQuoteDone = false;
+
+      // Normalise bold headers: **Header** or **Header ** at start of content
+      // Split on bold patterns that look like headings
+      text = text.replace(/\*\*([^*]+?)\s*\*\*/g, function(match, inner) {
+        var trimmed = inner.trim();
+        // Treat as heading if it looks like a section title (short, no sentence punctuation mid-text)
+        if (trimmed.length < 60 && !trimmed.match(/[,;]/)) {
+          return '\n## ' + trimmed + '\n';
+        }
+        return '<strong>' + trimmed + '</strong>';
+      });
+
       var lines = text.split('\n');
       var inParagraph = false;
-      var firstQuoteDone = false;
 
       lines.forEach(function(line) {
         line = line.trim();
@@ -248,11 +260,9 @@
           if (inParagraph) { html += '</p>'; inParagraph = false; }
           html += '<h2>' + line.replace('## ', '') + '</h2>';
         } else if (!firstQuoteDone && (line.startsWith('"') && line.endsWith('"'))) {
-          // Skip the quote — it's rendered separately above the description
           firstQuoteDone = true;
         } else if (line.startsWith('> ')) {
           if (inParagraph) { html += '</p>'; inParagraph = false; }
-          // skip blockquotes in body too
         } else {
           if (!inParagraph) { html += '<p>'; inParagraph = true; }
           else { html += ' '; }
@@ -330,7 +340,7 @@
     function renderProperty(record) {
       var f = record.fields;
       var images = getImages(f);
-      var heroImage = images[0] || '';
+      var heroImage = f['Hero Image'] || images[0] || '';
       var galleryImages = images.slice(1);
       var bookingUrl = f['Booking URL'] || '#';
       var bodyText = f['Full description'] || f['Description'] || '';
