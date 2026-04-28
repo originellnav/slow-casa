@@ -119,7 +119,92 @@
 
     .try-btn:hover { background: var(--white); color: var(--black); }
 
-    #latest-section .section-header { border-top: none; }
+    .featured-property {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 600px;
+    }
+
+    .featured-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 80px 64px;
+      background: #f9f7f2;
+    }
+
+    .featured-eyebrow {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 28px;
+    }
+
+    .featured-region {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 12px;
+    }
+
+    .featured-name {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 52px;
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--black);
+      margin-bottom: 24px;
+    }
+
+    .featured-desc {
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.65;
+      color: var(--black);
+      max-width: 340px;
+      margin-bottom: 36px;
+    }
+
+    .featured-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s;
+    }
+
+    .featured-arrow:hover { opacity: 0.6; }
+
+    .featured-right {
+      display: block;
+      overflow: hidden;
+    }
+
+    .featured-right img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .featured-right:hover img { transform: scale(1.03); }
+
+    @media (max-width: 768px) {
+      .featured-property { grid-template-columns: 1fr; }
+      .featured-left { padding: 56px 32px; }
+      .featured-name { font-size: 36px; }
+      .featured-right { min-height: 300px; }
+    }
 
     .criteria-section {
       background: #f9f7f2;
@@ -220,16 +305,22 @@
     <a href="/directory" class="criteria-btn">View Homes</a>
   </div>
 
-  <div style="padding-top:80px;">
-    <div class="section" id="latest-section">
-      <div class="section-header">
-        <span class="section-label">Latest additions</span>
-        <a href="/directory" class="section-link">View all</a>
-      </div>
-      <div class="property-grid" id="property-grid">
-        <div class="loading">Loading properties...</div>
-      </div>
+  <div class="featured-property" id="featured-property">
+    <div class="featured-left">
+      <p class="featured-eyebrow">New to the Club</p>
+      <p class="featured-region" id="featured-region"></p>
+      <h2 class="featured-name" id="featured-name"></h2>
+      <p class="featured-desc" id="featured-desc"></p>
+      <a class="featured-arrow" id="featured-link" href="#">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="23" stroke="#0f0f0f" stroke-width="0.8"/>
+          <path d="M18 24h12M25 19l5 5-5 5" stroke="#0f0f0f" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
     </div>
+    <a class="featured-right" id="featured-img-link" href="#">
+      <img id="featured-img" src="" alt="" />
+    </a>
   </div>
 
   <div class="criteria-section">
@@ -332,35 +423,35 @@
     initSlideshow();
 
     function renderProperties(records) {
-      var grid = document.getElementById('property-grid');
-      if (!records.length) {
-        grid.innerHTML = '<div class="loading">No properties yet — check back soon.</div>';
-        return;
-      }
-      grid.innerHTML = records.map(function(record, i) {
-        var f = record.fields;
-        var imgUrl = getImageUrl(record, 0);
-        var imgUrl2 = getImageUrl(record, 1) || imgUrl;
-        var delay = i < 3 ? 'delay-' + (i + 1) : '';
-        var location = f['Location label'] || '';
-        var name = f['Name'] || '';
-        var desc = f['Description'] ? f['Description'].substring(0, 80) + '...' : '';
-        var tag = f['Tags'] && f['Tags'].length ? f['Tags'][0] : '';
-        var slug = f['Slug'];
-        var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id;
-        return '<a href="' + url + '" style="text-decoration:none;color:inherit;">' +
-          '<div class="property-card fade-in ' + delay + '">' +
-            '<div class="card-img">' +
-              (imgUrl ? '<img src="' + imgUrl + '" alt="' + name + '" loading="lazy" class="img-primary" />' : '') +
-              (imgUrl2 ? '<img src="' + imgUrl2 + '" alt="' + name + '" loading="lazy" class="img-secondary" />' : '') +
-            '</div>' +
-            '<p class="card-location">' + location + '</p>' +
-            '<p class="card-name">' + name + '</p>' +
-            '<p class="card-detail">' + desc + '</p>' +
-            (tag ? '<span class="card-tag">' + tag + '</span>' : '') +
-          '</div>' +
-        '</a>';
-      }).join('');
+      if (!records.length) return;
+
+      // Sort by Date added descending, filter blanks
+      var sorted = records.filter(function(r) {
+        return r.fields['Name'] && r.fields['Images'] && r.fields['Images'].length > 0;
+      }).sort(function(a, b) {
+        var da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
+        var db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
+        return db - da;
+      });
+
+      if (!sorted.length) return;
+      var latest = sorted[0];
+      var f = latest.fields;
+      var slug = f['Slug'];
+      var url = slug ? '/properties/' + slug : '/property.html?id=' + latest.id;
+      var imgUrl = f['Hero Image'] || getImageUrl(latest, 0);
+      var region = f['Region'] || f['Country'] || '';
+      var name = f['Name'] || '';
+      var desc = f['Description'] || '';
+
+      document.getElementById('featured-region').textContent = region.toUpperCase();
+      document.getElementById('featured-name').textContent = name;
+      document.getElementById('featured-desc').textContent = desc;
+      document.getElementById('featured-link').href = url;
+      document.getElementById('featured-img-link').href = url;
+      var img = document.getElementById('featured-img');
+      img.src = imgUrl;
+      img.alt = name;
     }
 
     async function handleNewsletterSubscribe(e) {
