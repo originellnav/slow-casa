@@ -19,6 +19,11 @@
     /* Homepage-specific styles */
     html, body { background: #f9f7f2 !important; }
     .try-section, .criteria-section, .newsletter-strip { background: #f9f7f2 !important; }
+    nav, #main-nav {
+      background: #f9f7f2 !important;
+      position: static !important;
+      border-bottom: 0.5px solid #e8e8e8;
+    }
     .hero {
       width: 100%;
       height: 100vh;
@@ -80,7 +85,7 @@
     }
 
     .try-headline {
-      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif; font-weight: 400;
       font-size: 28px;
       font-weight: 300;
       line-height: 1.55;
@@ -274,11 +279,6 @@
   </footer>
 
   <script>
-    var nav = document.getElementById('main-nav');
-    window.addEventListener('scroll', function() {
-      if (window.scrollY > 80) { nav.classList.add('scrolled'); }
-      else { nav.classList.remove('scrolled'); }
-    });
 
     async function fetchProperties() {
       try {
