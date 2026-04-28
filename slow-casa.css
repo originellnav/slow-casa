@@ -16,6 +16,7 @@
   --serif: 'DM Serif Display', Georgia, serif;
   --sans: 'DM Sans', system-ui, sans-serif;
   --archivo: 'Archivo Black', sans-serif;
+  --playfair: 'Playfair Display', Georgia, serif;
 }
 
 html { font-size: 16px; -webkit-font-smoothing: antialiased; }
