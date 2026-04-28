@@ -5,50 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Slow Casa — Design-first homes in nature across Europe</title>
   <meta name="description" content="Handpicked vacation homes for people who want to slow down, go offline, and discover a different pace of life across Europe." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/slow-casa.css" />
   <style>
     /* Homepage-specific styles */
     .hero {
       width: 100%;
-      height: 85vh;
-      min-height: 400px;
+      height: 100vh;
+      min-height: 500px;
       position: relative;
-      overflow: visible;
+      overflow: hidden;
     }
 
-    .hero-img {
+    .hero-slides {
+      position: absolute;
+      inset: 0;
+    }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+
+    .hero-slide.active { opacity: 1; }
+
+    .hero-slide img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 30%;
+      object-position: center 35%;
       display: block;
     }
 
-    .hero-overlay {
+    .hero-top-gradient {
       position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.4) 100%);
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 180px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 100%);
+      z-index: 2;
+      pointer-events: none;
     }
 
-    .hero-content {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 0 48px;
-    }
-
-    .hero-headline {
-      font-family: 'DM Serif Text', Georgia, serif;
-      font-size: 80px;
-      font-weight: 400;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
+    /* Wordmark override for hero — white on image */
+    .hero-nav .wordmark {
       color: var(--white);
-      max-width: 900px;
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 30px;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      text-transform: none;
     }
+
+    .hero-nav .nav-links a { color: rgba(255,255,255,0.85); }
+    .hero-nav .nav-links a:hover { color: var(--white); }
 
     .try-section {
       background: var(--white);
@@ -58,7 +72,7 @@
     }
 
     .try-headline {
-      font-family: 'Playfair Display', Georgia, serif;
+      font-family: 'DM Serif Display', Georgia, serif;
       font-size: 28px;
       font-weight: 400;
       line-height: 1.45;
@@ -114,7 +128,7 @@
     }
 
     .criteria-body {
-      font-family: 'Playfair Display', Georgia, serif;
+      font-family: 'DM Serif Display', Georgia, serif;
       font-size: 28px;
       font-weight: 400;
       line-height: 1.45;
@@ -161,108 +175,8 @@
     .newsletter-submit:hover { background: var(--black); color: var(--white); }
     .newsletter-small { font-size: 11px; color: var(--grey-2); }
 
-    /* SEARCH */
-    .hero-search {
-      position: absolute;
-      bottom: auto;
-      top: 58%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 540px;
-      padding: 0 24px;
-      z-index: 10;
-    }
-
-    .hero-subheadline {
-      font-family: var(--sans);
-      font-size: 22px;
-      font-weight: 300;
-      letter-spacing: 0.02em;
-      color: rgba(255,255,255,0.9);
-      text-align: center;
-      margin-bottom: 20px;
-      transition: opacity 0.4s ease;
-    }
-
-    .search-wrap { position: relative; }
-
-    .search-input {
-      width: 100%;
-      font-family: var(--sans);
-      font-size: 15px;
-      padding: 16px 90px 16px 20px;
-      border: none;
-      background: rgba(255,255,255,0.95);
-      color: var(--black);
-      outline: none;
-      letter-spacing: 0.01em;
-    }
-
-    .search-input::placeholder { color: var(--grey-1); }
-
-    .search-btn {
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      padding: 0 20px;
-      font-family: var(--sans);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: #8B7355;
-      color: var(--white);
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .search-btn:hover { background: #6B5635; }
-
-    .search-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: var(--white);
-      border-top: 0.5px solid var(--grey-3);
-      z-index: 9999;
-      display: none;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    }
-
-    .search-dropdown.open { display: block; }
-
-    .dropdown-label {
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--grey-1);
-      padding: 12px 20px 6px;
-    }
-
-    .dropdown-item {
-      display: block;
-      width: 100%;
-      padding: 10px 20px;
-      font-size: 14px;
-      color: var(--black);
-      cursor: pointer;
-      transition: background 0.15s;
-      text-align: left;
-      border: none;
-      background: none;
-      font-family: var(--sans);
-    }
-
-    .dropdown-item:hover { background: var(--grey-4); }
-
-
-
     @media (max-width: 768px) {
-      .hero-headline { font-size: 48px; }
-      .hero-search { bottom: 32px; }
+      .hero-nav .wordmark { font-size: 22px; }
       .try-section { padding: 64px 24px; }
       .try-headline { font-size: 22px; }
       .editorial { grid-template-columns: 1fr; gap: 32px; }
@@ -295,28 +209,8 @@
   </nav>
 
   <div class="hero">
-    <img class="hero-img" src="/hero.jpg" alt="Slow Casa" />
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <h1 class="hero-headline">Peace is the new luxury</h1>
-    </div>
-    <div class="hero-search">
-      <p class="hero-subheadline" id="hero-sub">Modern vacation homes, rooted in nature.</p>
-      <div class="search-wrap">
-        <input class="search-input" type="text" placeholder="Where do you want to go?" id="hero-search" autocomplete="off" />
-        <button class="search-btn" onclick="goToLocation(document.getElementById('hero-search').value || '')">Search</button>
-        <div class="search-dropdown" id="search-dropdown">
-          <p class="dropdown-label">Popular locations</p>
-          <button class="dropdown-item" onclick="goToLocation('Mallorca')">Mallorca</button>
-          <button class="dropdown-item" onclick="goToLocation('Ibiza')">Ibiza</button>
-          <button class="dropdown-item" onclick="goToLocation('Menorca')">Menorca</button>
-          <button class="dropdown-item" onclick="goToLocation('Catalonia')">Catalonia</button>
-          <button class="dropdown-item" onclick="goToLocation('Algarve')">Algarve</button>
-          <button class="dropdown-item" onclick="goToLocation('Puglia')">Puglia</button>
-          <button class="dropdown-item" onclick="goToLocation('Corsica')">Corsica</button>
-        </div>
-      </div>
-    </div>
+    <div class="hero-slides" id="hero-slides"></div>
+    <div class="hero-top-gradient"></div>
   </div>
 
   <div class="try-section">
@@ -394,10 +288,60 @@
 
     function getImageUrl(record, index) {
       index = index || 0;
+      var heroImg = record.fields && record.fields['Hero Image'];
+      if (index === 0 && heroImg) return heroImg;
       var images = record.fields['Images'];
       if (images && images.length > index) return images[index].url;
       return null;
     }
+
+    // Slideshow
+    async function initSlideshow() {
+      try {
+        var res = await fetch('/api/properties');
+        var data = await res.json();
+        var records = data.records || [];
+        var slides = document.getElementById('hero-slides');
+        var images = [];
+
+        records.forEach(function(r) {
+          var heroImg = r.fields['Hero Image'];
+          var attachments = r.fields['Images'];
+          var url = null;
+          if (heroImg) { url = heroImg; }
+          else if (attachments && attachments.length) { url = attachments[0].url; }
+          if (url) images.push({ url: url, name: r.fields['Name'] || '' });
+        });
+
+        if (!images.length) {
+          slides.innerHTML = '<div class="hero-slide active"><img src="/hero.jpg" alt="Slow Casa" /></div>';
+          return;
+        }
+
+        images.slice(0, 8).forEach(function(img, i) {
+          var div = document.createElement('div');
+          div.className = 'hero-slide' + (i === 0 ? ' active' : '');
+          var el = document.createElement('img');
+          el.src = img.url;
+          el.alt = img.name;
+          if (i > 0) el.loading = 'lazy';
+          div.appendChild(el);
+          slides.appendChild(div);
+        });
+
+        var current = 0;
+        setInterval(function() {
+          var slideEls = document.querySelectorAll('.hero-slide');
+          slideEls[current].classList.remove('active');
+          current = (current + 1) % slideEls.length;
+          slideEls[current].classList.add('active');
+        }, 5000);
+      } catch(e) {
+        document.getElementById('hero-slides').innerHTML = '<div class="hero-slide active"><img src="/hero.jpg" alt="Slow Casa" /></div>';
+      }
+    }
+
+    initSlideshow();
 
     function renderProperties(records) {
       var grid = document.getElementById('property-grid');
@@ -414,7 +358,9 @@
         var name = f['Name'] || '';
         var desc = f['Description'] ? f['Description'].substring(0, 80) + '...' : '';
         var tag = f['Tags'] && f['Tags'].length ? f['Tags'][0] : '';
-        var slug = record.fields && record.fields['Slug']; var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id; return '<a href="' + url + '" style="text-decoration:none;color:inherit;">' +
+        var slug = f['Slug'];
+        var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id;
+        return '<a href="' + url + '" style="text-decoration:none;color:inherit;">' +
           '<div class="property-card fade-in ' + delay + '">' +
             '<div class="card-img">' +
               (imgUrl ? '<img src="' + imgUrl + '" alt="' + name + '" loading="lazy" class="img-primary" />' : '') +
@@ -427,10 +373,6 @@
           '</div>' +
         '</a>';
       }).join('');
-    }
-
-    function handleSubscribe() {
-      window.open('https://slowcasa.beehiiv.com/subscribe', '_blank');
     }
 
     async function handleNewsletterSubscribe(e) {
@@ -474,7 +416,6 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email })
         });
-        var json = await res.json();
         if (res.ok) {
           input.parentElement.innerHTML = '<p style="font-size:14px;color:var(--grey-1);letter-spacing:0.02em;">You\'re in. See you Thursday.</p>';
         } else {
@@ -488,23 +429,6 @@
     }
 
     fetchProperties().then(renderProperties);
-
-    // Rotating subheadline
-    var sublines = [
-      'Modern vacation homes, rooted in nature.',
-      'Handpicked architectural homes across Europe.',
-      'Try second home locations before you buy.'
-    ];
-    var subIndex = 0;
-    var subEl = document.getElementById('hero-sub');
-    setInterval(function() {
-      subEl.style.opacity = '0';
-      setTimeout(function() {
-        subIndex = (subIndex + 1) % sublines.length;
-        subEl.textContent = sublines[subIndex];
-        subEl.style.opacity = '1';
-      }, 400);
-    }, 4000);
 
     // Fetch latest journal post
     async function fetchLatestPost() {
@@ -528,34 +452,6 @@
     }
 
     fetchLatestPost();
-
-    // Search
-    var searchInput = document.getElementById('hero-search');
-    var searchDropdown = document.getElementById('search-dropdown');
-
-    searchInput.addEventListener('focus', function() {
-      searchDropdown.classList.add('open');
-    });
-
-    searchInput.addEventListener('input', function() {
-      searchDropdown.classList.add('open');
-    });
-
-    searchInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && searchInput.value.trim()) {
-        goToLocation(searchInput.value.trim());
-      }
-    });
-
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.search-wrap')) {
-        searchDropdown.classList.remove('open');
-      }
-    });
-
-    function goToLocation(location) {
-      window.location.href = '/directory?location=' + encodeURIComponent(location);
-    }
   </script>
 
 </body>
