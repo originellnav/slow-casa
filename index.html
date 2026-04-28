@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/slow-casa.css" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <style>
     @font-face {
       font-family: 'TT Norms Pro';
@@ -198,6 +200,191 @@
 
     .featured-right:hover img { transform: scale(1.03); }
 
+    /* MAP TEASER */
+    .map-teaser {
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .map-teaser-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 480px;
+    }
+
+    .map-teaser-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 64px;
+      background: #f9f7f2;
+    }
+
+    .map-teaser-eyebrow {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 20px;
+    }
+
+    .map-teaser-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 48px;
+      font-weight: 400;
+      line-height: 1.05;
+      color: var(--black);
+      margin-bottom: 16px;
+    }
+
+    .map-teaser-sub {
+      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.65;
+      color: var(--grey-1);
+      max-width: 320px;
+      margin-bottom: 36px;
+    }
+
+    .map-teaser-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: opacity 0.2s;
+    }
+
+    .map-teaser-btn:hover { opacity: 0.6; }
+
+    .map-teaser-right {
+      position: relative;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    /* MAP MODAL */
+    .map-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: #f9f7f2;
+      display: none;
+      flex-direction: column;
+    }
+
+    .map-modal.open { display: flex; }
+
+    .map-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px;
+      border-bottom: none;
+      background: #f9f7f2;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .map-modal-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--black);
+    }
+
+    .map-modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .map-modal-close:hover { opacity: 0.5; }
+
+    /* PROPERTY POPUP */
+    .map-popup {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      width: 280px;
+      background: #f9f7f2;
+      z-index: 20;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    }
+
+    .map-popup-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .map-popup-body {
+      padding: 16px 20px 20px;
+    }
+
+    .map-popup-location {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      margin-bottom: 4px;
+    }
+
+    .map-popup-name {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--black);
+      margin-bottom: 12px;
+    }
+
+    .map-popup-link {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+      border-bottom: 0.5px solid var(--black);
+      padding-bottom: 2px;
+    }
+
+    .map-popup-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(249,247,242,0.9);
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+    }
+
+    /* MAPBOX MARKER */
+    .sc-marker {
+      width: 10px;
+      height: 10px;
+      background: #0f0f0f;
+      border-radius: 50%;
+      border: 2px solid #f9f7f2;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      transition: transform 0.2s;
+    }
+
+    .sc-marker:hover { transform: scale(1.4); }
+    .sc-marker.active { background: #8B7355; transform: scale(1.4); }
+
+    @media (max-width: 768px) {
+      .map-teaser-inner { grid-template-columns: 1fr; }
+      .map-teaser-right { min-height: 240px; }
+      .map-teaser-left { padding: 48px 28px; }
+      .map-teaser-title { font-size: 36px; }
+      .map-popup { left: 16px; right: 16px; width: auto; bottom: 24px; }
+    }
+
     @media (max-width: 768px) {
       .featured-property { grid-template-columns: 1fr; }
       .featured-left { padding: 56px 32px; }
@@ -259,6 +446,191 @@
     .newsletter-submit:hover { background: var(--black); color: var(--white); }
     .newsletter-small { font-size: 11px; color: var(--grey-2); }
 
+    /* MAP TEASER */
+    .map-teaser {
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .map-teaser-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 480px;
+    }
+
+    .map-teaser-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 64px;
+      background: #f9f7f2;
+    }
+
+    .map-teaser-eyebrow {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 20px;
+    }
+
+    .map-teaser-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 48px;
+      font-weight: 400;
+      line-height: 1.05;
+      color: var(--black);
+      margin-bottom: 16px;
+    }
+
+    .map-teaser-sub {
+      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.65;
+      color: var(--grey-1);
+      max-width: 320px;
+      margin-bottom: 36px;
+    }
+
+    .map-teaser-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: opacity 0.2s;
+    }
+
+    .map-teaser-btn:hover { opacity: 0.6; }
+
+    .map-teaser-right {
+      position: relative;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    /* MAP MODAL */
+    .map-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: #f9f7f2;
+      display: none;
+      flex-direction: column;
+    }
+
+    .map-modal.open { display: flex; }
+
+    .map-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px;
+      border-bottom: none;
+      background: #f9f7f2;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .map-modal-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--black);
+    }
+
+    .map-modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .map-modal-close:hover { opacity: 0.5; }
+
+    /* PROPERTY POPUP */
+    .map-popup {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      width: 280px;
+      background: #f9f7f2;
+      z-index: 20;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    }
+
+    .map-popup-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .map-popup-body {
+      padding: 16px 20px 20px;
+    }
+
+    .map-popup-location {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      margin-bottom: 4px;
+    }
+
+    .map-popup-name {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--black);
+      margin-bottom: 12px;
+    }
+
+    .map-popup-link {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+      border-bottom: 0.5px solid var(--black);
+      padding-bottom: 2px;
+    }
+
+    .map-popup-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(249,247,242,0.9);
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+    }
+
+    /* MAPBOX MARKER */
+    .sc-marker {
+      width: 10px;
+      height: 10px;
+      background: #0f0f0f;
+      border-radius: 50%;
+      border: 2px solid #f9f7f2;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      transition: transform 0.2s;
+    }
+
+    .sc-marker:hover { transform: scale(1.4); }
+    .sc-marker.active { background: #8B7355; transform: scale(1.4); }
+
+    @media (max-width: 768px) {
+      .map-teaser-inner { grid-template-columns: 1fr; }
+      .map-teaser-right { min-height: 240px; }
+      .map-teaser-left { padding: 48px 28px; }
+      .map-teaser-title { font-size: 36px; }
+      .map-popup { left: 16px; right: 16px; width: auto; bottom: 24px; }
+    }
+
     @media (max-width: 768px) {
       .hero-nav .wordmark { font-size: 22px; }
       .try-section { padding: 64px 24px; }
@@ -319,6 +691,50 @@
     <a class="featured-right" id="featured-img-link" href="#">
       <img id="featured-img" src="" alt="" />
     </a>
+  </div>
+
+  <div class="map-teaser" onclick="openMapModal()">
+    <div class="map-teaser-inner">
+      <div class="map-teaser-left">
+        <p class="map-teaser-eyebrow">Find your slow place</p>
+        <h2 class="map-teaser-title">Explore the map</h2>
+        <p class="map-teaser-sub">Every home in the Slow Casa directory, plotted across Europe and beyond.</p>
+        <button class="map-teaser-btn">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="23" stroke="#0f0f0f" stroke-width="0.8"/>
+            <path d="M18 24h12M25 19l5 5-5 5" stroke="#0f0f0f" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="map-teaser-right" id="map-teaser-preview"></div>
+    </div>
+  </div>
+
+  <!-- Map Modal -->
+  <div class="map-modal" id="map-modal">
+    <div class="map-modal-header">
+      <span class="map-modal-title">Slow Casa · All homes</span>
+      <button class="map-modal-close" onclick="closeMapModal()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M3 3l14 14M17 3L3 17" stroke="#0f0f0f" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div id="map-full" style="width:100%;height:100%;"></div>
+    <!-- Property popup -->
+    <div class="map-popup" id="map-popup" style="display:none;">
+      <img class="map-popup-img" id="map-popup-img" src="" alt="" />
+      <div class="map-popup-body">
+        <p class="map-popup-location" id="map-popup-location"></p>
+        <p class="map-popup-name" id="map-popup-name"></p>
+        <a class="map-popup-link" id="map-popup-link" href="#">View property</a>
+      </div>
+      <button class="map-popup-close" onclick="document.getElementById('map-popup').style.display='none'">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1l12 12M13 1L1 13" stroke="#888" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <div class="criteria-section">
@@ -529,6 +945,119 @@
     }
 
     fetchLatestPost();
+
+    // MAP
+    var MAPBOX_TOKEN = 'pk.eyJ1IjoibHVrZXJ5YSIsImEiOiJjbG96cmZ3OTMwMHRyMmlzNHc1bTZkZzI4In0.8Pmo8eeUh48QHBpzqHwNuQ';
+    var MAPBOX_STYLE = 'mapbox://styles/lukerya/cmoime20s006m01r68jvia13j';
+    var mapTeaser = null;
+    var mapFull = null;
+    var mapProperties = [];
+
+    async function initMaps() {
+      try {
+        var res = await fetch('/api/properties?all=true');
+        var data = await res.json();
+        var records = data.records || [];
+        mapProperties = records.filter(function(r) {
+          return r.fields['Latitude'] && r.fields['Longitude'] && r.fields['Name'];
+        });
+        initTeaserMap();
+      } catch(e) { console.error('Map init error:', e); }
+    }
+
+    function initTeaserMap() {
+      if (!mapProperties.length) return;
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+      mapTeaser = new mapboxgl.Map({
+        container: 'map-teaser-preview',
+        style: MAPBOX_STYLE,
+        center: [8, 42],
+        zoom: 3.2,
+        interactive: false,
+        attributionControl: false
+      });
+
+      mapTeaser.on('load', function() {
+        mapProperties.forEach(function(r) {
+          var f = r.fields;
+          var el = document.createElement('div');
+          el.className = 'sc-marker';
+          new mapboxgl.Marker({ element: el })
+            .setLngLat([parseFloat(f['Longitude']), parseFloat(f['Latitude'])])
+            .addTo(mapTeaser);
+        });
+      });
+    }
+
+    function openMapModal() {
+      var modal = document.getElementById('map-modal');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (!mapFull) {
+        setTimeout(function() { initFullMap(); }, 50);
+      }
+    }
+
+    function closeMapModal() {
+      document.getElementById('map-modal').classList.remove('open');
+      document.getElementById('map-popup').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function initFullMap() {
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+      mapFull = new mapboxgl.Map({
+        container: 'map-full',
+        style: MAPBOX_STYLE,
+        center: [8, 42],
+        zoom: 3.2,
+        attributionControl: false
+      });
+
+      mapFull.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+
+      mapFull.on('load', function() {
+        mapProperties.forEach(function(r) {
+          var f = r.fields;
+          var slug = f['Slug'];
+          var url = slug ? '/properties/' + slug : '#';
+          var imgUrl = f['Hero Image'] || '';
+          var el = document.createElement('div');
+          el.className = 'sc-marker';
+
+          el.addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.querySelectorAll('.sc-marker').forEach(function(m) { m.classList.remove('active'); });
+            el.classList.add('active');
+
+            document.getElementById('map-popup-location').textContent = (f['Location label'] || '').toUpperCase();
+            document.getElementById('map-popup-name').textContent = f['Name'] || '';
+            document.getElementById('map-popup-link').href = url;
+            var popupImg = document.getElementById('map-popup-img');
+            if (imgUrl) { popupImg.src = imgUrl; popupImg.style.display = 'block'; }
+            else { popupImg.style.display = 'none'; }
+            document.getElementById('map-popup').style.display = 'block';
+
+            mapFull.flyTo({
+              center: [parseFloat(f['Longitude']), parseFloat(f['Latitude'])],
+              zoom: 8,
+              duration: 1200
+            });
+          });
+
+          new mapboxgl.Marker({ element: el })
+            .setLngLat([parseFloat(f['Longitude']), parseFloat(f['Latitude'])])
+            .addTo(mapFull);
+        });
+      });
+    }
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeMapModal();
+    });
+
+    initMaps();
   </script>
 
 </body>
