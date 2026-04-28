@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="/slow-casa.css" />
   <style>
     /* Homepage-specific styles */
+    html, body { background: #f9f7f2 !important; }
+    .try-section, .criteria-section, .newsletter-strip { background: #f9f7f2 !important; }
     .hero {
       width: 100%;
       height: 100vh;
@@ -51,9 +53,8 @@
       pointer-events: none;
     }
 
-    /* Wordmark override for hero — white on image */
     .hero-nav .wordmark {
-      color: var(--white);
+      color: var(--black);
       font-family: 'DM Serif Display', Georgia, serif;
       font-size: 30px;
       font-weight: 400;
@@ -61,24 +62,28 @@
       text-transform: none;
     }
 
-    .hero-nav .nav-links a { color: rgba(255,255,255,0.85); }
-    .hero-nav .nav-links a:hover { color: var(--white); }
+    .hero-nav .nav-links a { color: var(--grey-1); }
+    .hero-nav .nav-links a:hover { color: var(--black); }
 
     .try-section {
-      background: var(--white);
+      background: #f9f7f2;
       padding: 96px 48px;
       text-align: center;
       border-bottom: 0.5px solid var(--grey-3);
     }
 
     .try-headline {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
       font-size: 28px;
-      font-weight: 400;
-      line-height: 1.45;
+      font-weight: 300;
+      line-height: 1.55;
       color: var(--black);
-      max-width: 580px;
+      max-width: 900px;
       margin: 0 auto 32px;
+    }
+
+    .try-headline strong {
+      font-weight: 600;
     }
 
     .try-form {
@@ -214,7 +219,7 @@
   </div>
 
   <div class="try-section">
-    <p class="try-headline">Slow Casa is an exclusive club of exceptional homes to stay in. Timeless designs, connected to nature. We travel the world to find the best slow living spaces for you to enjoy.</p>
+    <p class="try-headline"><strong>Slow Casa</strong> is an exclusive club of exceptional homes to stay in. Timeless designs, connected to nature. We travel the world to find the best slow living spaces for you to enjoy.</p>
     <a href="/directory" class="criteria-btn">View Homes</a>
   </div>
 
