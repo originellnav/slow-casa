@@ -6,7 +6,7 @@
   <title>Directory — Slow Casa</title>
   <meta name="description" content="Every design-first vacation home in the Slow Casa directory. Filter by setting — sea, mountains, farm." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -24,7 +24,7 @@
     a { color: inherit; text-decoration: none; }
 
     nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 28px 48px; border-bottom: 0.5px solid var(--grey-3); position: sticky; top: 0; background: var(--white); z-index: 100; }
-    .wordmark { font-family: 'Archivo Black', sans-serif; font-size: 22px; font-weight: 400; letter-spacing: 0.06em; text-align: center; color: var(--black); text-transform: uppercase; }
+    .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: var(--black); text-transform: none; }
     .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
     .nav-links a { font-size: 13px; color: var(--grey-1); letter-spacing: 0.03em; transition: color 0.2s; }
     .nav-links a:hover { color: var(--black); }
@@ -32,26 +32,95 @@
     .page-header {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 64px 48px 48px;
+      padding: 72px 48px 56px;
       border-bottom: 0.5px solid var(--grey-3);
     }
 
-    .page-label {
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--grey-1);
-      margin-bottom: 16px;
-    }
-
-    .page-title {
+    .page-subline {
       font-family: var(--serif);
-      font-size: 42px;
+      font-size: 48px;
       font-weight: 400;
       line-height: 1.1;
       letter-spacing: -0.01em;
-      margin-bottom: 0;
+      margin-bottom: 32px;
+      transition: opacity 0.4s ease;
     }
+
+    .dir-search-wrap { position: relative; max-width: 480px; }
+
+    .dir-search-input {
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 15px;
+      padding: 15px 90px 15px 20px;
+      border: 0.5px solid var(--grey-3);
+      background: var(--white);
+      color: var(--black);
+      outline: none;
+      transition: border-color 0.2s;
+      letter-spacing: 0.01em;
+    }
+
+    .dir-search-input:focus { border-color: var(--black); }
+    .dir-search-input::placeholder { color: var(--grey-2); }
+
+    .dir-search-btn {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+      padding: 0 20px;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #8B7355;
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .dir-search-btn:hover { background: #6B5635; }
+
+    .search-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border: 0.5px solid var(--grey-3);
+      border-top: none;
+      z-index: 9999;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    .search-dropdown.open { display: block; }
+
+    .dropdown-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      padding: 12px 20px 6px;
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 10px 20px;
+      font-size: 14px;
+      color: var(--black);
+      cursor: pointer;
+      transition: background 0.15s;
+      text-align: left;
+      border: none;
+      background: none;
+      font-family: var(--sans);
+    }
+
+    .dropdown-item:hover { background: var(--grey-4); }
 
     .filters {
       max-width: 1200px;
@@ -85,12 +154,7 @@
     }
 
     .filter-btn:hover { border-color: var(--black); color: var(--black); }
-
-    .filter-btn.active {
-      background: var(--black);
-      border-color: var(--black);
-      color: var(--white);
-    }
+    .filter-btn.active { background: var(--black); border-color: var(--black); color: var(--white); }
 
     .directory-meta {
       max-width: 1200px;
@@ -101,23 +165,11 @@
       align-items: center;
     }
 
-    .property-count {
-      font-size: 12px;
-      color: var(--grey-1);
-      letter-spacing: 0.04em;
-    }
+    .property-count { font-size: 12px; color: var(--grey-1); letter-spacing: 0.04em; }
 
-    .section {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 48px 80px;
-    }
+    .section { max-width: 1200px; margin: 0 auto; padding: 0 48px 80px; }
 
-    .property-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 40px 32px;
-    }
+    .property-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 32px; }
 
     .property-card { cursor: pointer; }
 
@@ -153,8 +205,9 @@
     @media (max-width: 768px) {
       nav { padding: 20px 24px; }
       .nav-links { display: none; }
+      .wordmark { font-size: 22px; }
       .page-header { padding: 40px 24px 32px; }
-      .page-title { font-size: 30px; }
+      .page-subline { font-size: 30px; }
       .filters { padding: 20px 24px; flex-wrap: wrap; }
       .directory-meta { padding: 16px 24px; }
       .section { padding: 0 24px 56px; }
@@ -186,8 +239,21 @@
   </nav>
 
   <div class="page-header">
-    <p class="page-label">Design-first homes in nature · Europe</p>
-    <h1 class="page-title">The directory</h1>
+    <p class="page-subline" id="dir-sub">Modern vacation homes, rooted in nature.</p>
+    <div class="dir-search-wrap">
+      <input class="dir-search-input" type="text" placeholder="Where do you want to go?" id="dir-search" autocomplete="off" />
+      <button class="dir-search-btn" onclick="goToLocation(document.getElementById('dir-search').value || '')">Search</button>
+      <div class="search-dropdown" id="dir-dropdown">
+        <p class="dropdown-label">Popular locations</p>
+        <button class="dropdown-item" onclick="goToLocation('Mallorca')">Mallorca</button>
+        <button class="dropdown-item" onclick="goToLocation('Ibiza')">Ibiza</button>
+        <button class="dropdown-item" onclick="goToLocation('Menorca')">Menorca</button>
+        <button class="dropdown-item" onclick="goToLocation('Catalonia')">Catalonia</button>
+        <button class="dropdown-item" onclick="goToLocation('Algarve')">Algarve</button>
+        <button class="dropdown-item" onclick="goToLocation('Puglia')">Puglia</button>
+        <button class="dropdown-item" onclick="goToLocation('Corsica')">Corsica</button>
+      </div>
+    </div>
   </div>
 
   <div class="filters">
@@ -208,13 +274,16 @@
     </div>
   </div>
 
+  <div id="load-more-wrap" style="display:none;text-align:center;padding:48px 0 80px;">
+    <button onclick="loadMore()" style="font-family:var(--sans);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 40px;border:0.5px solid var(--black);background:transparent;color:var(--black);cursor:pointer;transition:background 0.2s,color 0.2s;" onmouseover="this.style.background='var(--black)';this.style.color='var(--white)'" onmouseout="this.style.background='transparent';this.style.color='var(--black)'">View more</button>
+  </div>
+
   <footer>
     <span class="footer-word" style="font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:#888888;">Slow Casa</span>
     <div class="footer-links">
       <a href="/directory">Directory</a>
-      <a href="#">Newsletter</a>
-      <a href="#">Submit a property</a>
-      <a href="#">Instagram</a>
+      <a href="https://slowcasa.beehiiv.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
     </div>
   </footer>
 
@@ -225,6 +294,52 @@
     var PAGE_SIZE = 30;
     var currentPage = 0;
     var currentFiltered = [];
+
+    // Pre-fill search if location param exists
+    if (locationQuery) {
+      document.getElementById('dir-search').value = locationQuery;
+    }
+
+    // Rotating subheadline
+    var sublines = [
+      'Modern vacation homes, rooted in nature.',
+      'Handpicked architectural homes across Europe.',
+      'Try second home locations before you buy.'
+    ];
+    var subIndex = 0;
+    var subEl = document.getElementById('dir-sub');
+    setInterval(function() {
+      subEl.style.opacity = '0';
+      setTimeout(function() {
+        subIndex = (subIndex + 1) % sublines.length;
+        subEl.textContent = sublines[subIndex];
+        subEl.style.opacity = '1';
+      }, 400);
+    }, 4000);
+
+    // Search
+    var searchInput = document.getElementById('dir-search');
+    var searchDropdown = document.getElementById('dir-dropdown');
+
+    searchInput.addEventListener('focus', function() {
+      if (!locationQuery) searchDropdown.classList.add('open');
+    });
+
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && searchInput.value.trim()) {
+        goToLocation(searchInput.value.trim());
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.dir-search-wrap')) {
+        searchDropdown.classList.remove('open');
+      }
+    });
+
+    function goToLocation(location) {
+      window.location.href = '/directory?location=' + encodeURIComponent(location);
+    }
 
     async function fetchProperties() {
       try {
@@ -239,6 +354,8 @@
 
     function getImageUrl(record, index) {
       index = index || 0;
+      var heroImg = record.fields && record.fields['Hero Image'];
+      if (index === 0 && heroImg) return heroImg;
       var images = record.fields['Images'];
       if (images && images.length > index) {
         if (images[index].thumbnails && images[index].thumbnails.full) return images[index].thumbnails.full.url;
@@ -283,19 +400,16 @@
       var grid = document.getElementById('property-grid');
       var count = document.getElementById('property-count');
 
-      // Remove blank records
       var filtered = records.filter(function(r) {
         return r.fields['Name'] && r.fields['Images'] && r.fields['Images'].length > 0;
       });
 
-      // Sort by Date added descending
       filtered.sort(function(a, b) {
         var da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
         var db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
         return db - da;
       });
 
-      // Apply location search
       if (locationQuery) {
         var q = locationQuery.toLowerCase();
         filtered = filtered.filter(function(r) {
@@ -307,7 +421,6 @@
         });
       }
 
-      // Apply tag filter
       if (activeFilter !== 'all') {
         filtered = filtered.filter(function(r) {
           var tags = r.fields['Tags'];
