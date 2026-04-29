@@ -203,7 +203,7 @@
 
     /* FULL DESCRIPTION */
     .description-section {
-      padding: 48px 0;
+      padding: 24px 0;
       border-bottom: none;
     }
 
@@ -240,6 +240,26 @@
 
     .favs-link:hover { border-color: var(--black); }
 
+    .description-cta {
+      padding: 40px 0 16px;
+      text-align: center;
+    }
+
+    .description-cta-btn {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 18px 64px;
+      background: var(--black);
+      color: #f9f7f2;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .description-cta-btn:hover { opacity: 0.75; }
+
     /* FULL DESCRIPTION (legacy) */
     .description { padding: 0 0 48px; max-width: 680px; margin: 0 auto; }
 
@@ -248,11 +268,11 @@
     .section-heading {
       font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
       font-size: 11px;
-      font-weight: 400;
+      font-weight: 700;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--grey-1);
-      margin: 2.5em 0 0.8em;
+      color: var(--black);
+      margin: 1.2em 0 0.6em;
     }
 
     .description h2 {
@@ -500,28 +520,32 @@
       return all;
     }
 
-    function renderSections(f) {
-      var sections = [
-        { key: 'The Story', label: 'The Story' },
-        { key: 'The Surroundings', label: 'The Surroundings' },
-        { key: 'The Space', label: 'The Space' },
-        { key: 'Who is it for?', label: 'Who is it for' },
-      ];
-
+    function renderSections(f, galleryHtml, bookingUrl) {
       var html = '';
 
-      sections.forEach(function(s) {
-        var text = f[s.key];
-        if (!text) return;
-        html += '<div class="description-section">';
-        html += '<p class="section-heading">' + s.label + '</p>';
+      // Helper to render a text section
+      function renderTextSection(key, label) {
+        var text = f[key];
+        if (!text) return '';
+        var s = '<div class="description-section">';
+        s += '<p class="section-heading">' + label + '</p>';
         var paras = text.split(/\n\n+/);
         paras.forEach(function(para) {
           para = para.trim();
-          if (para) html += '<p>' + para + '</p>';
+          if (para) s += '<p>' + para + '</p>';
         });
-        html += '</div>';
-      });
+        s += '</div>';
+        return s;
+      }
+
+      html += renderTextSection('The Story', 'The Story');
+      html += renderTextSection('The Surroundings', 'The Surroundings');
+
+      // Gallery sits here between Surroundings and The Space
+      if (galleryHtml) html += galleryHtml;
+
+      html += renderTextSection('The Space', 'The Space');
+      html += renderTextSection('Who is it for?', 'Who is it for');
 
       // Local Favourites
       var favs = f['Local Favourites'];
@@ -553,6 +577,13 @@
           html += '</div>';
           html += '</div>';
         }
+      }
+
+      // CTA button
+      if (bookingUrl) {
+        html += '<div class="description-cta">';
+        html += '<a href="' + bookingUrl + '" target="_blank" rel="noopener" class="description-cta-btn">Book this property</a>';
+        html += '</div>';
       }
 
       // Fall back to Full description if no new fields populated
@@ -725,8 +756,7 @@
         '</div>' +
 
         '<div class="content">' +
-          '<div class="description">' + renderSections(f) + '</div>' +
-          renderGallery(galleryImages) +
+          '<div class="description">' + renderSections(f, renderGallery(galleryImages), bookingUrl) + '</div>' +
         '</div>';
 
       // Set allImages for lightbox after hero is rendered
