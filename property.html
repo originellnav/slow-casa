@@ -202,6 +202,45 @@
     }
 
     /* FULL DESCRIPTION */
+    .description-section {
+      padding: 48px 0;
+      border-bottom: none;
+    }
+
+    .description-section:first-child { padding-top: 0; }
+
+    .favs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 32px;
+      margin-top: 16px;
+    }
+
+    .favs-group { display: flex; flex-direction: column; gap: 8px; }
+
+    .favs-cat {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      margin-bottom: 4px;
+    }
+
+    .favs-link {
+      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--black);
+      border-bottom: 0.5px solid var(--grey-3);
+      padding-bottom: 2px;
+      transition: border-color 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .favs-link:hover { border-color: var(--black); }
+
+    /* FULL DESCRIPTION (legacy) */
     .description { padding: 0 0 48px; max-width: 680px; margin: 0 auto; }
 
     .description p { font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif; font-size: 17px; font-weight: 300; line-height: 1.9; color: var(--black); margin-bottom: 1.5em; }
@@ -461,6 +500,75 @@
       return all;
     }
 
+    function renderSections(f) {
+      var sections = [
+        { key: 'The Story', label: 'The Story' },
+        { key: 'The Surroundings', label: 'The Surroundings' },
+        { key: 'The Space', label: 'The Space' },
+        { key: 'Who is it for?', label: 'Who is it for' },
+      ];
+
+      var html = '';
+
+      sections.forEach(function(s) {
+        var text = f[s.key];
+        if (!text) return;
+        html += '<div class="description-section">';
+        html += '<p class="section-heading">' + s.label + '</p>';
+        var paras = text.split(/
+
++/);
+        paras.forEach(function(para) {
+          para = para.trim();
+          if (para) html += '<p>' + para + '</p>';
+        });
+        html += '</div>';
+      });
+
+      // Local Favourites
+      var favs = f['Local Favourites'];
+      if (favs) {
+        var lines = favs.split('
+').map(function(l) { return l.trim(); }).filter(Boolean);
+        var grouped = {};
+        lines.forEach(function(line) {
+          var parts = line.split(' · ');
+          if (parts.length < 3) return;
+          var cat = parts[0].trim();
+          var name = parts[1].trim();
+          var url = parts[2].trim();
+          if (!grouped[cat]) grouped[cat] = [];
+          grouped[cat].push({ name: name, url: url });
+        });
+
+        if (Object.keys(grouped).length) {
+          html += '<div class="description-section local-favs">';
+          html += '<p class="section-heading">Local Favourites</p>';
+          html += '<div class="favs-grid">';
+          Object.keys(grouped).forEach(function(cat) {
+            html += '<div class="favs-group">';
+            html += '<p class="favs-cat">' + cat + '</p>';
+            grouped[cat].forEach(function(item) {
+              html += '<a href="' + item.url + '" target="_blank" rel="noopener" class="favs-link">' + item.name + '</a>';
+            });
+            html += '</div>';
+          });
+          html += '</div>';
+          html += '</div>';
+        }
+      }
+
+      // Fall back to Full description if no new fields populated
+      if (!html) {
+        var bodyText = f['Full description'] || f['Description'] || '';
+        if (bodyText) {
+          html = '<div class="description-section">' + parseFullDescription(bodyText) + '</div>';
+        }
+      }
+
+      return html;
+    }
+
     function parseFullDescription(text) {
       if (!text) return '';
       var html = '';
@@ -623,7 +731,7 @@
         '</div>' +
 
         '<div class="content">' +
-          '<div class="description">' + parseFullDescription(bodyText) + '</div>' +
+          '<div class="description">' + renderSections(f) + '</div>' +
           renderGallery(galleryImages) +
         '</div>';
 
