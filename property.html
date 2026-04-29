@@ -556,7 +556,7 @@
       }
 
       // Fall back to Full description if no new fields populated
-      if (!html) {
+      if (!html || html.trim() === '') {
         var bodyText = f['Full description'] || f['Description'] || '';
         if (bodyText) {
           html = '<div class="description-section">' + parseFullDescription(bodyText) + '</div>';
@@ -717,13 +717,10 @@
             (images.length > 1 ? '<button class="hero-more-photos" onclick="openLightbox(0)">' + images.length + ' photos</button>' : '') +
           '</div>' +
           '<div class="hero-right">' +
-            (tag ? '<p class="hero-tag">' + tag + '</p>' : '') +
             (f['Location label'] ? '<p class="hero-location">' + f['Location label'] + '</p>' : '') +
             '<h1 class="hero-title">' + (f['Name'] || '') + '</h1>' +
             (f['Description'] ? '<p class="hero-desc">' + f['Description'] + '</p>' : '') +
-            (f['Architect'] ? '<p class="hero-architect">Architecture by ' + f['Architect'] + '</p>' : '') +
             '<a href="' + bookingUrl + '" target="_blank" rel="noopener" class="hero-cta">Book this property</a>' +
-            (sleeps ? '<button class="hero-photos-count" onclick="openLightbox(0)">' + sleeps + '</button>' : '') +
           '</div>' +
         '</div>' +
 
