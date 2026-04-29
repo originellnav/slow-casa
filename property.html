@@ -515,9 +515,7 @@
         if (!text) return;
         html += '<div class="description-section">';
         html += '<p class="section-heading">' + s.label + '</p>';
-        var paras = text.split(/
-
-+/);
+        var paras = text.split(/\n\n+/);
         paras.forEach(function(para) {
           para = para.trim();
           if (para) html += '<p>' + para + '</p>';
@@ -528,8 +526,7 @@
       // Local Favourites
       var favs = f['Local Favourites'];
       if (favs) {
-        var lines = favs.split('
-').map(function(l) { return l.trim(); }).filter(Boolean);
+        var lines = favs.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
         var grouped = {};
         lines.forEach(function(line) {
           var parts = line.split(' · ');
