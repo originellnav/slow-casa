@@ -430,6 +430,97 @@
       .related-grid { grid-template-columns: 1fr; gap: 40px; }
       footer { padding: 24px; flex-direction: column; gap: 12px; }
     }
+
+    /* NEWSLETTER POPUP */
+    .nl-popup {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #0f0f0f;
+      color: #f9f7f2;
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+      white-space: nowrap;
+      max-width: calc(100vw - 48px);
+    }
+
+    .nl-popup.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: all;
+    }
+
+    .nl-popup-text {
+      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      color: #f9f7f2;
+      flex-shrink: 0;
+    }
+
+    .nl-popup-input {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 13px;
+      padding: 9px 14px;
+      border: 0.5px solid rgba(255,255,255,0.3);
+      background: transparent;
+      color: #f9f7f2;
+      outline: none;
+      width: 200px;
+      transition: border-color 0.2s;
+    }
+
+    .nl-popup-input::placeholder { color: rgba(255,255,255,0.4); }
+    .nl-popup-input:focus { border-color: rgba(255,255,255,0.8); }
+
+    .nl-popup-btn {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 9px 20px;
+      background: #f9f7f2;
+      color: #0f0f0f;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .nl-popup-btn:hover { opacity: 0.8; }
+
+    .nl-popup-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0 0 0 8px;
+      line-height: 1;
+      transition: color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .nl-popup-close:hover { color: #f9f7f2; }
+
+    @media (max-width: 600px) {
+      .nl-popup {
+        flex-wrap: wrap;
+        white-space: normal;
+        bottom: 16px;
+        padding: 16px 20px;
+      }
+      .nl-popup-input { width: 100%; }
+    }
   </style>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
@@ -812,5 +903,61 @@
     }
   </script>
 
+
+  <!-- Newsletter Popup -->
+  <div class="nl-popup" id="nl-popup">
+    <p class="nl-popup-text">One email every Thursday. New homes, slow places.</p>
+    <input class="nl-popup-input" id="nl-popup-email" type="email" placeholder="your@email.com" />
+    <button class="nl-popup-btn" onclick="handlePopupSubscribe()">Subscribe</button>
+    <button class="nl-popup-close" onclick="dismissPopup()" aria-label="Close">&#215;</button>
+  </div>
+
+  <script>
+    // Newsletter popup
+    (function() {
+      if (localStorage.getItem('sc_nl_dismissed')) return;
+
+      setTimeout(function() {
+        var popup = document.getElementById('nl-popup');
+        if (popup) popup.classList.add('visible');
+      }, 10000);
+    })();
+
+    function dismissPopup() {
+      var popup = document.getElementById('nl-popup');
+      if (popup) {
+        popup.classList.remove('visible');
+        setTimeout(function() { popup.style.display = 'none'; }, 400);
+      }
+      localStorage.setItem('sc_nl_dismissed', '1');
+    }
+
+    async function handlePopupSubscribe() {
+      var input = document.getElementById('nl-popup-email');
+      var btn = document.querySelector('.nl-popup-btn');
+      var email = input.value;
+      if (!email || !email.includes('@')) { input.focus(); return; }
+      btn.textContent = 'Subscribing...';
+      btn.disabled = true;
+      try {
+        var res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        if (res.ok) {
+          document.getElementById('nl-popup').innerHTML = "<p class=\"nl-popup-text\">You're in. See you Thursday.</p><button class=\"nl-popup-close\" onclick=\"dismissPopup()\">&#215;</button>";
+          setTimeout(dismissPopup, 3000);
+          localStorage.setItem('sc_nl_dismissed', '1');
+        } else {
+          btn.textContent = 'Subscribe';
+          btn.disabled = false;
+        }
+      } catch(e) {
+        btn.textContent = 'Subscribe';
+        btn.disabled = false;
+      }
+    }
+  </script>
 </body>
 </html>
