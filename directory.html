@@ -391,7 +391,6 @@
 
     function renderProperties(records) {
       var grid = document.getElementById('property-grid');
-      var count = document.getElementById('property-count');
 
       var filtered = records.filter(function(r) {
         return r.fields['Name'] && r.fields['Images'] && r.fields['Images'].length > 0;
@@ -416,17 +415,16 @@
 
       if (activeFilter !== 'all') {
         filtered = filtered.filter(function(r) {
-          var tags = r.fields['Tags'];
-          return tags && tags.indexOf(activeFilter) !== -1;
+          var country = (r.fields['Country'] || '').toLowerCase();
+          var region = (r.fields['Region'] || '').toLowerCase();
+          var filter = activeFilter.toLowerCase();
+          return country === filter || region === filter || country.includes(filter) || region.includes(filter);
         });
       }
 
       currentFiltered = filtered;
       currentPage = 0;
 
-      var countText = filtered.length + (filtered.length === 1 ? ' property' : ' properties');
-      if (locationQuery) countText = filtered.length + ' ' + (filtered.length === 1 ? 'property' : 'properties') + ' in ' + locationQuery;
-      count.textContent = countText;
 
       if (!filtered.length) {
         grid.innerHTML = '<div class="no-results"><p>No properties found.</p></div>';
