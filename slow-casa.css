@@ -80,26 +80,28 @@ nav.hero-nav .nav-links a:hover { color: var(--white); }
 
 /* FOOTER — sitewide */
 footer {
-  padding: 32px 48px;
+  padding: 24px 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  }
-
-
-.footer-word {
-  font-family: var(--archivo);
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--grey-1);
+  border-top: 0.5px solid var(--grey-3);
+  margin-top: 40px;
 }
 
+.footer-left { display: flex; align-items: center; gap: 32px; }
+.footer-copy { font-family: var(--sans); font-size: 12px; color: var(--grey-1); letter-spacing: 0.02em; }
+.footer-policy { font-family: var(--sans); font-size: 12px; color: var(--grey-1); letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+.footer-policy:hover { color: var(--black); }
+
 .footer-links { display: flex; gap: 28px; }
-.footer-links a { font-size: 12px; color: var(--grey-1); transition: color 0.2s; }
+.footer-links a { font-family: var(--sans); font-size: 12px; color: var(--grey-1); letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
 .footer-links a:hover { color: var(--black); }
+
+@media (max-width: 768px) {
+  footer { flex-direction: column; gap: 16px; padding: 24px; text-align: center; }
+  .footer-left { flex-direction: column; gap: 12px; }
+  .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+}
 
 /* PROPERTY CARDS — shared */
 .property-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
