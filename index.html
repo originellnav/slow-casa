@@ -936,14 +936,13 @@
         var url = '/journal/' + (post.category || 'places') + '/' + post.slug;
         var feature = document.getElementById('journal-feature');
         feature.innerHTML =
-          '<div class="editorial-img"><a href="' + url + '">' +
+          '<a href="' + url + '" class="editorial-img">' +
             (post.heroImage ? '<img src="' + post.heroImage + '" alt="' + post.title + '" loading="lazy" />' : '') +
-          '</a></div>' +
+          '</a>' +
           '<div class="editorial-text">' +
             '<p class="editorial-label">From the Journal</p>' +
             '<h2 class="editorial-title">' + post.title + '</h2>' +
-            (post.excerpt ? '<p class="editorial-body">' + post.excerpt + '</p>' : '') +
-            '<a href="' + url + '" class="editorial-link">' +
+            '<a href="' + url + '" class="editorial-arrow">' +
               '<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="23" stroke="#0f0f0f" stroke-width="0.8"/><path d="M18 24h12M25 19l5 5-5 5" stroke="#0f0f0f" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
             '</a>' +
           '</div>';
