@@ -84,6 +84,25 @@
 
     .dir-search-btn:hover { background: #6B5635; }
 
+    .dir-search-clear {
+      display: none;
+      position: absolute;
+      right: 100px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .dir-search-clear:hover { color: var(--black); }
+    .dir-search-clear.visible { display: block; }
+
     .search-dropdown {
       position: absolute;
       top: 100%;
@@ -236,6 +255,7 @@
     <div class="dir-search-wrap">
       <input class="dir-search-input" type="text" placeholder="Where do you want to go?" id="dir-search" autocomplete="off" />
       <button class="dir-search-btn" onclick="goToLocation(document.getElementById('dir-search').value || '')">Search</button>
+      <button class="dir-search-clear" id="dir-clear" onclick="clearSearch()">Clear</button>
       <div class="search-dropdown" id="dir-dropdown">
         <p class="dropdown-label">Popular locations</p>
         <button class="dropdown-item" onclick="goToLocation('Mallorca')">Mallorca</button>
@@ -251,7 +271,7 @@
 
   <div class="dir-body">
     <div class="dir-sidebar">
-      <button class="filter-btn active" onclick="setFilter('all', this)">All locations</button>
+      <button class="filter-btn active" onclick="setFilter('all', this); if(locationQuery) clearSearch();">All locations</button>
       <button class="filter-btn" onclick="setFilter('Alps', this)">Alps</button>
       <button class="filter-btn" onclick="setFilter('Spain', this)">Spain</button>
       <button class="filter-btn" onclick="setFilter('Portugal', this)">Portugal</button>
@@ -292,6 +312,11 @@
     // Pre-fill search if location param exists
     if (locationQuery) {
       document.getElementById('dir-search').value = locationQuery;
+      document.getElementById('dir-clear').classList.add('visible');
+    }
+
+    function clearSearch() {
+      window.location.href = '/directory';
     }
 
     // Rotating subheadline
