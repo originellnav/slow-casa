@@ -753,10 +753,6 @@
 
 
   <div class="section">
-    <div class="section-header">
-      <span class="section-label">From the Journal</span>
-      <a href="/journal" class="section-link">View all</a>
-    </div>
     <div class="editorial" id="journal-feature"><div class="loading" style="grid-column:1/-1;padding:40px 0;font-size:13px;color:var(--grey-1);letter-spacing:0.06em;">Loading...</div></div>
   </div>
   </div>
@@ -945,10 +941,13 @@
           '<div class="editorial-img"><a href="' + url + '">' +
             (post.heroImage ? '<img src="' + post.heroImage + '" alt="' + post.title + '" loading="lazy" />' : '') +
           '</a></div>' +
-          '<div>' +
-            '<p class="editorial-label">Places · ' + (post.location || '') + '</p>' +
+          '<div class="editorial-text">' +
+            '<p class="editorial-label">From the Journal</p>' +
             '<h2 class="editorial-title">' + post.title + '</h2>' +
-            '<a href="' + url + '" class="editorial-link">Read more</a>' +
+            (post.excerpt ? '<p class="editorial-body">' + post.excerpt + '</p>' : '') +
+            '<a href="' + url + '" class="editorial-link">' +
+              '<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="23" stroke="#0f0f0f" stroke-width="0.8"/><path d="M18 24h12M25 19l5 5-5 5" stroke="#0f0f0f" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '</a>' +
           '</div>';
       } catch (err) { console.error(err); }
     }
