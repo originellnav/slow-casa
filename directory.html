@@ -211,6 +211,37 @@
     .footer-links a { font-size: 12px; color: var(--grey-1); transition: color 0.2s; }
     .footer-links a:hover { color: var(--black); }
 
+    .page-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 0.5px solid var(--grey-3);
+      background: transparent;
+      color: #2a2a28;
+      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-btn:hover { border-color: #2a2a28; }
+
+    .page-btn.active {
+      background: #2a2a28;
+      border-color: #2a2a28;
+      color: #f9f7f2;
+      font-weight: 500;
+    }
+
+    .page-btn.arrow {
+      font-size: 16px;
+      color: #2a2a28;
+    }
+
     .fade-in { opacity: 0; transform: translateY(12px); animation: fadeIn 0.5s ease forwards; }
     @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
@@ -288,8 +319,8 @@
     </div>
   </div>
 
-  <div id="load-more-wrap" style="display:none;text-align:center;padding:48px 0 80px;">
-    <button onclick="loadMore()" style="font-family:var(--sans);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 40px;border:0.5px solid var(--black);background:transparent;color:var(--black);cursor:pointer;transition:background 0.2s,color 0.2s;" onmouseover="this.style.background='var(--black)';this.style.color='var(--white)'" onmouseout="this.style.background='transparent';this.style.color='var(--black)'">View more</button>
+  <div id="pagination" style="display:none;text-align:center;padding:56px 0 80px;">
+    <div id="pagination-inner" style="display:inline-flex;align-items:center;gap:8px;"></div>
   </div>
 
   <footer>
@@ -305,7 +336,7 @@
     var allRecords = [];
     var activeFilter = 'all';
     var locationQuery = new URLSearchParams(window.location.search).get('location') || '';
-    var PAGE_SIZE = 30;
+    var PAGE_SIZE = 12;
     var currentPage = 0;
     var currentFiltered = [];
 
@@ -464,22 +495,56 @@
     }
 
     function updateLoadMore() {
-      var wrap = document.getElementById('load-more-wrap');
-      var shown = (currentPage + 1) * PAGE_SIZE;
-      if (shown < currentFiltered.length) {
-        wrap.style.display = 'block';
-      } else {
-        wrap.style.display = 'none';
+      var pagination = document.getElementById('pagination');
+      var inner = document.getElementById('pagination-inner');
+      var totalPages = Math.ceil(currentFiltered.length / PAGE_SIZE);
+
+      if (totalPages <= 1) {
+        pagination.style.display = 'none';
+        return;
       }
+
+      pagination.style.display = 'block';
+      inner.innerHTML = '';
+
+      // Prev arrow
+      var prev = document.createElement('button');
+      prev.className = 'page-btn arrow';
+      prev.innerHTML = '&#8592;';
+      prev.disabled = currentPage === 0;
+      prev.style.opacity = currentPage === 0 ? '0.3' : '1';
+      prev.onclick = function() { goToPage(currentPage - 1); };
+      inner.appendChild(prev);
+
+      // Page numbers
+      for (var p = 0; p < totalPages; p++) {
+        (function(pageNum) {
+          var btn = document.createElement('button');
+          btn.className = 'page-btn' + (pageNum === currentPage ? ' active' : '');
+          btn.textContent = pageNum + 1;
+          btn.onclick = function() { goToPage(pageNum); };
+          inner.appendChild(btn);
+        })(p);
+      }
+
+      // Next arrow
+      var next = document.createElement('button');
+      next.className = 'page-btn arrow';
+      next.innerHTML = '&#8594;';
+      next.disabled = currentPage >= totalPages - 1;
+      next.style.opacity = currentPage >= totalPages - 1 ? '0.3' : '1';
+      next.onclick = function() { goToPage(currentPage + 1); };
+      inner.appendChild(next);
     }
 
-    function loadMore() {
-      currentPage++;
+    function goToPage(page) {
+      currentPage = page;
       var grid = document.getElementById('property-grid');
-      var start = currentPage * PAGE_SIZE;
-      var nextPage = currentFiltered.slice(start, start + PAGE_SIZE);
-      grid.innerHTML += nextPage.map(renderCard).join('');
+      var start = page * PAGE_SIZE;
+      var pageRecords = currentFiltered.slice(start, start + PAGE_SIZE);
+      grid.innerHTML = pageRecords.map(renderCard).join('');
       updateLoadMore();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     fetchProperties().then(function(records) {
