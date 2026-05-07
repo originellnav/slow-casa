@@ -516,7 +516,7 @@ module.exports = async function handler(req, res) {
       try {
         var res = await fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email }) });
         if (res.ok) {
-          document.getElementById('nl-popup').innerHTML = "<p class=\"nl-popup-text\">You're in. See you Thursday.</p><button class=\"nl-popup-close\" onclick=\"dismissPopup()\">&#215;</button>";
+          document.getElementById('nl-popup').innerHTML = '<p class="nl-popup-text">You\u2019re in. See you Thursday.</p><button class="nl-popup-close" onclick="dismissPopup()">&#215;</button>';
           setTimeout(dismissPopup, 3000);
           localStorage.setItem('sc_nl_dismissed', '1');
         } else { btn.textContent = 'Subscribe'; btn.disabled = false; }
