@@ -336,7 +336,7 @@ module.exports = async function handler(req, res) {
         if (!text) return '';
         var s = '<div class="description-section">';
         s += '<p class="section-heading">' + label + '</p>';
-        var paras = text.split(/\n\n+/);
+        var paras = text.split('\\n\\n');
         paras.forEach(function(para) {
           para = para.trim();
           if (para) s += '<p>' + para + '</p>';
@@ -353,7 +353,7 @@ module.exports = async function handler(req, res) {
 
       var favs = f['Local Favourites'];
       if (favs) {
-        var lines = favs.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+       var lines = favs.split('\\n').map(function(l) { return l.trim(); }).filter(Boolean);
         var grouped = {};
         lines.forEach(function(line) {
           var parts = line.split(' · ');
