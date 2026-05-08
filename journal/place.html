@@ -3,13 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Slow Casa</title>
+  <title id="page-title">Slow Casa</title>
+  <meta name="description" id="page-description" content="" />
+  <link rel="canonical" id="page-canonical" href="https://slowcasa.com" />
+  <meta property="og:title" id="og-title" content="Slow Casa" />
+  <meta property="og:description" id="og-description" content="" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Slow Casa" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/slow-casa.css" />
   <style>
-    body { font-family: var(--sans); background: var(--white); color: var(--black); }
-    nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 28px 48px; border-bottom: 0.5px solid var(--grey-3); position: sticky; top: 0; background: var(--white); z-index: 100; }
+    body { font-family: var(--sans); background: #f9f7f2; color: var(--black); }
+    nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 28px 48px; background: #f9f7f2; }
     .nav-links a { color: var(--grey-1); }
     .nav-links a:hover { color: var(--black); }
     .hero { width: 100%; height: 80vh; min-height: 480px; overflow: hidden; background: var(--grey-4); }
@@ -57,7 +64,6 @@
       .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
     }
   </style>
-  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -90,7 +96,7 @@
   </div>
 
   <footer>
-    <span class="footer-word">Slow Casa</span>
+    <div class="footer-left"><span class="footer-copy">&copy; 2026 Slow Casa</span><a href="/privacy" class="footer-policy" style="font-family:var(--sans);font-size:12px;color:#888;letter-spacing:0.08em;text-transform:uppercase;margin-left:32px;">Privacy Policy</a></div>
     <div class="footer-links">
       <a href="/directory">Directory</a>
       <a href="/journal">Journal</a>
@@ -147,8 +153,36 @@
       return 'Journal';
     }
 
+    function extractTextFromBody(body) {
+      for (var i = 0; i < (body || []).length; i++) {
+        var block = body[i];
+        if (block._type === 'block' && block.style === 'normal') {
+          var text = (block.children || []).map(function(c) { return c.text || ''; }).join('');
+          if (text.trim().length > 20) return text.trim().substring(0, 155);
+        }
+      }
+      return '';
+    }
+
     function renderGuide(guide) {
-      document.title = guide.title + ' — Slow Casa';
+      var pageTitle = guide.title + ' — Slow Casa';
+      var metaDesc = extractTextFromBody(guide.body);
+      var canonical = 'https://slowcasa.com/places/' + slug;
+      var ogImage = guide.heroImage || '';
+
+      document.title = pageTitle;
+      document.getElementById('page-title').textContent = pageTitle;
+      document.getElementById('page-description').setAttribute('content', metaDesc);
+      document.getElementById('page-canonical').setAttribute('href', canonical);
+      document.getElementById('og-title').setAttribute('content', pageTitle);
+      document.getElementById('og-description').setAttribute('content', metaDesc);
+
+      if (ogImage) {
+        var ogImg = document.createElement('meta');
+        ogImg.setAttribute('property', 'og:image');
+        ogImg.setAttribute('content', ogImage);
+        document.head.appendChild(ogImg);
+      }
       var bodyHtml = (guide.body || []).map(renderBlock).join('');
       document.getElementById('app').innerHTML =
         '<div class="hero">' +
