@@ -26,10 +26,10 @@ module.exports = async function handler(req, res) {
   const location = f['Location label'] || '';
   const description = (f['Description'] || '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   const architect = f['Architect'] || '';
-  const architectUrl = f['Architect URL'] || '';
   const heroImage = f['Hero Image'] || (f['Images'] && f['Images'][0] && f['Images'][0].url) || '';
   const bookingUrl = f['Booking URL'] || '#';
   const country = f['Country'] || '';
+  const region = f['Region'] || '';
   const editorialTitle = f['Editorial Title'] || '';
   const introOne = f['Intro One'] || '';
   const introTwo = f['Intro Two'] || '';
@@ -310,7 +310,10 @@ module.exports = async function handler(req, res) {
     <a href="${bookingUrl}" target="_blank" rel="noopener" class="prop-cta-btn">Book this property</a>
   </div>
 
-  <div class="related-section" id="related-section" style="display:none;">
+  <div class="related-section" id="related-section" style="display:none;"
+    data-region="${region.replace(/"/g, '&quot;')}"
+    data-country="${country.replace(/"/g, '&quot;')}"
+    data-slug="${slug}">
     <p class="related-label">More properties</p>
     <div class="related-grid" id="related-grid"></div>
   </div>
@@ -336,20 +339,22 @@ module.exports = async function handler(req, res) {
   <script>
     async function loadRelated() {
       try {
+        var el = document.getElementById('related-section');
+        var region = el.getAttribute('data-region');
+        var country = el.getAttribute('data-country');
+        var currentSlug = el.getAttribute('data-slug');
         var res = await fetch('/api/properties?all=true');
         var data = await res.json();
-        var region = '${(f['Region'] || '').replace(/'/g, "\\'")}';
-        var country = '${(f['Country'] || '').replace(/'/g, "\\'")}';
-        var currentSlug = '${slug}';
         var records = (data.records || []).filter(function(r) {
           return r.fields['Slug'] !== currentSlug &&
-            (r.fields['Region'] === region || r.fields['Country'] === country);
+            (r.fields['Region'] === region || r.fields['Country'] === country) &&
+            r.fields['Hero Image'];
         }).slice(0, 3);
         if (!records.length) return;
         var grid = document.getElementById('related-grid');
         grid.innerHTML = records.map(function(r) {
           var rf = r.fields;
-          var img = rf['Hero Image'] || (rf['Images'] && rf['Images'][0] && rf['Images'][0].url);
+          var img = rf['Hero Image'];
           var rslug = rf['Slug'];
           var rurl = rslug ? '/properties/' + rslug : '#';
           return '<a href="' + rurl + '" style="text-decoration:none;color:inherit;">' +
@@ -358,7 +363,7 @@ module.exports = async function handler(req, res) {
             '<p class="card-name">' + (rf['Name']||'') + '</p></div>' +
           '</a>';
         }).join('');
-        document.getElementById('related-section').style.display = 'block';
+        el.style.display = 'block';
       } catch(e) {}
     }
     loadRelated();
