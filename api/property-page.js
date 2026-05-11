@@ -338,11 +338,12 @@ module.exports = async function handler(req, res) {
       try {
         var res = await fetch('/api/properties?all=true');
         var data = await res.json();
-        var region = '${(f['Region'] || f['Country'] || '').replace(/'/g, "\\'")}';
+        var region = '${(f['Region'] || '').replace(/'/g, "\\'")}';
+        var country = '${(f['Country'] || '').replace(/'/g, "\\'")}';
         var currentSlug = '${slug}';
         var records = (data.records || []).filter(function(r) {
           return r.fields['Slug'] !== currentSlug &&
-            (r.fields['Region'] === region || r.fields['Country'] === region);
+            (r.fields['Region'] === region || r.fields['Country'] === country);
         }).slice(0, 3);
         if (!records.length) return;
         var grid = document.getElementById('related-grid');
