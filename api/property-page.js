@@ -174,8 +174,8 @@ module.exports = async function handler(req, res) {
       color: #444; margin-bottom: 24px;
     }
 
-    .prop-gallery { padding: 56px 0 0; }
-    .prop-gallery-row { display: grid; gap: 12px; margin-bottom: 12px; }
+    .prop-gallery { padding: 80px 0 0; }
+    .prop-gallery-row { display: grid; gap: 16px; margin-bottom: 32px; }
     .prop-gallery-row.two-col { grid-template-columns: 1fr 1fr; }
     .prop-gallery-row.one-col { grid-template-columns: 1fr; }
     .prop-gallery-img { overflow: hidden; background: #e8e8e8; aspect-ratio: 4/3; }
@@ -296,7 +296,7 @@ module.exports = async function handler(req, res) {
     ${introTwo ? `<p class="prop-intro">${introTwo}</p>` : ''}
   </div>` : ''}
 
-  ${images.length ? `<div style="padding: 0 48px;">${buildGallery(images)}</div>` : ''}
+  ${images.length ? `<div style="padding: 0 24px;">${buildGallery(images)}</div>` : ''}
 
   ${architectFeature ? `
   <div class="prop-section">
