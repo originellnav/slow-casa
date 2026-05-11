@@ -347,8 +347,7 @@ module.exports = async function handler(req, res) {
         var data = await res.json();
         var records = (data.records || []).filter(function(r) {
           return r.fields['Slug'] !== currentSlug &&
-            (r.fields['Region'] === region || r.fields['Country'] === country) &&
-            r.fields['Hero Image'];
+            (r.fields['Region'] === region || r.fields['Country'] === country);
         }).slice(0, 3);
         if (!records.length) return;
         var grid = document.getElementById('related-grid');
