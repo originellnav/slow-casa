@@ -201,6 +201,7 @@
     .loading { grid-column: 1 / -1; text-align: center; padding: 80px 48px; font-size: 13px; color: var(--grey-1); letter-spacing: 0.06em; }
     .no-results { grid-column: 1 / -1; text-align: center; padding: 80px 48px; }
     .no-results p { font-size: 15px; color: var(--grey-1); }
+    .card-hidden { display: none; }
 
     .skeleton { background: var(--grey-4); animation: pulse 1.5s ease-in-out infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
@@ -445,7 +446,9 @@
       var slug = f['Slug'];
       var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id;
       var featured = i < 2 ? '<span class="card-featured">&#9679; Featured</span>' : '';
-      return '<a href="' + url + '" style="text-decoration:none;color:inherit;">' +
+      var pageNum = Math.floor(i / PAGE_SIZE);
+var hiddenClass = pageNum === 0 ? '' : ' card-hidden';
+return '<a href="' + url + '" data-page="' + pageNum + '" class="' + ('card-link' + hiddenClass) + '" style="text-decoration:none;color:inherit;">' +
         '<div class="property-card fade-in" ' + delay + '>' +
           '<div class="card-img">' +
             (imgUrl ? '<img src="' + imgUrl + '" alt="' + name + '" loading="lazy" class="img-primary" />' : '') +
@@ -504,9 +507,8 @@
         return;
       }
 
-      var page = filtered.slice(0, PAGE_SIZE);
-      grid.innerHTML = page.map(renderCard).join('');
-      updateLoadMore();
+      grid.innerHTML = filtered.map(renderCard).join('');
+goToPage(0);
     }
 
     function updateLoadMore() {
@@ -552,15 +554,19 @@
       inner.appendChild(next);
     }
 
-    function goToPage(page) {
-      currentPage = page;
-      var grid = document.getElementById('property-grid');
-      var start = page * PAGE_SIZE;
-      var pageRecords = currentFiltered.slice(start, start + PAGE_SIZE);
-      grid.innerHTML = pageRecords.map(renderCard).join('');
-      updateLoadMore();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function goToPage(pageNum) {
+  currentPage = pageNum;
+  document.querySelectorAll('#property-grid > a[data-page]').forEach(function(card) {
+    var p = parseInt(card.getAttribute('data-page'), 10);
+    if (p === pageNum) {
+      card.classList.remove('card-hidden');
+    } else {
+      card.classList.add('card-hidden');
     }
+  });
+  updateLoadMore();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
     fetchProperties().then(function(records) {
       allRecords = records;
