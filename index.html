@@ -844,8 +844,10 @@
 
       // Sort by Date added descending, filter blanks
       var sorted = records.filter(function(r) {
-        return r.fields['Name'] && r.fields['Images'] && r.fields['Images'].length > 0;
-      }).sort(function(a, b) {
+  var f = r.fields;
+  if (!f['Name']) return false;
+  return !!f['Hero Image'] || !!f['Gallery Images'] || (f['Images'] && f['Images'].length > 0);
+}).sort(function(a, b) {
         var da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
         var db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
         return db - da;
