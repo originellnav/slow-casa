@@ -405,18 +405,27 @@
     }
 
     function getImageUrl(record, index) {
-      index = index || 0;
-      var heroImg = record.fields && record.fields['Hero Image'];
-      if (index === 0 && heroImg) return heroImg;
-      var images = record.fields['Images'];
-      if (images && images.length > index) {
-        if (images[index].thumbnails && images[index].thumbnails.full) return images[index].thumbnails.full.url;
-        return images[index].url;
-      }
-      // Fallback to Hero Image if no attachments
-      if (heroImg) return heroImg;
-      return null;
-    }
+  index = index || 0;
+  var f = record.fields || {};
+  var heroImg = f['Hero Image'];
+  var galleryStr = f['Gallery Images'];
+  var galleryUrls = galleryStr ? galleryStr.split('\n').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+
+  // Unified list: Hero Image is index 0, Gallery Images follow
+  var combined = [];
+  if (heroImg) combined.push(heroImg);
+  for (var i = 0; i < galleryUrls.length; i++) combined.push(galleryUrls[i]);
+  if (combined.length > index) return combined[index];
+
+  // Legacy Images attachment fallback for older records
+  var images = f['Images'];
+  if (images && images.length > index) {
+    if (images[index].thumbnails && images[index].thumbnails.full) return images[index].thumbnails.full.url;
+    return images[index].url;
+  }
+
+  return null;
+}
 
     function setFilter(filter, btn) {
       activeFilter = filter;
@@ -453,9 +462,11 @@
     function renderProperties(records) {
       var grid = document.getElementById('property-grid');
 
-      var filtered = records.filter(function(r) {
-        return r.fields['Name'] && r.fields['Images'] && r.fields['Images'].length > 0;
-      });
+     var filtered = records.filter(function(r) {
+  var f = r.fields;
+  if (!f['Name']) return false;
+  return !!f['Hero Image'] || !!f['Gallery Images'] || (f['Images'] && f['Images'].length > 0);
+});
 
       filtered.sort(function(a, b) {
         var da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
