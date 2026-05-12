@@ -413,6 +413,8 @@
         if (images[index].thumbnails && images[index].thumbnails.full) return images[index].thumbnails.full.url;
         return images[index].url;
       }
+      // Fallback to Hero Image if no attachments
+      if (heroImg) return heroImg;
       return null;
     }
 
