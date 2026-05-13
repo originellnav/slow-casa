@@ -857,7 +857,7 @@
       var latest = sorted[0];
       var f = latest.fields;
       var slug = f['Slug'];
-      var url = slug ? '/properties/' + slug : '/property.html?id=' + latest.id;
+      var url = '/properties/' + slug;
       var imgUrl = f['Hero Image'] || getImageUrl(latest, 0);
       var region = f['Region'] || f['Country'] || '';
       var name = f['Name'] || '';
