@@ -1,5 +1,9 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/property.html", "destination": "/directory", "permanent": true },
+    { "source": "/property", "destination": "/directory", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/properties/:slug", "destination": "/api/property-page?slug=:slug" },
