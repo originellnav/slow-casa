@@ -444,7 +444,7 @@
       var desc = f['Description'] ? f['Description'].substring(0, 100) + '...' : '';
       var delay = i < 4 ? 'style="animation-delay:' + (i * 0.05) + 's"' : '';
       var slug = f['Slug'];
-      var url = slug ? '/properties/' + slug : '/property.html?id=' + record.id;
+      var url = '/properties/' + slug;
       var featured = i < 2 ? '<span class="card-featured">&#9679; Featured</span>' : '';
       var pageNum = Math.floor(i / PAGE_SIZE);
 var hiddenClass = pageNum === 0 ? '' : ' card-hidden';
