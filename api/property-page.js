@@ -37,6 +37,13 @@ module.exports = async function handler(req, res) {
   const localFavourites = f['Local Favourites'] || '';
   const galleryImagesRaw = f['Gallery Images'] || '';
 
+  // Additional fields for structured data
+  const town = f['Town'] || '';
+  const latitude = f['Latitude'] || '';
+  const longitude = f['Longitude'] || '';
+  const sleeps = f['Sleeps'] || '';
+  const architectUrl = f['Architect URL'] || '';
+
   const galleryImages = galleryImagesRaw
     .split('\n')
     .map(u => u.trim())
@@ -50,6 +57,51 @@ module.exports = async function handler(req, res) {
   const title = `${name} — ${location} | Slow Casa`;
   const metaDesc = description ? description.substring(0, 155) : `${name} is a design-first vacation home in ${location}. Discover it on Slow Casa — curated architect-designed homes in ${country}.`;
   const canonicalUrl = `https://slowcasa.com/properties/${slug}`;
+
+  // Build JSON-LD structured data for SEO and rich results
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    "name": f['Name'] || '',
+    "description": f['Description'] || '',
+    "url": canonicalUrl,
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": country
+    }
+  };
+
+  if (town) structuredData.address.addressLocality = town;
+  if (region) structuredData.address.addressRegion = region;
+
+  if (latitude && longitude) {
+    structuredData.geo = {
+      "@type": "GeoCoordinates",
+      "latitude": parseFloat(latitude),
+      "longitude": parseFloat(longitude)
+    };
+  }
+
+  if (sleeps) {
+    const sleepsNum = parseInt(sleeps);
+    if (!isNaN(sleepsNum)) structuredData.maximumAttendeeCapacity = sleepsNum;
+  }
+
+  if (images.length > 0) {
+    structuredData.image = images.slice(0, 6);
+  }
+
+  if (architect) {
+    structuredData.creator = {
+      "@type": "Organization",
+      "name": architect
+    };
+    if (architectUrl) {
+      structuredData.creator.url = architectUrl;
+    }
+  }
+
+  const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`;
 
   function buildGallery(imgs) {
     if (!imgs.length) return '';
@@ -107,6 +159,7 @@ module.exports = async function handler(req, res) {
   <title>${title}</title>
   <meta name="description" content="${metaDesc}" />
   <link rel="canonical" href="${canonicalUrl}" />
+  ${jsonLdScript}
   <meta property="og:title" content="${title}" />
   <meta property="og:description" content="${metaDesc}" />
   <meta property="og:url" content="${canonicalUrl}" />
