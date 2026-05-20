@@ -4,13 +4,14 @@
     { "source": "/property.html", "destination": "/directory", "permanent": true },
     { "source": "/property", "destination": "/directory", "permanent": true }
   ],
-  "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/properties/:slug", "destination": "/api/property-page?slug=:slug" },
-    { "source": "/journal/places/:slug", "destination": "/journal/place?slug=:slug&category=places" },
-    { "source": "/places/:slug", "destination": "/journal/place?slug=:slug&category=places" },
-    { "source": "/journal/interviews/:slug", "destination": "/journal/place?slug=:slug&category=interviews" },
-    { "source": "/journal/stories/:slug", "destination": "/journal/place?slug=:slug&category=stories" },
-    { "source": "/privacy", "destination": "/privacy.html" }
-  ]
+ "rewrites": [
+  { "source": "/directory", "destination": "/api/directory" },
+  { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+  { "source": "/properties/:slug", "destination": "/api/property-page?slug=:slug" },
+  { "source": "/journal/places/:slug", "destination": "/journal/place?slug=:slug&category=places" },
+  { "source": "/places/:slug", "destination": "/journal/place?slug=:slug&category=places" },
+  { "source": "/journal/interviews/:slug", "destination": "/journal/place?slug=:slug&category=interviews" },
+  { "source": "/journal/stories/:slug", "destination": "/journal/place?slug=:slug&category=stories" },
+  { "source": "/privacy", "destination": "/privacy.html" }
+]
 }
