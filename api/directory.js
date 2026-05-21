@@ -1,6 +1,49 @@
 const AIRTABLE_TOKEN = 'patgpNhgfFkQsyQj9.887202d16495ba49fad025cb888cef3eac0a6c34058675dd2516127ad083d8c6';
 const BASE_ID = 'appndrnWrdlgxRJAG';
 
+// In-memory cache for the full Airtable property fetch.
+// One cache entry shared across all directory requests, since we filter in memory.
+let CACHED_RECORDS = null;
+let CACHED_AT = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+async function fetchAllPropertiesFromAirtable() {
+  let allRecords = [];
+  let offset = null;
+  let attempts = 0;
+  do {
+    let url = `https://api.airtable.com/v0/${BASE_ID}/Properties?pageSize=100`;
+    if (offset) url += `&offset=${encodeURIComponent(offset)}`;
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Cache-Control': 'no-cache' }
+    });
+    if (!response.ok) throw new Error('Airtable fetch failed: ' + response.status);
+    const data = await response.json();
+    allRecords = allRecords.concat(data.records || []);
+    offset = data.offset;
+    attempts++;
+  } while (offset && attempts < 10);
+  return allRecords;
+}
+
+async function getProperties() {
+  // Return cached records if still fresh
+  if (CACHED_RECORDS && (Date.now() - CACHED_AT) < CACHE_TTL_MS) {
+    return CACHED_RECORDS;
+  }
+
+  // Otherwise fetch fresh
+  const records = await fetchAllPropertiesFromAirtable();
+
+  // Only cache if fetch returned actual data
+  if (records && records.length > 0) {
+    CACHED_RECORDS = records;
+    CACHED_AT = Date.now();
+  }
+
+  return records;
+}
+
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g, '&amp;')
@@ -31,28 +74,15 @@ function getImageUrl(record, index) {
 module.exports = async function handler(req, res) {
   const locationQuery = (req.query.location || '').trim();
 
-  // Fetch all properties (paginated in case >100 exist in future)
-  let allRecords = [];
-  let offset = null;
-  let attempts = 0;
+  let allRecords;
   try {
-    do {
-      let url = `https://api.airtable.com/v0/${BASE_ID}/Properties?pageSize=100`;
-      if (offset) url += `&offset=${encodeURIComponent(offset)}`;
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Cache-Control': 'no-cache' }
-      });
-      const data = await response.json();
-      allRecords = allRecords.concat(data.records || []);
-      offset = data.offset;
-      attempts++;
-    } while (offset && attempts < 10);
+    allRecords = await getProperties();
   } catch (e) {
     return res.status(500).send('Error fetching directory');
   }
 
   // Filter to valid properties (must have a name and at least one image)
-  let records = allRecords.filter(r => {
+  let records = (allRecords || []).filter(r => {
     const f = r.fields || {};
     if (!f['Name']) return false;
     return !!f['Hero Image'] || !!f['Gallery Images'] || (f['Images'] && f['Images'].length > 0);
@@ -474,7 +504,6 @@ module.exports = async function handler(req, res) {
       window.location.href = '/directory?location=' + encodeURIComponent(location);
     }
 
-    // Rotating subheadline
     var sublines = [
       'Modern vacation homes, rooted in nature.',
       'Handpicked architectural homes across Europe.',
@@ -493,7 +522,6 @@ module.exports = async function handler(req, res) {
       }, 4000);
     }
 
-    // Search dropdown
     var searchInput = document.getElementById('dir-search');
     var searchDropdown = document.getElementById('dir-dropdown');
 
@@ -501,13 +529,11 @@ module.exports = async function handler(req, res) {
       searchInput.addEventListener('focus', function() {
         if (!locationQuery) searchDropdown.classList.add('open');
       });
-
       searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && searchInput.value.trim()) {
           goToLocation(searchInput.value.trim());
         }
       });
-
       document.addEventListener('click', function(e) {
         if (!e.target.closest('.dir-search-wrap')) {
           searchDropdown.classList.remove('open');
@@ -515,7 +541,6 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // Client-side filtering on existing server-rendered cards
     function setFilter(filter, btn) {
       activeFilter = filter;
       document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -526,39 +551,27 @@ module.exports = async function handler(req, res) {
     function applyFilter() {
       var allCards = Array.from(document.querySelectorAll('.card-link'));
       var filtered = [];
-
       allCards.forEach(function(card) {
         var country = card.getAttribute('data-country') || '';
         var region = card.getAttribute('data-region') || '';
         var match = false;
-
         if (activeFilter === 'all') {
           match = true;
         } else {
           var f = activeFilter.toLowerCase();
           match = country === f || region === f || country.indexOf(f) !== -1 || region.indexOf(f) !== -1;
         }
-
         if (match) filtered.push(card);
       });
-
-      // Hide all cards first
       allCards.forEach(function(card) { card.classList.add('card-hidden'); });
-
-      // Re-assign page numbers based on filtered order
       filtered.forEach(function(card, i) {
         card.setAttribute('data-page', Math.floor(i / PAGE_SIZE));
       });
-
       currentFiltered = filtered;
       currentPage = 0;
-
-      // Show page 0 of filtered set
       filtered.forEach(function(card, i) {
         if (Math.floor(i / PAGE_SIZE) === 0) card.classList.remove('card-hidden');
       });
-
-      // Empty state handling
       var existing = document.querySelector('.no-results');
       if (filtered.length === 0) {
         if (!existing) {
@@ -570,7 +583,6 @@ module.exports = async function handler(req, res) {
       } else if (existing) {
         existing.remove();
       }
-
       updateLoadMore();
     }
 
@@ -578,15 +590,12 @@ module.exports = async function handler(req, res) {
       var pagination = document.getElementById('pagination');
       var inner = document.getElementById('pagination-inner');
       var totalPages = Math.ceil(currentFiltered.length / PAGE_SIZE);
-
       if (totalPages <= 1) {
         pagination.style.display = 'none';
         return;
       }
-
       pagination.style.display = 'block';
       inner.innerHTML = '';
-
       var prev = document.createElement('button');
       prev.className = 'page-btn arrow';
       prev.innerHTML = '&#8592;';
@@ -594,7 +603,6 @@ module.exports = async function handler(req, res) {
       prev.style.opacity = currentPage === 0 ? '0.3' : '1';
       prev.onclick = function() { goToPage(currentPage - 1); };
       inner.appendChild(prev);
-
       for (var p = 0; p < totalPages; p++) {
         (function(pageNum) {
           var btn = document.createElement('button');
@@ -604,7 +612,6 @@ module.exports = async function handler(req, res) {
           inner.appendChild(btn);
         })(p);
       }
-
       var next = document.createElement('button');
       next.className = 'page-btn arrow';
       next.innerHTML = '&#8594;';
@@ -628,7 +635,6 @@ module.exports = async function handler(req, res) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Initialize on page load
     currentFiltered = Array.from(document.querySelectorAll('.card-link'));
     updateLoadMore();
   </script>
