@@ -1,25 +1,56 @@
 const AIRTABLE_TOKEN = 'patgpNhgfFkQsyQj9.887202d16495ba49fad025cb888cef3eac0a6c34058675dd2516127ad083d8c6';
 const BASE_ID = 'appndrnWrdlgxRJAG';
 
+// In-memory cache (persists for the lifetime of a warm function instance)
+// Keyed by slug. Each entry: { data: record, expiresAt: timestamp }
+const CACHE = new Map();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+function getCached(slug) {
+  const entry = CACHE.get(slug);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    CACHE.delete(slug);
+    return null;
+  }
+  return entry.data;
+}
+
+function setCached(slug, data) {
+  // Only cache successful, non-empty responses
+  if (!data) return;
+  CACHE.set(slug, { data, expiresAt: Date.now() + CACHE_TTL_MS });
+}
+
 module.exports = async function handler(req, res) {
   const { slug } = req.query;
   if (!slug) return res.status(400).send('Missing slug');
 
-  const formula = encodeURIComponent(`{Slug} = "${slug}"`);
-  const url = `https://api.airtable.com/v0/${BASE_ID}/Properties?filterByFormula=${formula}&maxRecords=1`;
+  let record = getCached(slug);
 
-  let record;
-  try {
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Cache-Control': 'no-cache' }
-    });
-    const data = await response.json();
-    record = data.records && data.records[0];
-  } catch(e) {
-    return res.status(500).send('Error fetching property');
+  if (!record) {
+    const formula = encodeURIComponent(`{Slug} = "${slug}"`);
+    const url = `https://api.airtable.com/v0/${BASE_ID}/Properties?filterByFormula=${formula}&maxRecords=1`;
+
+    try {
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Cache-Control': 'no-cache' }
+      });
+      if (!response.ok) {
+        // Don't cache failures
+        return res.status(500).send('Error fetching property');
+      }
+      const data = await response.json();
+      record = data.records && data.records[0];
+    } catch(e) {
+      return res.status(500).send('Error fetching property');
+    }
+
+    if (!record) return res.status(404).send('Property not found');
+
+    // Cache the successful fetch
+    setCached(slug, record);
   }
-
-  if (!record) return res.status(404).send('Property not found');
 
   const f = record.fields;
   const name = (f['Name'] || '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
@@ -37,7 +68,6 @@ module.exports = async function handler(req, res) {
   const localFavourites = f['Local Favourites'] || '';
   const galleryImagesRaw = f['Gallery Images'] || '';
 
-  // Additional fields for structured data
   const town = f['Town'] || '';
   const latitude = f['Latitude'] || '';
   const longitude = f['Longitude'] || '';
@@ -58,7 +88,7 @@ module.exports = async function handler(req, res) {
   const metaDesc = description ? description.substring(0, 155) : `${name} is a design-first vacation home in ${location}. Discover it on Slow Casa — curated architect-designed homes in ${country}.`;
   const canonicalUrl = `https://slowcasa.com/properties/${slug}`;
 
-  // Build JSON-LD structured data for SEO and rich results
+  // Build JSON-LD structured data
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "LodgingBusiness",
