@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Slow Casa — Architect-designed vacation homes in the Mediterranean</title>
-  <meta name="description" content="A curated directory of architect-designed vacation homes across the Mediterranean. Rural retreats and coastal hideaways handpicked for design-led travel." />
+  <title>Slow Casa — Architect-designed vacation homes in rural Europe</title>
+  <meta name="description" content="A curated directory of architect-designed vacation homes in rural Europe. Country retreats and coastal hideaways for slow, considered travel." />
   <link rel="canonical" href="https://slowcasa.com/" />
-<meta property="og:title" content="Slow Casa — Architect-designed vacation homes in the Mediterranean" />
-<meta property="og:description" content="A curated directory of architect-designed vacation homes across the Mediterranean. Rural retreats and coastal hideaways handpicked for design-led travel." />
+<meta property="og:title" content="Slow Casa — Architect-designed vacation homes in rural Europe" />
+<meta property="og:description" content="A curated directory of architect-designed vacation homes in rural Europe. Country retreats and coastal hideaways for slow, considered travel." />
 <meta property="og:url" content="https://slowcasa.com/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Slow Casa" />
-<meta property="og:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779355812/slow_casa_home_pahe_hero_image_chc38o.jpg" />
+<meta property="og:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Slow Casa — Architect-designed vacation homes in the Mediterranean" />
-<meta name="twitter:description" content="A curated directory of architect-designed vacation homes across the Mediterranean. Rural retreats and coastal hideaways handpicked for design-led travel." />
-<meta name="twitter:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779355812/slow_casa_home_pahe_hero_image_chc38o.jpg" />
+<meta name="twitter:title" content="Slow Casa — Architect-designed vacation homes in rural Europe" />
+<meta name="twitter:description" content="A curated directory of architect-designed vacation homes in rural Europe. Country retreats and coastal hideaways for slow, considered travel." />
+<meta name="twitter:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/slow-casa.css" />
@@ -34,33 +34,53 @@
     .hero {
       width: 100%;
       height: 100vh;
-      min-height: 500px;
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .hero-col {
+      min-height: 600px;
       position: relative;
       overflow: hidden;
     }
 
-    .hero-slide {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      transition: opacity 1.2s ease;
-    }
-
-    .hero-slide.active { opacity: 1; }
-
-    .hero-slide img {
+    .hero-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
       object-position: center;
       display: block;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 5;
+      width: 90%;
+      max-width: 800px;
+      padding: 0 24px;
+    }
+
+    .hero-headline {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 400;
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      margin-bottom: 24px;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-subhead {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: clamp(13px, 1.3vw, 16px);
+      font-weight: 400;
+      line-height: 1.5;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      opacity: 0.95;
+      text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+      max-width: 540px;
+      margin: 0 auto;
     }
 
     .hero-top-gradient {
@@ -69,14 +89,15 @@
       left: 0;
       right: 0;
       height: 180px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 100%);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 100%);
       z-index: 2;
       pointer-events: none;
     }
 
     @media (max-width: 768px) {
-      .hero { grid-template-columns: 1fr; }
-      .hero-col:last-child { display: none; }
+      .hero { min-height: 500px; }
+      .hero-headline { font-size: clamp(32px, 9vw, 48px); }
+      .hero-subhead { font-size: 13px; letter-spacing: 0.04em; }
     }
 
 
@@ -683,14 +704,17 @@
       </ul>
     </nav>
   <div class="hero">
-    <div class="hero-col" id="hero-col-left"></div>
-    <div class="hero-col" id="hero-col-right"></div>
+    <img class="hero-image" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_2400,h_1200,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" alt="A modern concrete villa in an olive grove on the south coast of Crete" />
     <div class="hero-top-gradient"></div>
+    <div class="hero-overlay">
+      <h1 class="hero-headline">Peace is the new luxury.</h1>
+      <p class="hero-subhead">Architect-designed vacation homes in rural Europe.</p>
+    </div>
   </div>
   </div>
 
   <div class="try-section">
-    <h1 class="try-headline"><strong>Slow Casa</strong> is an exclusive club of exceptional homes to stay in. Timeless designs, connected to nature. We travel the world to find the best slow living spaces for you to enjoy.</h1>
+    <h2 class="try-headline">Every home is selected for design, place, and a certain quiet. <strong>Architect-designed villas, modernist retreats, country houses and coastal hideaways across rural Europe.</strong></h2>
     <a href="/directory" class="criteria-btn">View Homes</a>
   </div>
 
@@ -713,7 +737,7 @@
   </div>
 
   <div class="criteria-section">
-    <p class="criteria-body"><strong>Peace is the new luxury.</strong> We believe in the power of simplicity, living in harmony with nature and focusing on essentials. All the homes we select reflect this ethos.</p>
+    <p class="criteria-body">We believe in the power of simplicity, in living closer to nature, and in spaces designed with intention. Every home in the directory is selected for design integrity, considered architecture, and a sense of place that earns the journey.</p>
     <a href="/criteria" class="criteria-btn">Our Criteria</a>
   </div>
 
@@ -722,7 +746,7 @@
       <div class="map-teaser-left">
         <p class="map-teaser-eyebrow">Find your slow place</p>
         <h2 class="map-teaser-title">Explore the map</h2>
-        <p class="map-teaser-sub">Every home in the Slow Casa directory, plotted across Europe and beyond.</p>
+        <p class="map-teaser-sub">Every home in the Slow Casa directory, plotted across rural Europe.</p>
         <button class="map-teaser-btn">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="24" cy="24" r="23" stroke="#0f0f0f" stroke-width="0.8"/>
@@ -804,51 +828,7 @@
       return null;
     }
 
-    // Fixed two-column slideshow
-    var leftImages = [
-      'https://res.cloudinary.com/dw1wmo2go/image/upload/v1777537771/22-01_IbizaCampoAtelier_AriadnaPuigdomenech_LR_113_u6oncz.jpg',
-      'https://res.cloudinary.com/dw1wmo2go/image/upload/v1777537785/685406a9bea8d02016f29004_joandso-holiday-house-meda-alentejo-casa-no-castanheiro-05-p-1080_czp6yc.jpg',
-      'https://res.cloudinary.com/dw1wmo2go/image/upload/v1777537814/f3bbf6_9010317cd98f43fca39f03b23d06fc5e_mv2_mp7km2.jpg'
-    ];
-
-    var rightImages = [
-      'https://res.cloudinary.com/dw1wmo2go/image/upload/v1777537831/casa-plaj-007_osogmy.jpg',
-      'https://res.cloudinary.com/dw1wmo2go/image/upload/v1777537795/casa-esperanca-012_weqdhi.jpg',
-      'https://res.cloudinary.com/dw1wmo2go/image/upload/v1777537961/en_kyano_home_22-1000x1252_gpxfz6.jpg'
-    ];
-
-    function buildCol(colId, images) {
-      var col = document.getElementById(colId);
-      images.forEach(function(url, i) {
-        var div = document.createElement('div');
-        div.className = 'hero-slide' + (i === 0 ? ' active' : '');
-        var img = document.createElement('img');
-        img.src = url;
-        img.alt = 'Slow Casa';
-        if (i > 0) img.loading = 'lazy';
-        div.appendChild(img);
-        col.appendChild(div);
-      });
-    }
-
-    function cycleCol(colId, intervalMs) {
-      var current = 0;
-      setInterval(function() {
-        var slides = document.querySelectorAll('#' + colId + ' .hero-slide');
-        slides[current].classList.remove('active');
-        current = (current + 1) % slides.length;
-        slides[current].classList.add('active');
-      }, intervalMs);
-    }
-
-    buildCol('hero-col-left', leftImages);
-    buildCol('hero-col-right', rightImages);
-
-    // Left changes first, right changes 2.5s later
-    cycleCol('hero-col-left', 5000);
-    setTimeout(function() {
-      cycleCol('hero-col-right', 5000);
-    }, 2500);
+    // Fetch featured property from API (single static hero image now)
 
     function renderProperties(records) {
       if (!records.length) return;
