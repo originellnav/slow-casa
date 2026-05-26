@@ -79,8 +79,10 @@ function formatMarkdown(text) {
   // Normalize line endings
   text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-  // Convert Airtable's \|text\| escape pattern to standard **text** markdown
+  // Convert Airtable's escape patterns back to standard markdown
+  // Handles \|text\| (rich text legacy) and \*\*text\*\* (escaped asterisks)
   text = text.replace(/\\\|(.+?)\\\|/g, '**$1**');
+  text = text.replace(/\\\*\\\*(.+?)\\\*\\\*/g, '**$1**');
 
   // Split into paragraphs (double line breaks)
   const paragraphs = text.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
