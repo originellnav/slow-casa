@@ -72,8 +72,16 @@ function escapeHtml(str) {
 
 // Simple markdown-to-HTML converter for the Philosophy field
 // Handles: **bold**, *italic*, paragraphs (double line breaks), single line breaks
+// Also handles Airtable's \|text\| escape pattern (legacy from rich text → plain text conversion)
 function formatMarkdown(text) {
   if (!text) return '';
+
+  // Normalize line endings
+  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+  // Convert Airtable's \|text\| escape pattern to standard **text** markdown
+  text = text.replace(/\\\|(.+?)\\\|/g, '**$1**');
+
   // Split into paragraphs (double line breaks)
   const paragraphs = text.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
   return paragraphs.map(p => {
@@ -516,7 +524,7 @@ module.exports = async function handler(req, res) {
 
   ${philosophy ? `
   <section class="arch-philosophy">
-     <p class="arch-section-label">In Conversation</p>
+    <p class="arch-section-label">In Conversation</p>
     <div class="arch-philosophy-content">${formatMarkdown(philosophy)}</div>
   </section>` : ''}
 
