@@ -8,6 +8,7 @@
   { "source": "/directory", "destination": "/api/directory" },
   { "source": "/sitemap.xml", "destination": "/api/sitemap" },
   { "source": "/properties/:slug", "destination": "/api/property-page?slug=:slug" },
+  { "source": "/architects/:slug", "destination": "/api/architect?slug=:slug" },
   { "source": "/journal/places/:slug", "destination": "/journal/place?slug=:slug&category=places" },
   { "source": "/places/:slug", "destination": "/journal/place?slug=:slug&category=places" },
   { "source": "/journal/interviews/:slug", "destination": "/journal/place?slug=:slug&category=interviews" },
