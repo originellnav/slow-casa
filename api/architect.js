@@ -516,7 +516,7 @@ module.exports = async function handler(req, res) {
 
   ${philosophy ? `
   <section class="arch-philosophy">
-    <p class="arch-section-label">Philosophy</p>
+     <p class="arch-section-label">In Conversation</p>
     <div class="arch-philosophy-content">${formatMarkdown(philosophy)}</div>
   </section>` : ''}
 
