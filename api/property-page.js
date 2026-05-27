@@ -367,7 +367,10 @@ module.exports = async function handler(req, res) {
     <div class="hero-right">
       ${location ? `<p class="hero-location">${location}</p>` : ''}
       <h1 class="hero-title">${name}</h1>
-      ${architect ? `<p class="hero-meta">Architecture by ${architect}</p>` : ''}
+      ${(architect || sleeps) ? `<p class="hero-meta">${[
+  architect ? `Architecture by ${architect}` : null,
+  sleeps ? `Sleeps ${sleeps}` : null
+].filter(Boolean).join(' · ')}</p>` : ''}
     </div>
   </div>
 
