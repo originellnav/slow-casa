@@ -62,6 +62,26 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// Responsive image URL helper - injects sensible width into Cloudinary URLs
+function responsiveImageUrl(url, width) {
+  if (!url) return url;
+  if (url.indexOf('res.cloudinary.com') >= 0) {
+    try {
+      const parts = url.split('/upload/');
+      if (parts.length !== 2) return url;
+      const rest = parts[1];
+      const versionIdx = rest.search(/\/v\d+\//);
+      const trail = versionIdx >= 0 ? rest.substring(versionIdx) : '/' + rest;
+      return parts[0] + '/upload/c_fill,w_' + width + ',g_auto,q_auto,f_auto' + trail;
+    } catch (e) { return url; }
+  }
+  if (url.indexOf('cdn.sanity.io') >= 0) {
+    const separator = url.indexOf('?') >= 0 ? '&' : '?';
+    return url + separator + 'w=' + width + '&auto=format&fit=max&q=80';
+  }
+  return url;
+}
+
 function getImageUrl(record, index) {
   index = index || 0;
   const f = record.fields || {};
@@ -135,20 +155,20 @@ module.exports = async function handler(req, res) {
   const allImages = getAllImageUrls(record);
   const galleryImages = allImages.slice(1);
 
-  // Gallery render
+  // Gallery render - apply responsive sizing
   let galleryHtml = '';
   const imgs = galleryImages;
   for (let i = 0; i < imgs.length; i += 2) {
     if (i + 1 < imgs.length) {
       galleryHtml += `
         <div class="prop-gallery-row">
-          <div class="prop-gallery-img"><img src="${imgs[i]}" alt="${name}" loading="lazy" /></div>
-          <div class="prop-gallery-img"><img src="${imgs[i+1]}" alt="${name}" loading="lazy" /></div>
+          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i], 1200)}" alt="${name}" loading="lazy" /></div>
+          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i+1], 1200)}" alt="${name}" loading="lazy" /></div>
         </div>`;
     } else {
       galleryHtml += `
         <div class="prop-gallery-row">
-          <div class="prop-gallery-img"><img src="${imgs[i]}" alt="${name}" loading="lazy" /></div>
+          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i], 1600)}" alt="${name}" loading="lazy" /></div>
         </div>`;
     }
   }
@@ -496,7 +516,7 @@ module.exports = async function handler(req, res) {
 
   <div class="hero-split">
     <div class="hero-left">
-      ${heroImage ? `<img src="${heroImage}" alt="${name}, ${location}" fetchpriority="high" loading="eager" />` : '<div style="width:100%;height:100%;background:#e8e8e8;"></div>'}
+      ${heroImage ? `<img src="${responsiveImageUrl(heroImage, 1400)}" alt="${name}, ${location}" fetchpriority="high" loading="eager" />` : '<div style="width:100%;height:100%;background:#e8e8e8;"></div>'}
     </div>
     <div class="hero-right">
       ${location ? `<p class="hero-location">${location}</p>` : ''}
@@ -571,7 +591,7 @@ async function renderOtherProperties(currentId) {
       const slug = rf['Slug'] || '';
       const url = '/properties/' + slug;
       return '<div onclick="window.location=\'' + url + '\'">' +
-            '<div class="card-img">' + (img ? '<img src="' + img + '" alt="' + (rf['Name']||'') + '" loading="lazy" />' : '') + '</div>' +
+            '<div class="card-img">' + (img ? '<img src="' + responsiveImageUrl(img, 600) + '" alt="' + (rf['Name']||'') + '" loading="lazy" />' : '') + '</div>' +
             '<p class="card-location">' + (rf['Location label']||'') + '</p>' +
             '<p class="card-name">' + (rf['Name']||'') + '</p>' +
             '</div>';
