@@ -17,7 +17,10 @@
 <meta name="twitter:description" content="A curated directory of architect-designed vacation homes in rural Europe. Country retreats and coastal hideaways for slow, considered travel." />
 <meta name="twitter:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" /></noscript>
   <link rel="stylesheet" href="/slow-casa.css" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
@@ -37,6 +40,12 @@
       min-height: 600px;
       position: relative;
       overflow: hidden;
+    }
+
+    .hero picture {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .hero-image {
@@ -682,7 +691,7 @@
     }
   </style>
   <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
+  <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -704,7 +713,11 @@
       </ul>
     </nav>
   <div class="hero">
-    <img class="hero-image" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_2400,h_1200,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" alt="A modern concrete villa in an olive grove on the south coast of Crete" />
+    <picture>
+      <source media="(max-width: 768px)" srcset="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_800,h_900,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
+      <source media="(max-width: 1200px)" srcset="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1400,h_900,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
+      <img class="hero-image" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_2400,h_1200,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" alt="A modern concrete villa in an olive grove on the south coast of Crete" fetchpriority="high" />
+    </picture>
     <div class="hero-top-gradient"></div>
     <div class="hero-overlay">
       <h1 class="hero-headline">Peace is the new luxury</h1>
