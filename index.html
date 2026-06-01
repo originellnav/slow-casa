@@ -18,12 +18,10 @@
 <meta name="twitter:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" /></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" /></noscript>
   <link rel="stylesheet" href="/slow-casa.css" />
-  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <style>
     @font-face {
       font-family: 'TT Norms Pro';
@@ -745,7 +743,7 @@
       </a>
     </div>
     <a class="featured-right" id="featured-img-link" href="#">
-      <img id="featured-img" src="" alt="" />
+      <img id="featured-img" src="" alt="" loading="lazy" />
     </a>
   </div>
 
@@ -784,7 +782,7 @@
     <div id="map-full" style="width:100%;height:100%;"></div>
     <!-- Property popup -->
     <div class="map-popup" id="map-popup" style="display:none;">
-      <img class="map-popup-img" id="map-popup-img" src="" alt="" />
+      <img class="map-popup-img" id="map-popup-img" src="" alt="" loading="lazy" />
       <div class="map-popup-body">
         <p class="map-popup-location" id="map-popup-location"></p>
         <p class="map-popup-name" id="map-popup-name"></p>
@@ -823,6 +821,40 @@
   </footer>
 
   <script>
+  // All page logic deferred until after initial render to maximize FCP/LCP
+  window.addEventListener('DOMContentLoaded', function() {
+
+    // Mapbox lazy loader - loads Mapbox CSS+JS only when first needed
+    var mapboxLoadPromise = null;
+    function loadMapbox() {
+      if (mapboxLoadPromise) return mapboxLoadPromise;
+      mapboxLoadPromise = new Promise(function(resolve) {
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css';
+        document.head.appendChild(css);
+        var script = document.createElement('script');
+        script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js';
+        script.onload = function() { resolve(); };
+        document.head.appendChild(script);
+      });
+      return mapboxLoadPromise;
+    }
+
+    // Cloudinary responsive transformer - keeps Cloudinary URLs but enforces sensible sizes
+    function responsiveCloudinaryUrl(url, width) {
+      if (!url || url.indexOf('res.cloudinary.com') === -1) return url;
+      // If the URL already has transformations, replace width; otherwise inject one
+      try {
+        var parts = url.split('/upload/');
+        if (parts.length !== 2) return url;
+        // Strip any existing transformation segment if present (between /upload/ and /v...)
+        var rest = parts[1];
+        var versionIdx = rest.search(/\/v\d+\//);
+        var trail = versionIdx >= 0 ? rest.substring(versionIdx) : '/' + rest;
+        return parts[0] + '/upload/c_fill,w_' + width + ',g_auto,q_auto,f_auto' + trail;
+      } catch (e) { return url; }
+    }
 
     async function fetchProperties() {
       try {
@@ -873,7 +905,7 @@
       document.getElementById('featured-link').href = url;
       document.getElementById('featured-img-link').href = url;
       var img = document.getElementById('featured-img');
-      img.src = imgUrl;
+      img.src = responsiveCloudinaryUrl(imgUrl, 1400);
       img.alt = name;
     }
 
@@ -943,7 +975,7 @@
         var feature = document.getElementById('journal-feature');
         feature.innerHTML =
           '<a href="' + url + '" class="editorial-img">' +
-            (post.heroImage ? '<img src="' + post.heroImage + '" alt="' + post.title + '" loading="lazy" />' : '') +
+            (post.heroImage ? '<img src="' + responsiveCloudinaryUrl(post.heroImage, 1200) + '" alt="' + post.title + '" loading="lazy" />' : '') +
           '</a>' +
           '<div class="editorial-text">' +
             '<p class="editorial-label">From the Journal</p>' +
@@ -972,6 +1004,7 @@
         mapProperties = records.filter(function(r) {
           return r.fields['Latitude'] && r.fields['Longitude'] && r.fields['Name'];
         });
+        await loadMapbox();
         initTeaserMap();
       } catch(e) { console.error('Map init error:', e); }
     }
@@ -1005,7 +1038,9 @@
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
       if (!mapFull) {
-        setTimeout(function() { initFullMap(); }, 50);
+        loadMapbox().then(function() {
+          setTimeout(function() { initFullMap(); }, 50);
+        });
       }
     }
 
@@ -1045,7 +1080,7 @@
             document.getElementById('map-popup-name').textContent = f['Name'] || '';
             document.getElementById('map-popup-link').href = url;
             var popupImg = document.getElementById('map-popup-img');
-            if (imgUrl) { popupImg.src = imgUrl; popupImg.style.display = 'block'; }
+            if (imgUrl) { popupImg.src = responsiveCloudinaryUrl(imgUrl, 600); popupImg.style.display = 'block'; }
             else { popupImg.style.display = 'none'; }
             document.getElementById('map-popup').style.display = 'block';
 
@@ -1068,7 +1103,13 @@
       if (e.key === 'Escape') closeMapModal();
     });
 
+    // Expose modal functions globally for inline onclick handlers
+    window.openMapModal = openMapModal;
+    window.closeMapModal = closeMapModal;
+    window.handleTrySubscribe = handleTrySubscribe;
+
     initMaps();
+  });
   </script>
 
 </body>
