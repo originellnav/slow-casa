@@ -16,11 +16,52 @@
 <meta name="twitter:title" content="Slow Casa — Architect-designed vacation homes in rural Europe" />
 <meta name="twitter:description" content="A curated directory of architect-designed vacation homes in rural Europe. Country retreats and coastal hideaways for slow, considered travel." />
 <meta name="twitter:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
   <link rel="stylesheet" href="/slow-casa.css" />
   <style>
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2');
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-300italic.woff2') format('woff2');
+      font-weight: 300;
+      font-style: italic;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-500.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Serif Display';
+      src: url('/fonts/dm-serif-display-v17-latin-regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Serif Display';
+      src: url('/fonts/dm-serif-display-v17-latin-italic.woff2') format('woff2');
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
     @font-face {
       font-family: 'TT Norms Pro';
       src: url('/TT_Norms_Pro_Regular.woff2') format('woff2');
@@ -796,7 +837,6 @@
 
 
 
-  <div class="editorial" id="journal-feature"><div class="loading" style="grid-column:1/-1;padding:40px 0;font-size:13px;color:var(--grey-1);letter-spacing:0.06em;">Loading...</div></div>
   </div>
 
   <div class="try-section">
@@ -979,27 +1019,9 @@
 
     fetchProperties().then(renderProperties);
 
-    // Fetch latest journal post
+    // Fetch latest journal post - DISABLED until journal section is re-added with proper content
     async function fetchLatestPost() {
-      try {
-        var res = await fetch('/api/journal');
-        var posts = await res.json();
-        if (!posts || !posts.length) return;
-        var post = posts[0];
-        var url = '/journal/' + (post.category || 'places') + '/' + post.slug;
-        var feature = document.getElementById('journal-feature');
-        feature.innerHTML =
-          '<a href="' + url + '" class="editorial-img">' +
-            (post.heroImage ? '<img src="' + responsiveImageUrl(post.heroImage, 1200) + '" alt="' + post.title + '" loading="lazy" />' : '') +
-          '</a>' +
-          '<div class="editorial-text">' +
-            '<p class="editorial-label">From the Journal</p>' +
-            '<h2 class="editorial-title">' + post.title + '</h2>' +
-            '<a href="' + url + '" class="editorial-arrow">' +
-              '<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="23" stroke="#0f0f0f" stroke-width="0.8"/><path d="M18 24h12M25 19l5 5-5 5" stroke="#0f0f0f" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-            '</a>' +
-          '</div>';
-      } catch (err) { console.error(err); }
+      return;
     }
 
     fetchLatestPost();
