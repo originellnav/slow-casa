@@ -408,8 +408,7 @@ module.exports = async function handler(req, res) {
     .card-img { width: 100%; aspect-ratio: 3/2; overflow: hidden; margin-bottom: 20px; background: var(--grey-4); position: relative; }
     .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; top: 0; left: 0; transition: opacity 0.4s ease; }
     .card-featured { position: absolute; top: 16px; left: 16px; font-family: 'DM Sans', system-ui, sans-serif; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--white); background: rgba(0,0,0,0.35); border: 0.5px solid rgba(255,255,255,0.5); padding: 5px 12px; z-index: 2; backdrop-filter: blur(4px); }
-    .property-card:hover .card-img img.img-primary { opacity: 0; }
-    .property-card:hover .card-img img.img-secondary { opacity: 1; }
+    .card-img img.img-primary { opacity: 1; }
     .card-img-placeholder { width: 100%; height: 100%; background: var(--grey-4); }
 
     .card-location { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 8px; }
