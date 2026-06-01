@@ -151,7 +151,6 @@ module.exports = async function handler(req, res) {
       <div class="property-card">
         <div class="card-img">
           ${imgUrl ? `<img src="${escapeHtml(responsiveImageUrl(imgUrl, 600))}" alt="${name}" loading="lazy" class="img-primary" />` : ''}
-          ${imgUrl2 && imgUrl2 !== imgUrl ? `<img src="${escapeHtml(responsiveImageUrl(imgUrl2, 600))}" alt="${name}" loading="lazy" class="img-secondary" />` : ''}
           ${featured}
         </div>
         <p class="card-location">${locationLabel}</p>
