@@ -18,9 +18,7 @@
 <meta name="twitter:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" /></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" />
   <link rel="stylesheet" href="/slow-casa.css" />
   <style>
     @font-face {
@@ -856,6 +854,23 @@
       } catch (e) { return url; }
     }
 
+    // Sanity responsive transformer - adds width + format hints to cdn.sanity.io URLs
+    function responsiveSanityUrl(url, width) {
+      if (!url || url.indexOf('cdn.sanity.io') === -1) return url;
+      try {
+        var separator = url.indexOf('?') >= 0 ? '&' : '?';
+        return url + separator + 'w=' + width + '&auto=format&fit=max&q=80';
+      } catch (e) { return url; }
+    }
+
+    // Smart responsive URL - applies the right transformer based on URL host
+    function responsiveImageUrl(url, width) {
+      if (!url) return url;
+      if (url.indexOf('res.cloudinary.com') >= 0) return responsiveCloudinaryUrl(url, width);
+      if (url.indexOf('cdn.sanity.io') >= 0) return responsiveSanityUrl(url, width);
+      return url;
+    }
+
     async function fetchProperties() {
       try {
         var res = await fetch('/api/properties');
@@ -905,7 +920,7 @@
       document.getElementById('featured-link').href = url;
       document.getElementById('featured-img-link').href = url;
       var img = document.getElementById('featured-img');
-      img.src = responsiveCloudinaryUrl(imgUrl, 1400);
+      img.src = responsiveImageUrl(imgUrl, 1400);
       img.alt = name;
     }
 
@@ -975,7 +990,7 @@
         var feature = document.getElementById('journal-feature');
         feature.innerHTML =
           '<a href="' + url + '" class="editorial-img">' +
-            (post.heroImage ? '<img src="' + responsiveCloudinaryUrl(post.heroImage, 1200) + '" alt="' + post.title + '" loading="lazy" />' : '') +
+            (post.heroImage ? '<img src="' + responsiveImageUrl(post.heroImage, 1200) + '" alt="' + post.title + '" loading="lazy" />' : '') +
           '</a>' +
           '<div class="editorial-text">' +
             '<p class="editorial-label">From the Journal</p>' +
@@ -1080,7 +1095,7 @@
             document.getElementById('map-popup-name').textContent = f['Name'] || '';
             document.getElementById('map-popup-link').href = url;
             var popupImg = document.getElementById('map-popup-img');
-            if (imgUrl) { popupImg.src = responsiveCloudinaryUrl(imgUrl, 600); popupImg.style.display = 'block'; }
+            if (imgUrl) { popupImg.src = responsiveImageUrl(imgUrl, 600); popupImg.style.display = 'block'; }
             else { popupImg.style.display = 'none'; }
             document.getElementById('map-popup').style.display = 'block';
 
