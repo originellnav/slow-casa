@@ -53,6 +53,26 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// Responsive image URL helper - injects sensible width into Cloudinary URLs
+function responsiveImageUrl(url, width) {
+  if (!url) return url;
+  if (url.indexOf('res.cloudinary.com') >= 0) {
+    try {
+      const parts = url.split('/upload/');
+      if (parts.length !== 2) return url;
+      const rest = parts[1];
+      const versionIdx = rest.search(/\/v\d+\//);
+      const trail = versionIdx >= 0 ? rest.substring(versionIdx) : '/' + rest;
+      return parts[0] + '/upload/c_fill,w_' + width + ',g_auto,q_auto,f_auto' + trail;
+    } catch (e) { return url; }
+  }
+  if (url.indexOf('cdn.sanity.io') >= 0) {
+    const separator = url.indexOf('?') >= 0 ? '&' : '?';
+    return url + separator + 'w=' + width + '&auto=format&fit=max&q=80';
+  }
+  return url;
+}
+
 function getImageUrl(record, index) {
   index = index || 0;
   const f = record.fields || {};
@@ -130,8 +150,8 @@ module.exports = async function handler(req, res) {
     return `<a href="${url}" data-page="${pageNum}" data-country="${country}" data-region="${region}" class="card-link${hiddenClass}" style="text-decoration:none;color:inherit;">
       <div class="property-card">
         <div class="card-img">
-          ${imgUrl ? `<img src="${escapeHtml(imgUrl)}" alt="${name}" loading="lazy" class="img-primary" />` : ''}
-          ${imgUrl2 && imgUrl2 !== imgUrl ? `<img src="${escapeHtml(imgUrl2)}" alt="${name}" loading="lazy" class="img-secondary" />` : ''}
+          ${imgUrl ? `<img src="${escapeHtml(responsiveImageUrl(imgUrl, 600))}" alt="${name}" loading="lazy" class="img-primary" />` : ''}
+          ${imgUrl2 && imgUrl2 !== imgUrl ? `<img src="${escapeHtml(responsiveImageUrl(imgUrl2, 600))}" alt="${name}" loading="lazy" class="img-secondary" />` : ''}
           ${featured}
         </div>
         <p class="card-location">${locationLabel}</p>
@@ -149,7 +169,7 @@ module.exports = async function handler(req, res) {
   const clearVisible = locationQuery ? 'visible' : '';
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=600');
+  res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -165,9 +185,51 @@ module.exports = async function handler(req, res) {
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Slow Casa" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
   <style>
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2');
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-300italic.woff2') format('woff2');
+      font-weight: 300;
+      font-style: italic;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-500.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Serif Display';
+      src: url('/fonts/dm-serif-display-v17-latin-regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Serif Display';
+      src: url('/fonts/dm-serif-display-v17-latin-italic.woff2') format('woff2');
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --white: #ffffff;
@@ -414,7 +476,7 @@ module.exports = async function handler(req, res) {
       .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
     }
   </style>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
+  <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
