@@ -4,7 +4,6 @@ module.exports = async function handler(req, res) {
   const staticPages = [
     { url: '/', priority: '1.0', changefreq: 'weekly' },
     { url: '/directory', priority: '0.9', changefreq: 'weekly' },
-    { url: '/journal', priority: '0.8', changefreq: 'weekly' },
     { url: '/criteria', priority: '0.5', changefreq: 'monthly' },
   ];
 
@@ -25,22 +24,7 @@ module.exports = async function handler(req, res) {
       }));
   } catch (e) {}
 
-  let journalUrls = [];
-  try {
-    const query = encodeURIComponent('*[_type == "locationGuide"]{slug, category, publishedAt}');
-    const res = await fetch(`https://hchp27po.apicdn.sanity.io/v2024-01-01/data/query/production?query=${query}`);
-    const data = await res.json();
-    journalUrls = (data.result || [])
-      .filter(p => p.slug && p.slug.current)
-      .map(p => ({
-        url: '/journal/' + (p.category || 'places') + '/' + p.slug.current,
-        priority: '0.7',
-        changefreq: 'monthly',
-        lastmod: p.publishedAt ? p.publishedAt.split('T')[0] : ''
-      }));
-  } catch (e) {}
-
-  const allPages = [...staticPages, ...propertyUrls, ...journalUrls];
+  const allPages = [...staticPages, ...propertyUrls];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
