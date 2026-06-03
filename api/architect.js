@@ -548,8 +548,9 @@ module.exports = async function handler(req, res) {
       <a href="/privacy" class="footer-policy">Privacy Policy</a>
     </div>
     <div class="footer-links">
+      <a href="/guides">Guides</a>
       <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://slowcasa.beehiiv.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
     </div>
   </footer>
 
