@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><style>
+    #light-icon {
+      display: inline;
+    }
+    #dark-icon {
+      display: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #light-icon {
+        display: none;
+      }
+      #dark-icon {
+        display: inline;
+      }
+    }
+  </style><g id="light-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g><g transform="matrix(10,0,0,10,0,0)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><defs>
+    <style type="text/css">
+      @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;display=swap');
+      .s-letter {
+        font-family: 'DM Serif Display', 'Playfair Display', 'Bodoni 72', Georgia, 'Times New Roman', serif;
+        font-size: 84px;
+        font-weight: 400;
+        fill: #f9f7f2;
+      }
+    </style>
+  </defs><circle cx="50" cy="50" r="50" fill="#0f0f0f"></circle><text x="50" y="74" text-anchor="middle" class="s-letter">S</text></svg></g></g></svg></g><g id="dark-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g clip-path="url(#SvgjsClipPath1001)"><rect width="1000" height="1000" fill="#ffffff"></rect><g transform="matrix(7,0,0,7,150,150)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><defs>
+    <style type="text/css">
+      @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;display=swap');
+      .s-letter {
+        font-family: 'DM Serif Display', 'Playfair Display', 'Bodoni 72', Georgia, 'Times New Roman', serif;
+        font-size: 84px;
+        font-weight: 400;
+        fill: #f9f7f2;
+      }
+    </style>
+  <clipPath id="SvgjsClipPath1001"><rect width="1000" height="1000" x="0" y="0" rx="350" ry="350"></rect></clipPath></defs><circle cx="50" cy="50" r="50" fill="#0f0f0f"></circle><text x="50" y="74" text-anchor="middle" class="s-letter">S</text></svg></g></g></svg></g></svg>
