@@ -176,6 +176,12 @@ module.exports = async function handler(req, res) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Directory — Slow Casa</title>
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Slow Casa" />
+<link rel="manifest" href="/site.webmanifest" />
   <meta name="description" content="Every design-first vacation home in the Slow Casa directory. Filter by setting — sea, mountains, farm." />
   <link rel="canonical" href="https://slowcasa.com/directory" />
   <meta property="og:title" content="Directory — Slow Casa" />
