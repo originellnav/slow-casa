@@ -5,13 +5,4 @@
     { "source": "/property", "destination": "/directory", "permanent": true },
     { "source": "/journal", "destination": "/", "statusCode": 410 },
     { "source": "/journal/:path*", "destination": "/", "statusCode": 410 },
-    { "source": "/places/:slug", "destination": "/", "statusCode": 410 }
-  ],
-  "rewrites": [
-    { "source": "/directory", "destination": "/api/directory" },
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/properties/:slug", "destination": "/api/property-page?slug=:slug" },
-    { "source": "/architects/:slug", "destination": "/api/architect?slug=:slug" },
-    { "source": "/privacy", "destination": "/privacy.html" }
-  ]
-}
+    { "source": "/places/:slug", "destination": "/", "statusCode":
