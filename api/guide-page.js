@@ -234,14 +234,16 @@ module.exports = async function handler(req, res) {
   const categoryLabel = formatCategory(category);
   const metaTitle = guide.metaTitle || (title + ' | Slow Casa');
   const metaDesc = guide.metaDescription || guide.excerpt || `A guide on Slow Casa, the curated directory of architect-designed vacation homes in rural Europe.`;
-  const excerpt = guide.excerpt || '';
   const publishedAt = guide.publishedAt || '';
-  const publishedDateReadable = formatDate(publishedAt);
   const heroImage = guide.heroImage || {};
   const heroUrl = heroImage.url || '';
   const heroAlt = heroImage.alt || title;
-  const heroCredit = heroImage.credit || '';
   const bodyHtml = renderBody(guide.body || []);
+
+  // Build leading image (replaces full-width hero). Sits at top of body content.
+  const leadImageHtml = heroUrl ? `<figure class="guide-image guide-image-lead">
+    <img src="${escapeHtml(sanityImageUrl(heroUrl, 1200))}" alt="${escapeHtml(heroAlt)}" fetchpriority="high" loading="eager" />
+  </figure>` : '';
 
   const canonicalUrl = `https://slowcasa.com/guides/${slug}`;
 
@@ -370,24 +372,10 @@ module.exports = async function handler(req, res) {
     .nav-links a { font-size: 13px; color: #0f0f0f; opacity: 0.7; letter-spacing: 0.03em; transition: opacity 0.2s; }
     .nav-links a:hover { opacity: 1; }
 
-    .guide-hero {
-      width: 100%;
-      max-height: 70vh;
-      overflow: hidden;
-      background: #e8e8e8;
-    }
-    .guide-hero img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      aspect-ratio: 16/9;
-    }
-
     .guide-header {
       max-width: 720px;
       margin: 0 auto;
-      padding: 80px 48px 48px;
+      padding: 64px 48px 32px;
       text-align: center;
     }
     .guide-category {
@@ -403,21 +391,6 @@ module.exports = async function handler(req, res) {
       line-height: 1.1;
       letter-spacing: -0.01em;
       color: #0f0f0f;
-      margin-bottom: 28px;
-    }
-    .guide-excerpt {
-      font-family: 'TT Norms Pro', 'DM Sans', sans-serif;
-      font-size: 19px;
-      font-weight: 300;
-      line-height: 1.6;
-      color: #555;
-      margin-bottom: 28px;
-    }
-    .guide-meta {
-      font-size: 11px;
-      color: #888;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
     }
 
     .guide-body {
@@ -464,10 +437,13 @@ module.exports = async function handler(req, res) {
     .guide-body a:hover {
       border-color: #0f0f0f;
     }
-    .guide-body strong { font-weight: 500; }
+    .guide-body strong { font-weight: 600; }
 
     .guide-image {
       margin: 2.4em -48px;
+    }
+    .guide-image-lead {
+      margin: 0 -48px 2.4em;
     }
     .guide-image img {
       width: 100%;
@@ -502,9 +478,10 @@ module.exports = async function handler(req, res) {
     @media (max-width: 768px) {
       nav { padding: 20px 24px; }
       .nav-links { display: none; }
-      .guide-header { padding: 56px 24px 32px; }
+      .guide-header { padding: 48px 24px 24px; }
       .guide-body { padding: 0 24px 56px; font-size: 17px; }
       .guide-image { margin: 2em -24px; }
+      .guide-image-lead { margin: 0 -24px 2em; }
       footer { padding: 56px 24px 24px; flex-direction: column; gap: 16px; text-align: center; }
       .footer-left { flex-direction: column; gap: 12px; }
     }
@@ -523,18 +500,13 @@ module.exports = async function handler(req, res) {
     </ul>
   </nav>
 
-  ${heroUrl ? `<div class="guide-hero">
-    <img src="${escapeHtml(sanityImageUrl(heroUrl, 1800))}" alt="${escapeHtml(heroAlt)}" fetchpriority="high" loading="eager" />
-  </div>` : ''}
-
   <header class="guide-header">
     <p class="guide-category">${escapeHtml(categoryLabel)}</p>
     <h1 class="guide-title">${escapeHtml(title)}</h1>
-    ${excerpt ? `<p class="guide-excerpt">${escapeHtml(excerpt)}</p>` : ''}
-    ${publishedDateReadable ? `<p class="guide-meta">${escapeHtml(publishedDateReadable)}</p>` : ''}
   </header>
 
   <article class="guide-body">
+    ${leadImageHtml}
     ${bodyHtml}
   </article>
 
