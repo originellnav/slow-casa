@@ -150,6 +150,36 @@ module.exports = async function handler(req, res) {
   const bookingUrl = f['Booking URL'] || '';
   const architect = f['Architect'] || '';
   const architectUrl = f['Architect URL'] || '';
+  const localFavourites = f['Local Favourites'] || '';
+
+  // Local Favourites render - expects one entry per line: "Category · Name · URL"
+  function buildFavourites(favs) {
+    if (!favs) return '';
+    const lines = favs.split('\n').map(l => l.trim()).filter(Boolean);
+    const grouped = {};
+    lines.forEach(line => {
+      // Strip leading list markers Airtable rich text may add (- or *)
+      const clean = line.replace(/^[-*]\s+/, '');
+      const parts = clean.split(' · ');
+      if (parts.length < 3) return;
+      const cat = parts[0].trim();
+      const favName = parts[1].trim();
+      const favUrl = parts.slice(2).join(' · ').trim();
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push({ name: favName, url: favUrl });
+    });
+    if (!Object.keys(grouped).length) return '';
+    let favsHtml = '<section class="prop-favs"><p class="prop-favs-label">Local Favourites</p><div class="favs-grid">';
+    Object.keys(grouped).forEach(cat => {
+      favsHtml += '<div class="favs-group"><p class="favs-cat">' + escapeHtml(cat) + '</p>';
+      grouped[cat].forEach(item => {
+        favsHtml += '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="favs-link">' + escapeHtml(item.name) + '</a>';
+      });
+      favsHtml += '</div>';
+    });
+    favsHtml += '</div></section>';
+    return favsHtml;
+  }
 
   const heroImage = getImageUrl(record, 0);
   const allImages = getAllImageUrls(record);
@@ -396,6 +426,45 @@ module.exports = async function handler(req, res) {
       display: block;
     }
 
+    .prop-favs {
+      max-width: 720px;
+      margin: 96px auto 0;
+      padding: 0 48px;
+    }
+    .prop-favs-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #0f0f0f;
+      margin-bottom: 28px;
+    }
+    .favs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 32px;
+    }
+    .favs-group { display: flex; flex-direction: column; gap: 8px; }
+    .favs-cat {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .favs-link {
+      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      color: #0f0f0f;
+      border-bottom: 0.5px solid #e8e8e8;
+      padding-bottom: 2px;
+      transition: border-color 0.2s;
+      display: inline-block;
+      width: fit-content;
+    }
+    .favs-link:hover { border-color: #0f0f0f; }
+
     .prop-cta {
       max-width: 720px;
       margin: 96px auto 0;
@@ -500,6 +569,7 @@ module.exports = async function handler(req, res) {
       .prop-gallery { padding: 0 24px; margin-top: 64px; }
       .prop-gallery-row { grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
       .prop-cta { padding: 0 24px; margin-top: 64px; }
+      .prop-favs { padding: 0 24px; margin-top: 64px; }
       .prop-other { padding: 80px 24px 0; }
       .prop-other-grid { grid-template-columns: 1fr; gap: 40px; }
       footer { padding: 56px 24px 24px; margin-top: 80px; flex-direction: column; gap: 16px; text-align: center; }
@@ -546,6 +616,8 @@ module.exports = async function handler(req, res) {
   <section class="prop-gallery">
     ${galleryHtml}
   </section>` : ''}
+
+  ${buildFavourites(localFavourites)}
 
   ${bookingUrl ? `
   <section class="prop-cta">
