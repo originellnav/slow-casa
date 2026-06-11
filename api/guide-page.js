@@ -48,11 +48,11 @@ function formatDate(isoString) {
 // Format category as readable label
 function formatCategory(category) {
   const labels = {
-    'architect-roundup': 'Architect Roundup',
-    'typology-guide': 'Typology Guide',
-    'region-discovery': 'Region Discovery',
-    'architectural-pilgrimage': 'Architectural Pilgrimage'
-  };
+  'architect-roundup': 'Architects',
+  'typology-guide': 'House Types',
+  'region-discovery': 'Places',
+  'architectural-pilgrimage': 'Journeys'
+};
   return labels[category] || 'Guide';
 }
 
