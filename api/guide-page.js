@@ -105,8 +105,8 @@ function renderSpan(span, markDefs) {
       // Mark is a reference to a markDef (annotation like a link)
       const def = (markDefs || []).find(d => d._key === mark);
       if (def && def._type === 'link' && def.href) {
-        linkHref = def.href;
-      }
+  linkHref = def.href;
+}
     }
   }
 
