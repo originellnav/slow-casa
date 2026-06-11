@@ -354,7 +354,7 @@ module.exports = async function handler(req, res) {
 
   <header class="guides-header">
     <h1 class="guides-title">Guides</h1>
-    <p class="guides-intro">Editorial reference on architect-designed vacation homes, regional architectural traditions, and slow-living destinations across Europe.</p>
+    <p class="guides-intro">Guides to living slower in rural Europe. Architects. House types. Places.</p>
   </header>
 
   <main class="guides-grid">
