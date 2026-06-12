@@ -11,7 +11,7 @@
     { "source": "/directory", "destination": "/api/directory" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/properties/:slug", "destination": "/api/property-page?slug=:slug" },
-    { "source": "/design-directory", "destination": "/api/architects-index" }
+    { "source": "/design-directory", "destination": "/api/architects-index" },
     { "source": "/architects/:slug", "destination": "/api/architect?slug=:slug" },
     { "source": "/guides", "destination": "/api/guides-index" },
     { "source": "/guides/:slug", "destination": "/api/guide-page?slug=:slug" },
