@@ -84,6 +84,10 @@ function formatMarkdown(text) {
   text = text.replace(/\\\|(.+?)\\\|/g, '**$1**');
   text = text.replace(/\\\*\\\*(.+?)\\\*\\\*/g, '**$1**');
 
+  // Generic unescape: Airtable rich text fields backslash-escape markdown characters
+  // in several inconsistent ways. Strip any remaining escapes on these characters.
+  text = text.replace(/\\([*_|])/g, '$1');
+
   // Split into paragraphs (double line breaks)
   const paragraphs = text.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
   return paragraphs.map(p => {
@@ -177,7 +181,8 @@ module.exports = async function handler(req, res) {
   const metaDescBase = bio ? bio.substring(0, 155).replace(/\n/g, ' ') : `${name} is an architect featured on Slow Casa, a curated directory of architect-designed vacation homes in rural Europe.`;
   const metaDesc = metaDescBase.length > 155 ? metaDescBase.substring(0, 152) + '...' : metaDescBase;
   const canonicalUrl = `https://slowcasa.com/architects/${slug}`;
-  const ogImage = studioPhoto || (linkedProperties[0] ? (linkedProperties[0].fields['Hero Image'] || '') : '');
+  const pagePhoto = studioPhoto || (linkedProperties.length > 0 ? (getPropertyImageUrl(linkedProperties[0], 0) || '') : '');
+  const ogImage = pagePhoto;
 
   // JSON-LD Organization schema
   const structuredData = {
@@ -195,7 +200,7 @@ module.exports = async function handler(req, res) {
     };
     if (country) structuredData.address.addressCountry = country;
   }
-  if (studioPhoto) structuredData.image = studioPhoto;
+  if (pagePhoto) structuredData.image = pagePhoto;
   if (linkedProperties.length > 0) {
     structuredData.subjectOf = linkedProperties.slice(0, 6).map(p => ({
       "@type": "LodgingBusiness",
@@ -502,7 +507,9 @@ module.exports = async function handler(req, res) {
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
       <li><a href="/directory">Directory</a></li>
-      <li><a href="https://slowcasa.beehiiv.com/subscribe" target="_blank" rel="noopener">Newsletter</a></li>
+      <li><a href="/design-directory">Architects</a></li>
+      <li><a href="/guides">Guides</a></li>
+      <li><a href="https://newsletter.slowcasa.com" target="_blank" rel="noopener">Newsletter</a></li>
       <li><a href="/criteria">About</a></li>
     </ul>
   </nav>
@@ -517,10 +524,10 @@ module.exports = async function handler(req, res) {
     </p>
   </section>
 
-  ${studioPhoto ? `
+  ${pagePhoto ? `
   <section class="arch-photo">
     <div class="arch-photo-inner">
-      <img src="${escapeHtml(studioPhoto)}" alt="${escapeHtml(name)}" />
+      <img src="${escapeHtml(pagePhoto)}" alt="${escapeHtml(name)}" />
     </div>
   </section>` : ''}
 
@@ -565,3 +572,4 @@ module.exports = async function handler(req, res) {
 
   res.status(200).send(html);
 };
+
