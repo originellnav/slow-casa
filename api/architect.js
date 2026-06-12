@@ -388,6 +388,7 @@ module.exports = async function handler(req, res) {
     }
     .arch-philosophy-content p { margin-bottom: 1.4em; }
     .arch-philosophy-content strong {
+      font-family: 'DM Sans', sans-serif;
       font-weight: 500;
       color: #0f0f0f;
       display: block;
