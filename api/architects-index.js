@@ -133,15 +133,15 @@ module.exports = async function handler(req, res) {
     };
   });
 
-  const canonicalUrl = 'https://slowcasa.com/architects';
-  const title = 'Architects | Slow Casa';
-  const metaDesc = 'The architects behind the houses on Slow Casa. Studios and practices working across rural Europe, from new builds to the careful rebuilding of old farms.';
+  const canonicalUrl = 'https://slowcasa.com/design-directory';
+  const title = 'Design Directory | Slow Casa';
+  const metaDesc = 'The people behind the houses on Slow Casa. Starting with the architects: studios and practices working across rural Europe, from new builds to the careful rebuilding of old farms.';
 
   // JSON-LD ItemList
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Architects",
+    "name": "Design Directory",
     "url": canonicalUrl,
     "mainEntity": {
       "@type": "ItemList",
@@ -252,6 +252,18 @@ module.exports = async function handler(req, res) {
       margin: 0 auto;
     }
 
+    .grid-section-label {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px 32px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #0f0f0f;
+    }
+
     .arch-grid {
       max-width: 1200px;
       margin: 0 auto;
@@ -334,6 +346,7 @@ module.exports = async function handler(req, res) {
       .wordmark { font-size: 22px; }
       .dir-header { padding: 48px 24px 40px; }
       .arch-grid { grid-template-columns: 1fr; gap: 40px; padding: 0 24px 72px; }
+      .grid-section-label { padding: 0 24px 24px; }
       footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
       .footer-left { flex-direction: column; gap: 12px; }
     }
@@ -346,7 +359,7 @@ module.exports = async function handler(req, res) {
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
       <li><a href="/directory">Directory</a></li>
-      <li><a href="/architects">Architects</a></li>
+      <li><a href="/design-directory">Architects</a></li>
       <li><a href="/guides">Guides</a></li>
       <li><a href="https://newsletter.slowcasa.com" target="_blank" rel="noopener">Newsletter</a></li>
       <li><a href="/criteria">About</a></li>
@@ -354,12 +367,12 @@ module.exports = async function handler(req, res) {
   </nav>
 
   <header class="dir-header">
-    <p class="dir-eyebrow">Design Directory</p>
-    <h1 class="dir-title">Architects</h1>
-    <p class="dir-subline">The architects behind the houses on Slow Casa. Studios and practices working across rural Europe.</p>
+    <h1 class="dir-title">Design Directory</h1>
+    <p class="dir-subline">The people behind the houses on Slow Casa. Starting with the architects.</p>
   </header>
 
   ${cards.length > 0 ? `
+  <p class="grid-section-label">Architects</p>
   <div class="arch-grid">
     ${cardsHtml}
   </div>` : `
@@ -381,3 +394,4 @@ module.exports = async function handler(req, res) {
 
   res.status(200).send(html);
 };
+
