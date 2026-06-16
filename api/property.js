@@ -279,7 +279,7 @@ module.exports = async function handler(req, res) {
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
       <li><a href="/directory">Directory</a></li>
-      <li><a href="/journal">Journal</a></li>
+      <li><a href="/guides">Guides</a></li>
       <li><a href="https://slowcasa.beehiiv.com/subscribe" target="_blank" rel="noopener">Newsletter</a></li>
       <li><a href="/criteria">About</a></li>
     </ul>
