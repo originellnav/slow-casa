@@ -3,8 +3,8 @@
   "redirects": [
     { "source": "/property.html", "destination": "/directory", "permanent": true },
     { "source": "/property", "destination": "/directory", "permanent": true },
-    { "source": "/journal", "destination": "/", "statusCode": 410 },
-    { "source": "/journal/:path*", "destination": "/", "statusCode": 410 },
+    { "source": "/journal", "destination": "/guides", "permanent": true },
+    { "source": "/journal/:path*", "destination": "/guides", "permanent": true },
     { "source": "/places/:slug", "destination": "/", "statusCode": 410 }
   ],
   "rewrites": [
