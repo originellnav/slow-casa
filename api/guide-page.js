@@ -51,7 +51,8 @@ function formatCategory(category) {
   'architect-roundup': 'Architects',
   'typology-guide': 'House Types',
   'region-discovery': 'Places',
-  'architectural-pilgrimage': 'Journeys'
+  'architectural-pilgrimage': 'Journeys',
+    'terminology': 'Terminology'
 };
   return labels[category] || 'Guide';
 }
