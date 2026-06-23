@@ -174,6 +174,25 @@ function getAllImageUrls(record) {
   });
 }
 
+// --- Geo helpers for the "Nearby houses" ranking ---
+function toRad(deg) { return (deg * Math.PI) / 180; }
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+function getCoords(record) {
+  const f = (record && record.fields) || {};
+  const lat = parseFloat(f['Latitude']);
+  const lon = parseFloat(f['Longitude']);
+  if (Number.isFinite(lat) && Number.isFinite(lon)) return { lat, lon };
+  return null;
+}
+
 module.exports = async function handler(req, res) {
   const { slug } = req.query;
   if (!slug) return res.status(400).send('Missing slug');
@@ -240,7 +259,6 @@ module.exports = async function handler(req, res) {
       const pName = pf['Name'] || '';
       if (!pName) return '';
       const cat = pf['Category'] || '';
-      const note = pf['Note'] || '';
       const link = pf['Link'] || '';
       const img = getPlaceImageUrl(p);
       const imgTag = img
@@ -248,8 +266,7 @@ module.exports = async function handler(req, res) {
         : `<div class="place-img place-img-empty"></div>`;
       const inner = `${imgTag}
             ${cat ? `<p class="place-cat">${escapeHtml(cat)}</p>` : ''}
-            <h3 class="place-name">${escapeHtml(pName)}</h3>
-            ${note ? `<p class="place-note">${escapeHtml(note)}</p>` : ''}`;
+            <h3 class="place-name">${escapeHtml(pName)}</h3>`;
       return link
         ? `<article class="place-card"><a href="${escapeHtml(link)}" target="_blank" rel="noopener">${inner}</a></article>`
         : `<article class="place-card">${inner}</article>`;
@@ -724,16 +741,9 @@ module.exports = async function handler(req, res) {
       font-size: 22px;
       line-height: 1.2;
       color: #0f0f0f;
-      margin-bottom: 8px;
+      margin-bottom: 0;
     }
     .place-card a:hover .place-name { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-    .place-note {
-      font-family: 'TT Norms Pro', 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 300;
-      color: #555;
-      line-height: 1.5;
-    }
     @media (max-width: 900px) {
       .prop-places-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
     }
@@ -792,7 +802,7 @@ module.exports = async function handler(req, res) {
 
   ${buildPlaces(places)}
 
-  ${await renderOtherProperties(record.id)}
+  ${await renderNearbyHouses(record)}
 
 <footer>
     <div class="footer-left">
@@ -811,26 +821,51 @@ module.exports = async function handler(req, res) {
   res.status(200).send(html);
 };
 
-async function renderOtherProperties(currentId) {
+async function renderNearbyHouses(currentRecord) {
   try {
     const all = await getAllProperties();
-    const others = all
-      .filter(r => r.id !== currentId)
-      .filter(r => {
-        const rf = r.fields || {};
-        if (!rf['Name']) return false;
-        return !!rf['Hero Image'] || !!rf['Gallery Images'] || (rf['Images'] && rf['Images'].length > 0);
-      })
-      .sort((a, b) => {
-        const da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
-        const db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
-        return db - da;
-      })
-      .slice(0, 3);
+    const currentId = currentRecord.id;
 
-    if (others.length === 0) return '';
+    const hasImage = (r) => {
+      const rf = r.fields || {};
+      if (!rf['Name']) return false;
+      return !!rf['Hero Image'] || !!rf['Gallery Images'] || (rf['Images'] && rf['Images'].length > 0);
+    };
 
-    const cardsHtml = others.map(r => {
+    const candidates = all.filter(r => r.id !== currentId && hasImage(r));
+    if (candidates.length === 0) return '';
+
+    const byRecency = (a, b) => {
+      const da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
+      const db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
+      return db - da;
+    };
+
+    // Rank by great-circle distance from this house. Houses missing
+    // coordinates drop to the back (most recent first), and if this house
+    // has no coordinates at all we fall back to recency entirely, so the
+    // section always fills.
+    const origin = getCoords(currentRecord);
+    let ordered;
+    if (origin) {
+      const withDist = [];
+      const withoutDist = [];
+      candidates.forEach(r => {
+        const c = getCoords(r);
+        if (c) withDist.push({ r, dist: haversineKm(origin.lat, origin.lon, c.lat, c.lon) });
+        else withoutDist.push(r);
+      });
+      withDist.sort((a, b) => a.dist - b.dist);
+      withoutDist.sort(byRecency);
+      ordered = withDist.map(x => x.r).concat(withoutDist);
+    } else {
+      ordered = candidates.slice().sort(byRecency);
+    }
+
+    const nearest = ordered.slice(0, 3);
+    if (nearest.length === 0) return '';
+
+    const cardsHtml = nearest.map(r => {
       const rf = r.fields;
       const img = getImageUrl(r, 0) || '';
       const slug = rf['Slug'] || '';
@@ -845,7 +880,7 @@ async function renderOtherProperties(currentId) {
     return `
     <section class="prop-other">
       <div class="prop-other-header">
-        <h2 class="prop-other-title">More on Slow Casa</h2>
+        <h2 class="prop-other-title">Nearby houses</h2>
       </div>
       <div class="prop-other-grid">
         ${cardsHtml}
@@ -855,3 +890,4 @@ async function renderOtherProperties(currentId) {
     return '';
   }
 }
+
