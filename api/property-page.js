@@ -1,10 +1,13 @@
 const AIRTABLE_TOKEN = 'patgpNhgfFkQsyQj9.887202d16495ba49fad025cb888cef3eac0a6c34058675dd2516127ad083d8c6';
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const PROPERTIES_TABLE = 'Properties';
+const PLACES_TABLE = 'Places';
 
 const PROPERTY_CACHE = new Map();
 let ALL_PROPERTIES_CACHE = null;
 let ALL_PROPERTIES_CACHED_AT = 0;
+let ALL_PLACES_CACHE = null;
+let ALL_PLACES_CACHED_AT = 0;
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
 function getCached(slug) {
@@ -53,6 +56,54 @@ async function fetchPropertyBySlug(slug) {
   return allProperties.find(r => r.fields && r.fields.Slug === slug);
 }
 
+// Fetch all Places records. Fails soft: never throws, so a problem here
+// can never stop a property page from rendering.
+async function getAllPlaces() {
+  if (ALL_PLACES_CACHE && (Date.now() - ALL_PLACES_CACHED_AT) < CACHE_TTL_MS) {
+    return ALL_PLACES_CACHE;
+  }
+  let allRecords = [];
+  let offset = null;
+  let attempts = 0;
+  try {
+    do {
+      let url = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(PLACES_TABLE)}?pageSize=100`;
+      if (offset) url += `&offset=${encodeURIComponent(offset)}`;
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Cache-Control': 'no-cache' }
+      });
+      if (!response.ok) return ALL_PLACES_CACHE || [];
+      const data = await response.json();
+      allRecords = allRecords.concat(data.records || []);
+      offset = data.offset;
+      attempts++;
+    } while (offset && attempts < 10);
+  } catch (e) {
+    return ALL_PLACES_CACHE || [];
+  }
+  if (allRecords.length > 0) {
+    ALL_PLACES_CACHE = allRecords;
+    ALL_PLACES_CACHED_AT = Date.now();
+  }
+  return allRecords;
+}
+
+// Pull the image URL for a Place. Prefers a hosted URL stored as text
+// (stable, like the property Hero Image). Also tolerates an Airtable
+// attachment, but note those URLs expire, so a text URL is recommended.
+function getPlaceImageUrl(place) {
+  const f = (place && place.fields) || {};
+  const img = f['Image'];
+  if (!img) return '';
+  if (typeof img === 'string') return img.trim();
+  if (Array.isArray(img) && img.length) {
+    const a = img[0] || {};
+    if (a.thumbnails && a.thumbnails.large) return a.thumbnails.large.url;
+    return a.url || '';
+  }
+  return '';
+}
+
 function escapeHtml(str) {
   return String(str || '')
     .replace(/&/g, '&amp;')
@@ -82,12 +133,19 @@ function responsiveImageUrl(url, width) {
   return url;
 }
 
+// Only treat absolute http(s) links as real images. This filters out blank
+// or malformed lines in the Gallery Images field, which is what was rendering
+// an empty grey cell in the gallery.
+function isValidImageUrl(u) {
+  return typeof u === 'string' && /^https?:\/\//i.test(u.trim());
+}
+
 function getImageUrl(record, index) {
   index = index || 0;
   const f = record.fields || {};
   const heroImg = f['Hero Image'];
   const galleryStr = f['Gallery Images'];
-  const galleryUrls = galleryStr ? galleryStr.split('\n').map(s => s.trim()).filter(Boolean) : [];
+  const galleryUrls = galleryStr ? galleryStr.split('\n').map(s => s.trim()).filter(isValidImageUrl) : [];
   const combined = [];
   if (heroImg) combined.push(heroImg);
   for (const u of galleryUrls) combined.push(u);
@@ -104,7 +162,7 @@ function getAllImageUrls(record) {
   const f = record.fields || {};
   const heroImg = f['Hero Image'];
   const galleryStr = f['Gallery Images'];
-  const galleryUrls = galleryStr ? galleryStr.split('\n').map(s => s.trim()).filter(Boolean) : [];
+  const galleryUrls = galleryStr ? galleryStr.split('\n').map(s => s.trim()).filter(isValidImageUrl) : [];
   const combined = [];
   if (heroImg) combined.push(heroImg);
   for (const u of galleryUrls) combined.push(u);
@@ -150,35 +208,67 @@ module.exports = async function handler(req, res) {
   const bookingUrl = f['Booking URL'] || '';
   const architect = f['Architect'] || '';
   const architectUrl = f['Architect URL'] || '';
-  const localFavourites = f['Local Favourites'] || '';
+  // Places we love - pulled from the linked "Places" table.
+  let places = [];
+  try {
+    const allPlaces = await getAllPlaces();
+    places = allPlaces.filter(p => {
+      const pf = p.fields || {};
+      const linked = pf['Properties'];
+      const isLinked = Array.isArray(linked) && linked.indexOf(record.id) !== -1;
+      const status = String(pf['Status'] || '').toLowerCase();
+      const notDraft = status !== 'draft'; // show Published or unset, hide Draft
+      return isLinked && notDraft && pf['Name'];
+    });
+  } catch (e) { places = []; }
 
-  // Local Favourites render - expects one entry per line: "Category · Name · URL"
-  function buildFavourites(favs) {
-    if (!favs) return '';
-    const lines = favs.split('\n').map(l => l.trim()).filter(Boolean);
-    const grouped = {};
-    lines.forEach(line => {
-      // Strip leading list markers Airtable rich text may add (- or *)
-      const clean = line.replace(/^[-*]\s+/, '');
-      const parts = clean.split(' · ');
-      if (parts.length < 3) return;
-      const cat = parts[0].trim();
-      const favName = parts[1].trim();
-      const favUrl = parts.slice(2).join(' · ').trim();
-      if (!grouped[cat]) grouped[cat] = [];
-      grouped[cat].push({ name: favName, url: favUrl });
+  function buildPlaces(items) {
+    if (!items || !items.length) return '';
+    // Category display order; anything unlisted falls to the end.
+    const order = ['Eat', 'Drink', 'Stay', 'Swim', 'Play', 'See', 'Do'];
+    const sorted = items.slice().sort((a, b) => {
+      const ca = order.indexOf(a.fields.Category || '');
+      const cb = order.indexOf(b.fields.Category || '');
+      const ra = ca === -1 ? 99 : ca;
+      const rb = cb === -1 ? 99 : cb;
+      if (ra !== rb) return ra - rb;
+      return String(a.fields.Name || '').localeCompare(String(b.fields.Name || ''));
     });
-    if (!Object.keys(grouped).length) return '';
-    let favsHtml = '<section class="prop-favs"><p class="prop-favs-label">Local Favourites</p><div class="favs-grid">';
-    Object.keys(grouped).forEach(cat => {
-      favsHtml += '<div class="favs-group"><p class="favs-cat">' + escapeHtml(cat) + '</p>';
-      grouped[cat].forEach(item => {
-        favsHtml += '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="favs-link">' + escapeHtml(item.name) + '</a>';
-      });
-      favsHtml += '</div>';
-    });
-    favsHtml += '</div></section>';
-    return favsHtml;
+
+    const cards = sorted.map(p => {
+      const pf = p.fields || {};
+      const pName = pf['Name'] || '';
+      if (!pName) return '';
+      const cat = pf['Category'] || '';
+      const note = pf['Note'] || '';
+      const link = pf['Link'] || '';
+      const img = getPlaceImageUrl(p);
+      const imgTag = img
+        ? `<div class="place-img"><img src="${escapeHtml(responsiveImageUrl(img, 600))}" alt="${escapeHtml(pName)}" loading="lazy" /></div>`
+        : `<div class="place-img place-img-empty"></div>`;
+      const inner = `${imgTag}
+            ${cat ? `<p class="place-cat">${escapeHtml(cat)}</p>` : ''}
+            <h3 class="place-name">${escapeHtml(pName)}</h3>
+            ${note ? `<p class="place-note">${escapeHtml(note)}</p>` : ''}`;
+      return link
+        ? `<article class="place-card"><a href="${escapeHtml(link)}" target="_blank" rel="noopener">${inner}</a></article>`
+        : `<article class="place-card">${inner}</article>`;
+    }).join('');
+
+    if (!cards) return '';
+
+    return `
+  <section class="prop-places">
+    <div class="prop-places-inner">
+      <div class="prop-places-head">
+        <h2 class="prop-places-title">Places we love</h2>
+        <p class="prop-places-sub">Local spots to eat, drink, stay or swim.</p>
+      </div>
+      <div class="prop-places-grid">
+        ${cards}
+      </div>
+    </div>
+  </section>`;
   }
 
   const heroImage = getImageUrl(record, 0);
@@ -575,6 +665,84 @@ module.exports = async function handler(req, res) {
       footer { padding: 56px 24px 24px; margin-top: 80px; flex-direction: column; gap: 16px; text-align: center; }
       .footer-left { flex-direction: column; gap: 12px; }
     }
+
+    /* --- Places we love (image-led, in its own band) --- */
+    .prop-places {
+      margin-top: 80px;
+      padding: 80px 0 96px;
+      background: #f3efe6;
+      border-top: 1px solid #e3ded3;
+      border-bottom: 1px solid #e3ded3;
+    }
+    .prop-places-inner { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+    .prop-places-head { text-align: center; max-width: 640px; margin: 0 auto 56px; }
+    .prop-places-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(30px, 3.6vw, 44px);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: #0f0f0f;
+      margin-bottom: 14px;
+    }
+    .prop-places-sub {
+      font-family: 'TT Norms Pro', 'DM Sans', sans-serif;
+      font-size: 17px;
+      font-weight: 300;
+      color: #555;
+    }
+    .prop-places-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 36px 32px;
+    }
+    .place-card a { display: block; color: inherit; }
+    .place-img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      overflow: hidden;
+      background: #e6e0d4;
+      margin-bottom: 18px;
+    }
+    .place-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .place-card a:hover .place-img img { transform: scale(1.03); }
+    .place-img-empty { background: linear-gradient(150deg, #e6ded0, #d7cdbb); }
+    .place-cat {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #8a857c;
+      margin-bottom: 9px;
+    }
+    .place-name {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 22px;
+      line-height: 1.2;
+      color: #0f0f0f;
+      margin-bottom: 8px;
+    }
+    .place-card a:hover .place-name { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    .place-note {
+      font-family: 'TT Norms Pro', 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      color: #555;
+      line-height: 1.5;
+    }
+    @media (max-width: 900px) {
+      .prop-places-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
+    }
+    @media (max-width: 768px) {
+      .prop-places { margin-top: 56px; padding: 56px 0 64px; }
+      .prop-places-inner { padding: 0 24px; }
+      .prop-places-grid { grid-template-columns: 1fr 1fr; gap: 24px 16px; }
+      .place-name { font-size: 18px; }
+    }
   </style>
 </head>
 <body>
@@ -617,12 +785,12 @@ module.exports = async function handler(req, res) {
     ${galleryHtml}
   </section>` : ''}
 
-  ${buildFavourites(localFavourites)}
-
   ${bookingUrl ? `
   <section class="prop-cta">
-    <a href="${escapeHtml(bookingUrl)}" target="_blank" rel="noopener" class="prop-cta-button">Visit booking site</a>
+    <a href="${escapeHtml(bookingUrl)}" target="_blank" rel="noopener" class="prop-cta-button">Rent this house</a>
   </section>` : ''}
+
+  ${buildPlaces(places)}
 
   ${await renderOtherProperties(record.id)}
 
