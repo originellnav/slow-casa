@@ -10,6 +10,10 @@ let ALL_PLACES_CACHE = null;
 let ALL_PLACES_CACHED_AT = 0;
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
+// If an image 404s, hide the broken graphic and let its tile show a sand
+// colour instead, so a bad URL never renders as a broken-image icon.
+const IMG_ONERROR = "onerror=\"this.onerror=null;this.style.display='none';this.parentElement.classList.add('img-fallback');\"";
+
 function getCached(slug) {
   const entry = PROPERTY_CACHE.get(slug);
   if (!entry) return null;
@@ -262,7 +266,7 @@ module.exports = async function handler(req, res) {
       const link = pf['Link'] || '';
       const img = getPlaceImageUrl(p);
       const imgTag = img
-        ? `<div class="place-img"><img src="${escapeHtml(responsiveImageUrl(img, 600))}" alt="${escapeHtml(pName)}" loading="lazy" /></div>`
+        ? `<div class="place-img"><img src="${escapeHtml(responsiveImageUrl(img, 600))}" alt="${escapeHtml(pName)}" loading="lazy" ${IMG_ONERROR} /></div>`
         : `<div class="place-img place-img-empty"></div>`;
       const inner = `${imgTag}
             ${cat ? `<p class="place-cat">${escapeHtml(cat)}</p>` : ''}
@@ -299,13 +303,13 @@ module.exports = async function handler(req, res) {
     if (i + 1 < imgs.length) {
       galleryHtml += `
         <div class="prop-gallery-row">
-          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i], 1200)}" alt="${name}" loading="lazy" /></div>
-          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i+1], 1200)}" alt="${name}" loading="lazy" /></div>
+          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i], 1200)}" alt="${name}" loading="lazy" ${IMG_ONERROR} /></div>
+          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i+1], 1200)}" alt="${name}" loading="lazy" ${IMG_ONERROR} /></div>
         </div>`;
     } else {
       galleryHtml += `
         <div class="prop-gallery-row">
-          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i], 1600)}" alt="${name}" loading="lazy" /></div>
+          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i], 1600)}" alt="${name}" loading="lazy" ${IMG_ONERROR} /></div>
         </div>`;
     }
   }
@@ -349,7 +353,7 @@ module.exports = async function handler(req, res) {
   const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`;
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+  res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -753,6 +757,9 @@ module.exports = async function handler(req, res) {
       .prop-places-grid { grid-template-columns: 1fr 1fr; gap: 24px 16px; }
       .place-name { font-size: 18px; }
     }
+
+    /* shown when an image fails to load, in place of a broken-image icon */
+    .img-fallback { background: linear-gradient(150deg, #e6ded0, #d7cdbb) !important; }
   </style>
 </head>
 <body>
@@ -769,7 +776,7 @@ module.exports = async function handler(req, res) {
 
   <div class="hero-split">
     <div class="hero-left">
-      ${heroImage ? `<img src="${responsiveImageUrl(heroImage, 1400)}" alt="${name}, ${location}" fetchpriority="high" loading="eager" />` : '<div style="width:100%;height:100%;background:#e8e8e8;"></div>'}
+      ${heroImage ? `<img src="${responsiveImageUrl(heroImage, 1400)}" alt="${name}, ${location}" fetchpriority="high" loading="eager" ${IMG_ONERROR} />` : '<div style="width:100%;height:100%;background:#e8e8e8;"></div>'}
     </div>
     <div class="hero-right">
       ${location ? `<p class="hero-location">${location}</p>` : ''}
@@ -871,7 +878,7 @@ async function renderNearbyHouses(currentRecord) {
       const slug = rf['Slug'] || '';
       const url = '/properties/' + slug;
       return '<div onclick="window.location=\'' + url + '\'">' +
-            '<div class="card-img">' + (img ? '<img src="' + responsiveImageUrl(img, 600) + '" alt="' + (rf['Name']||'') + '" loading="lazy" />' : '') + '</div>' +
+            '<div class="card-img">' + (img ? '<img src="' + responsiveImageUrl(img, 600) + '" alt="' + (rf['Name']||'') + '" loading="lazy" ' + IMG_ONERROR + ' />' : '') + '</div>' +
             '<p class="card-location">' + (rf['Location label']||'') + '</p>' +
             '<p class="card-name">' + (rf['Name']||'') + '</p>' +
             '</div>';
@@ -890,4 +897,5 @@ async function renderNearbyHouses(currentRecord) {
     return '';
   }
 }
+
 
