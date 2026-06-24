@@ -457,16 +457,18 @@ module.exports = async function handler(req, res) {
     .hero-split {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      min-height: calc(100vh - 88px);
-      max-height: 800px;
+      height: clamp(440px, calc(100vh - 88px), 760px);
     }
     .hero-left {
+      position: relative;
       width: 100%;
       height: 100%;
       overflow: hidden;
       background: #e8e8e8;
     }
     .hero-left img {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -487,6 +489,8 @@ module.exports = async function handler(req, res) {
     .hero-meta-sep { display: inline-block; margin: 0 12px; opacity: 0.6; }
 
     .prop-intro {
+      position: relative;
+      z-index: 1;
       max-width: 720px;
       margin: 0 auto;
       padding: 120px 48px 0;
@@ -665,7 +669,7 @@ module.exports = async function handler(req, res) {
     .footer-links a:hover { color: #0f0f0f; }
 
     @media (max-width: 900px) {
-      .hero-split { grid-template-columns: 1fr; max-height: none; min-height: auto; }
+      .hero-split { grid-template-columns: 1fr; height: auto; }
       .hero-left { height: 60vh; }
       .hero-right { padding: 64px 32px; }
       .hero-title { font-size: 38px; }
@@ -897,5 +901,3 @@ async function renderNearbyHouses(currentRecord) {
     return '';
   }
 }
-
-
