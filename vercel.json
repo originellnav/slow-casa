@@ -15,7 +15,7 @@
     { "source": "/architects/:slug", "destination": "/api/architect?slug=:slug" },
     { "source": "/guides", "destination": "/api/guides-index" },
     { "source": "/guides/:slug", "destination": "/api/guide-page?slug=:slug" },
-    { "source": "/privacy", "destination": "/privacy.html" }
+    { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/go/:slug", "destination": "/api/go?slug=:slug" }
   ]
 }
