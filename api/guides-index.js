@@ -33,8 +33,7 @@ function formatCategory(category) {
   'architect-roundup': 'Architects',
   'typology-guide': 'House Types',
   'region-discovery': 'Places',
-  'architectural-pilgrimage': 'Journeys',
-    'terminology': 'Terminology'
+  'architectural-pilgrimage': 'Journeys'
 };
   return labels[category] || 'Guide';
 }
@@ -76,7 +75,7 @@ module.exports = async function handler(req, res) {
   }
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+  res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
 
   const guidesHtml = guides.length === 0
     ? `<div class="guides-empty">
@@ -121,6 +120,7 @@ module.exports = async function handler(req, res) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Guides | Slow Casa</title>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <script defer data-domain="slowcasa.com" src="https://plausible.io/js/script.outbound-links.js"></script>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
