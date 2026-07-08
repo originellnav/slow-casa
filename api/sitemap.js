@@ -1,3 +1,5 @@
+   const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+
 module.exports = async function handler(req, res) {
   const base = 'https://slowcasa.com';
   const staticPages = [
@@ -6,14 +8,13 @@ module.exports = async function handler(req, res) {
     { url: '/guides', priority: '0.8', changefreq: 'weekly' },
     { url: '/criteria', priority: '0.5', changefreq: 'monthly' },
   ];
-
   // Fetch properties from Airtable and guides from Sanity in parallel
   const [propertyUrls, guideUrls] = await Promise.all([
     (async () => {
       try {
         const r = await fetch(
           'https://api.airtable.com/v0/appndrnWrdlgxRJAG/Properties?fields[]=Slug&fields[]=Date+added&maxRecords=100',
-          { headers: { Authorization: 'Bearer patgpNhgfFkQsyQj9.887202d16495ba49fad025cb888cef3eac0a6c34058675dd2516127ad083d8c6' } }
+          { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } }
         );
         const data = await r.json();
         return (data.records || [])
@@ -43,7 +44,6 @@ module.exports = async function handler(req, res) {
       } catch (e) { return []; }
     })()
   ]);
-
   const allPages = [...staticPages, ...propertyUrls, ...guideUrls];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
