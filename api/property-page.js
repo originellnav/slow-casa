@@ -1,4 +1,4 @@
-const AIRTABLE_TOKEN = 'patgpNhgfFkQsyQj9.887202d16495ba49fad025cb888cef3eac0a6c34058675dd2516127ad083d8c6';
+const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const PROPERTIES_TABLE = 'Properties';
 const PLACES_TABLE = 'Places';
@@ -383,6 +383,7 @@ module.exports = async function handler(req, res) {
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
   <link rel="stylesheet" href="/slow-casa.css" />
+  <script defer data-domain="slowcasa.com" src="https://plausible.io/js/script.outbound-links.js"></script>
   <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -620,7 +621,7 @@ module.exports = async function handler(req, res) {
       grid-template-columns: repeat(3, 1fr);
       gap: 48px 32px;
     }
-    .prop-other-grid > div { cursor: pointer; }
+    .prop-other-grid > a { cursor: pointer; text-decoration: none; color: inherit; display: block; }
     .card-img {
       width: 100%;
       aspect-ratio: 4/3;
@@ -635,7 +636,7 @@ module.exports = async function handler(req, res) {
       display: block;
       transition: transform 0.5s ease;
     }
-    .prop-other-grid > div:hover .card-img img { transform: scale(1.03); }
+    .prop-other-grid > a:hover .card-img img { transform: scale(1.03); }
     .card-location {
       font-size: 10px;
       letter-spacing: 0.14em;
@@ -808,7 +809,7 @@ module.exports = async function handler(req, res) {
 
   ${bookingUrl ? `
   <section class="prop-cta">
-    <a href="${escapeHtml(bookingUrl)}" target="_blank" rel="noopener" class="prop-cta-button">Rent this house</a>
+    <a href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener" class="prop-cta-button">Rent this house</a>
   </section>` : ''}
 
   ${buildPlaces(places)}
@@ -881,11 +882,11 @@ async function renderNearbyHouses(currentRecord) {
       const img = getImageUrl(r, 0) || '';
       const slug = rf['Slug'] || '';
       const url = '/properties/' + slug;
-      return '<div onclick="window.location=\'' + url + '\'">' +
-            '<div class="card-img">' + (img ? '<img src="' + responsiveImageUrl(img, 600) + '" alt="' + (rf['Name']||'') + '" loading="lazy" ' + IMG_ONERROR + ' />' : '') + '</div>' +
-            '<p class="card-location">' + (rf['Location label']||'') + '</p>' +
-            '<p class="card-name">' + (rf['Name']||'') + '</p>' +
-            '</div>';
+      return '<a class="prop-other-card" href="' + escapeHtml(url) + '">' +
+            '<div class="card-img">' + (img ? '<img src="' + escapeHtml(responsiveImageUrl(img, 600)) + '" alt="' + escapeHtml(rf['Name']||'') + '" loading="lazy" ' + IMG_ONERROR + ' />' : '') + '</div>' +
+            '<p class="card-location">' + escapeHtml(rf['Location label']||'') + '</p>' +
+            '<p class="card-name">' + escapeHtml(rf['Name']||'') + '</p>' +
+            '</a>';
     }).join('');
 
     return `
@@ -901,3 +902,4 @@ async function renderNearbyHouses(currentRecord) {
     return '';
   }
 }
+
