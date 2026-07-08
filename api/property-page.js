@@ -383,7 +383,12 @@ module.exports = async function handler(req, res) {
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
   <link rel="stylesheet" href="/slow-casa.css" />
-  <script defer data-domain="slowcasa.com" src="https://plausible.io/js/script.outbound-links.js"></script>
+  <!-- Privacy-friendly analytics by Plausible -->
+  <script async src="https://plausible.io/js/pa-aahRJ1iMPfiu0NJteNWEg.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
   <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
