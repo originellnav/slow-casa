@@ -52,7 +52,9 @@ function formatCategory(category) {
   'typology-guide': 'House Types',
   'region-discovery': 'Places',
   'architectural-pilgrimage': 'Journeys',
-    'terminology': 'Terminology'
+    'terminology': 'Terminology',
+    'architect-stories': 'Architect Stories',
+    'home-stories': 'Home Stories'
 };
   return labels[category] || 'Guide';
 }
