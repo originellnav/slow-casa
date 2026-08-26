@@ -41,30 +41,33 @@ function formatCategory(category) {
   return labels[category] || 'Guide';
 }
 
-// Config for the three routes this function serves:
-//   /guides           -> everything (the Journal)
-//   /location-guides  -> ?category=region-discovery
-//   /building-guides  -> ?category=typology-guide
+// This one function serves three routes. `categories: null` means show everything.
+//   /house-tours  -> ?section=house-tours
+//   /guides       -> (no param) Village Guides
+//   /how-to       -> ?section=how-to
 const PAGES = {
-  all: {
-    title: 'Journal | Slow Casa',
-    description: 'Home tours, location guides, how-tos and the design products behind them. A journal about modern homes in the wild and rural parts of Europe.',
+  'village-guides': {
+    categories: ['region-discovery'],
+    title: 'Village Guides | Slow Casa',
+    description: 'Where to eat, swim and stay in the villages and small towns our houses sit in. Practical guides to the rural and coastal corners of Europe.',
     canonical: 'https://slowcasa.com/guides',
-    heading: 'Journal',
-    intro: 'Home tours, location guides, how-tos, and the design behind them.'
-  },
-  'region-discovery': {
-    title: 'Location Guides | Slow Casa',
-    description: 'Where to eat, swim and stay in the places our houses sit. Practical guides to the rural and coastal corners of Europe worth going slowly in.',
-    canonical: 'https://slowcasa.com/location-guides',
-    heading: 'Location Guides',
+    heading: 'Village Guides',
     intro: 'Where to eat, swim and stay in the places these houses sit.'
   },
-  'typology-guide': {
-    title: 'Building Guides | Slow Casa',
-    description: 'How these houses get made. Materials, methods, house types and the people who know how to build in the European landscape.',
-    canonical: 'https://slowcasa.com/building-guides',
-    heading: 'Building Guides',
+  'house-tours': {
+    categories: ['home-stories', 'architect-stories', 'architect-roundup'],
+    title: 'House Tours | Slow Casa',
+    description: 'Inside the houses, with the people who made them. Conversations with the architects, designers and owners building in the European landscape.',
+    canonical: 'https://slowcasa.com/house-tours',
+    heading: 'House Tours',
+    intro: 'Inside the houses, with the people who made them.'
+  },
+  'how-to': {
+    categories: ['typology-guide', 'terminology'],
+    title: 'How To | Slow Casa',
+    description: 'How these houses get made. Materials, methods, house types and the practical business of building well in the European landscape.',
+    canonical: 'https://slowcasa.com/how-to',
+    heading: 'How To',
     intro: 'How these houses get made. Materials, methods, and the people who know.'
   }
 };
@@ -105,12 +108,11 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // Which of the three routes are we serving? Unknown values fall back to the
-  // full Journal rather than showing an empty page.
-  const requested = (req.query && req.query.category) || 'all';
-  const page = PAGES[requested] || PAGES.all;
-  if (page !== PAGES.all) {
-    guides = guides.filter(g => g.category === requested);
+  // Which route are we serving? Unknown values fall back to Village Guides.
+  const section = (req.query && req.query.section) || 'village-guides';
+  const page = PAGES[section] || PAGES['village-guides'];
+  if (page.categories) {
+    guides = guides.filter(g => page.categories.indexOf(g.category) !== -1);
   }
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -159,11 +161,6 @@ module.exports = async function handler(req, res) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(page.title)}</title>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-  <script async src="https://plausible.io/js/pa-aahRJ1iMPfiu0NJteNWEg.js"></script>
-  <script>
-    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-    plausible.init()
-  </script>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -421,4 +418,3 @@ module.exports = async function handler(req, res) {
 
   res.status(200).send(html);
 };
-
