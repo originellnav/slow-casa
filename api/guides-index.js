@@ -33,10 +33,41 @@ function formatCategory(category) {
   'architect-roundup': 'Architects',
   'typology-guide': 'House Types',
   'region-discovery': 'Places',
-  'architectural-pilgrimage': 'Journeys'
+  'architectural-pilgrimage': 'Journeys',
+  'terminology': 'Terminology',
+  'architect-stories': 'Architect Stories',
+  'home-stories': 'Home Stories'
 };
   return labels[category] || 'Guide';
 }
+
+// Config for the three routes this function serves:
+//   /guides           -> everything (the Journal)
+//   /location-guides  -> ?category=region-discovery
+//   /building-guides  -> ?category=typology-guide
+const PAGES = {
+  all: {
+    title: 'Journal | Slow Casa',
+    description: 'Home tours, location guides, how-tos and the design products behind them. A journal about modern homes in the wild and rural parts of Europe.',
+    canonical: 'https://slowcasa.com/guides',
+    heading: 'Journal',
+    intro: 'Home tours, location guides, how-tos, and the design behind them.'
+  },
+  'region-discovery': {
+    title: 'Location Guides | Slow Casa',
+    description: 'Where to eat, swim and stay in the places our houses sit. Practical guides to the rural and coastal corners of Europe worth going slowly in.',
+    canonical: 'https://slowcasa.com/location-guides',
+    heading: 'Location Guides',
+    intro: 'Where to eat, swim and stay in the places these houses sit.'
+  },
+  'typology-guide': {
+    title: 'Building Guides | Slow Casa',
+    description: 'How these houses get made. Materials, methods, house types and the people who know how to build in the European landscape.',
+    canonical: 'https://slowcasa.com/building-guides',
+    heading: 'Building Guides',
+    intro: 'How these houses get made. Materials, methods, and the people who know.'
+  }
+};
 
 async function fetchAllGuides() {
   const query = `*[_type == "guide" && defined(publishedAt) && defined(slug.current)] | order(publishedAt desc) {
@@ -72,6 +103,14 @@ module.exports = async function handler(req, res) {
       res.status(500).send('Error fetching guides');
       return;
     }
+  }
+
+  // Which of the three routes are we serving? Unknown values fall back to the
+  // full Journal rather than showing an empty page.
+  const requested = (req.query && req.query.category) || 'all';
+  const page = PAGES[requested] || PAGES.all;
+  if (page !== PAGES.all) {
+    guides = guides.filter(g => g.category === requested);
   }
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -118,9 +157,8 @@ module.exports = async function handler(req, res) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Guides | Slow Casa</title>
+  <title>${escapeHtml(page.title)}</title>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-  <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.io/js/pa-aahRJ1iMPfiu0NJteNWEg.js"></script>
   <script>
     window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
@@ -131,12 +169,12 @@ module.exports = async function handler(req, res) {
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Slow Casa" />
 <link rel="manifest" href="/site.webmanifest" />
-  <meta name="description" content="Editorial guides on architect-designed vacation homes, regional architectural traditions, and slow-living destinations across Europe." />
-  <link rel="canonical" href="https://slowcasa.com/guides" />
+  <meta name="description" content="${escapeHtml(page.description)}" />
+  <link rel="canonical" href="${escapeHtml(page.canonical)}" />
   <script type="application/ld+json">${JSON.stringify(structuredData)}</script>
-  <meta property="og:title" content="Guides | Slow Casa" />
-  <meta property="og:description" content="Editorial guides on architect-designed vacation homes, regional architectural traditions, and slow-living destinations across Europe." />
-  <meta property="og:url" content="https://slowcasa.com/guides" />
+  <meta property="og:title" content="${escapeHtml(page.title)}" />
+  <meta property="og:description" content="${escapeHtml(page.description)}" />
+  <meta property="og:url" content="${escapeHtml(page.canonical)}" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Slow Casa" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -359,8 +397,8 @@ module.exports = async function handler(req, res) {
   </nav>
 
   <header class="guides-header">
-    <h1 class="guides-title">Guides</h1>
-    <p class="guides-intro">Guides to living slower in rural Europe. Architects. House types. Places.</p>
+    <h1 class="guides-title">${escapeHtml(page.heading)}</h1>
+    <p class="guides-intro">${escapeHtml(page.intro)}</p>
   </header>
 
   <main class="guides-grid">
@@ -383,3 +421,4 @@ module.exports = async function handler(req, res) {
 
   res.status(200).send(html);
 };
+
