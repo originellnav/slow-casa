@@ -1,3 +1,4 @@
+const { nav } = require('../lib/nav');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const ARCHITECTS_TABLE = 'Architects';
@@ -503,17 +504,7 @@ module.exports = async function handler(req, res) {
 </head>
 <body>
 
-  <nav>
-    <div></div>
-    <a href="/" class="wordmark">Slow Casa</a>
-    <ul class="nav-links">
-      <li><a href="/directory">Directory</a></li>
-      <li><a href="/design-directory">Architects</a></li>
-      <li><a href="/guides">Guides</a></li>
-      <li><a href="https://newsletter.slowcasa.com" target="_blank" rel="noopener">Newsletter</a></li>
-      <li><a href="/criteria">About</a></li>
-    </ul>
-  </nav>
+ ${nav()}
 
   <section class="arch-hero">
     <p class="arch-eyebrow">Architect</p>
