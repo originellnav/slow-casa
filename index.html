@@ -1156,6 +1156,47 @@
     initMaps();
   });
   </script>
+<script>
+(function () {
+  var q = '*[_type == "guide" && defined(publishedAt) && defined(slug.current)]' +
+          ' | order(publishedAt desc){title, excerpt, category,' +
+          ' "slug": slug.current, "img": heroImage.asset->url}';
+  var url = 'https://hchp27po.apicdn.sanity.io/v2024-01-01/data/query/production?query=' + encodeURIComponent(q);
 
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function thumb(u) {
+    if (!u) return '';
+    return u + (u.indexOf('?') > -1 ? '&' : '?') + 'w=800&auto=format&fit=crop';
+  }
+  function card(g, label) {
+    return '<a class="property-card" href="/guides/' + esc(g.slug) + '">' +
+      '<div class="card-img">' + (g.img ? '<img src="' + esc(thumb(g.img)) + '" alt="' + esc(g.title) + '" loading="lazy" />' : '') + '</div>' +
+      '<p class="card-location">' + esc(label) + '</p>' +
+      '<p class="card-name">' + esc(g.title) + '</p>' +
+      '<p class="card-detail">' + esc(g.excerpt || '') + '</p>' +
+      '</a>';
+  }
+
+  fetch(url)
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var all = (d && d.result) || [];
+      var grids = document.querySelectorAll('.js-posts');
+      for (var i = 0; i < grids.length; i++) {
+        var grid = grids[i];
+        var cats = (grid.getAttribute('data-categories') || '').split(',');
+        var label = grid.getAttribute('data-label') || 'Guide';
+        var items = all.filter(function (g) { return cats.indexOf(g.category) > -1; }).slice(0, 3);
+        if (!items.length) { var s = grid.closest('section'); if (s) s.style.display = 'none'; continue; }
+        grid.innerHTML = items.map(function (g) { return card(g, label); }).join('');
+      }
+    })
+    .catch(function () { /* sections stay empty rather than breaking the page */ });
+})();
+</script>
 </body>
 </html>
