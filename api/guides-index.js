@@ -1,3 +1,4 @@
+const { nav } = require('../lib/nav');
 const SANITY_PROJECT_ID = 'hchp27po';
 const SANITY_DATASET = 'production';
 const SANITY_API_VERSION = '2024-01-01';
@@ -382,16 +383,7 @@ module.exports = async function handler(req, res) {
 </head>
 <body>
 
-  <nav>
-    <div></div>
-    <a href="/" class="wordmark">Slow Casa</a>
-    <ul class="nav-links">
-      <li><a href="/directory">Directory</a></li>
-      <li><a href="/guides">Guides</a></li>
-      <li><a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a></li>
-      <li><a href="/criteria">About</a></li>
-    </ul>
-  </nav>
+  ${nav()}
 
   <header class="guides-header">
     <h1 class="guides-title">${escapeHtml(page.heading)}</h1>
