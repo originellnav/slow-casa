@@ -735,6 +735,8 @@
     }
 
     /* Homepage editorial sections — temporary, replaced in the October design pass */
+    .posts { padding-top: 72px; padding-bottom: 0; }
+    .posts:last-of-type { padding-bottom: 72px; }
     .posts .section-header {
       align-items: center;
       gap: 24px;
@@ -830,21 +832,29 @@
     </div>
     <div class="property-grid js-posts" data-categories="region-discovery" data-label="Village Guide"></div>
   </section>
-    <section class="section posts">
-    <div class="section-header">
-      <p class="section-label">House Tours</p>
-      <a class="section-link" href="/house-tours">All house tours</a>
-    </div>
-    <div class="property-grid js-posts" data-categories="home-stories,architect-stories,architect-roundup" data-label="House Tour"></div>
-  </section>
 
-  <section class="section posts">
-    <div class="section-header">
-      <p class="section-label">How To</p>
-      <a class="section-link" href="/how-to">All how-tos</a>
+  <div class="featured-property" id="featured-property">
+    <div class="featured-left">
+      <p class="featured-eyebrow">New to the Club</p>
+      <p class="featured-region" id="featured-region"></p>
+      <h2 class="featured-name" id="featured-name"></h2>
+      <p class="featured-desc" id="featured-desc"></p>
+      <a class="featured-arrow" id="featured-link" href="#">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="23" stroke="#0f0f0f" stroke-width="0.8"/>
+          <path d="M18 24h12M25 19l5 5-5 5" stroke="#0f0f0f" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
     </div>
-    <div class="property-grid js-posts" data-categories="typology-guide,terminology" data-label="How To"></div>
-  </section>
+    <a class="featured-right" id="featured-img-link" href="#">
+      <img id="featured-img" src="" alt="" loading="lazy" />
+    </a>
+  </div>
+
+  <div class="criteria-section">
+    <p class="criteria-body">We believe in the power of simplicity, in living closer to nature, and in spaces designed with intention. Every home in the directory is selected for design integrity, considered architecture, and a sense of place that earns the journey.</p>
+    <a href="/criteria" class="criteria-btn">Our Criteria</a>
+  </div>
 
   <div class="map-teaser" onclick="openMapModal()">
     <div class="map-teaser-inner">
@@ -895,7 +905,7 @@
   </div>
 
   <div class="try-section">
-    <h2 class="try-headline">Try before you buy. Get design-first homes on your radar. One email every Thursday.</h2>
+    <h2 class="try-headline">The Slow Signal. <strong>One email a week: an idea worth thinking about, and a few houses worth knowing about.</strong></h2>
     <div class="try-form">
       <input class="try-email" id="try-email-input" type="email" placeholder="Your email address" />
       <button class="try-btn" type="button" onclick="handleTrySubscribe()">Sign up</button>
@@ -908,7 +918,12 @@
       <a href="/privacy" class="footer-policy">Privacy Policy</a>
     </div>
     <div class="footer-links">
-      <a href="/guides">Guides</a>
+      <a href="/house-tours">House Tours</a>
+      <a href="/guides">Village Guides</a>
+      <a href="/how-to">How To</a>
+      <a href="/directory">Vacation Homes</a>
+      <a href="/design-directory">Architects</a>
+      <a href="/criteria">About</a>
       <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
       <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
     </div>
