@@ -478,6 +478,49 @@ module.exports = async function handler(req, res) {
       footer { padding: 24px; flex-direction: column; gap: 20px; text-align: center; }
       .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
     }
+
+    /* Directory map */
+    .dir-map-wrap {
+      position: relative;
+      max-width: 1400px;
+      margin: 0 auto 64px;
+      padding: 0 48px;
+    }
+    .dir-map {
+      width: 100%;
+      height: 380px;
+      background: var(--grey-4);
+      border: 0.5px solid var(--grey-3);
+    }
+    .sc-marker {
+      width: 11px; height: 11px; border-radius: 50%;
+      background: #0f0f0f; border: 2px solid #f9f7f2;
+      cursor: pointer; transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .sc-marker:hover { transform: scale(1.4); }
+    .sc-marker.active { background: #8B7355; transform: scale(1.4); }
+
+    .map-popup {
+      position: absolute; left: 68px; bottom: 28px; z-index: 5;
+      width: 260px; background: #fff; border: 0.5px solid var(--grey-3);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    }
+    .map-popup-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+    .map-popup-body { padding: 16px 18px 18px; }
+    .map-popup-location { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 6px; }
+    .map-popup-name { font-family: var(--serif); font-size: 19px; line-height: 1.2; margin-bottom: 12px; }
+    .map-popup-link { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid var(--black); padding-bottom: 2px; }
+    .map-popup-close {
+      position: absolute; top: 10px; right: 10px; width: 26px; height: 26px;
+      background: rgba(255,255,255,0.9); border: none; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+      .dir-map-wrap { padding: 0 24px; margin-bottom: 44px; }
+      .dir-map { height: 300px; }
+      .map-popup { left: 44px; right: 44px; width: auto; }
+    }
   </style>
   <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
   <script>
@@ -493,20 +536,22 @@ module.exports = async function handler(req, res) {
 
   <div class="page-header">
     <h1 class="page-subline" id="dir-sub">Modern vacation homes, rooted in nature.</h1>
-    <div class="dir-search-wrap">
-      <input class="dir-search-input" type="text" placeholder="Where do you want to go?" id="dir-search" autocomplete="off" value="${searchValue}" />
-      <button class="dir-search-btn" onclick="goToLocation(document.getElementById('dir-search').value || '')">Search</button>
-      <button class="dir-search-clear ${clearVisible}" id="dir-clear" onclick="clearSearch()">Clear</button>
-      <div class="search-dropdown" id="dir-dropdown">
-        <p class="dropdown-label">Popular locations</p>
-        <button class="dropdown-item" onclick="goToLocation('Mallorca')">Mallorca</button>
-        <button class="dropdown-item" onclick="goToLocation('Ibiza')">Ibiza</button>
-        <button class="dropdown-item" onclick="goToLocation('Menorca')">Menorca</button>
-        <button class="dropdown-item" onclick="goToLocation('Portugal')">Portugal</button>
-        <button class="dropdown-item" onclick="goToLocation('Italy')">Italy</button>
-        <button class="dropdown-item" onclick="goToLocation('Greece')">Greece</button>
-        <button class="dropdown-item" onclick="goToLocation('France')">France</button>
+  </div>
+
+  <div class="dir-map-wrap">
+    <div class="dir-map" id="dir-map"></div>
+    <div class="map-popup" id="map-popup" style="display:none;">
+      <img class="map-popup-img" id="map-popup-img" src="" alt="" loading="lazy" />
+      <div class="map-popup-body">
+        <p class="map-popup-location" id="map-popup-location"></p>
+        <p class="map-popup-name" id="map-popup-name"></p>
+        <a class="map-popup-link" id="map-popup-link" href="#">View property</a>
       </div>
+      <button class="map-popup-close" onclick="document.getElementById('map-popup').style.display='none'">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1l12 12M13 1L1 13" stroke="#888" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+      </button>
     </div>
   </div>
 
@@ -694,6 +739,86 @@ module.exports = async function handler(req, res) {
 
     currentFiltered = Array.from(document.querySelectorAll('.card-link'));
     updateLoadMore();
+
+    // ---- Directory map ----
+    var MAPBOX_TOKEN = 'pk.eyJ1IjoibHVrZXJ5YSIsImEiOiJjbG96cmZ3OTMwMHRyMmlzNHc1bTZkZzI4In0.8Pmo8eeUh48QHBpzqHwNuQ';
+    var MAPBOX_STYLE = 'mapbox://styles/lukerya/cmoime20s006m01r68jvia13j';
+    var mapboxLoadPromise = null;
+
+    function loadMapbox() {
+      if (mapboxLoadPromise) return mapboxLoadPromise;
+      mapboxLoadPromise = new Promise(function (resolve) {
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css';
+        document.head.appendChild(css);
+        var script = document.createElement('script');
+        script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js';
+        script.onload = function () { resolve(); };
+        document.head.appendChild(script);
+      });
+      return mapboxLoadPromise;
+    }
+
+    function mapImage(url, width) {
+      if (!url) return '';
+      if (url.indexOf('res.cloudinary.com') > -1 && url.indexOf('/upload/') > -1) {
+        return url.replace('/upload/', '/upload/f_auto,q_auto,w_' + width + '/');
+      }
+      return url;
+    }
+
+    async function initDirectoryMap() {
+      var container = document.getElementById('dir-map');
+      if (!container) return;
+      try {
+        var res = await fetch('/api/properties?all=true');
+        var data = await res.json();
+        var records = (data.records || []).filter(function (r) {
+          return r.fields['Latitude'] && r.fields['Longitude'] && r.fields['Name'];
+        });
+        if (!records.length) { container.parentElement.style.display = 'none'; return; }
+
+        await loadMapbox();
+        mapboxgl.accessToken = MAPBOX_TOKEN;
+        var map = new mapboxgl.Map({
+          container: 'dir-map',
+          style: MAPBOX_STYLE,
+          center: [8, 45],
+          zoom: 3.4,
+          attributionControl: false
+        });
+        map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+
+        map.on('load', function () {
+          records.forEach(function (r) {
+            var f = r.fields;
+            var el = document.createElement('div');
+            el.className = 'sc-marker';
+            el.addEventListener('click', function (ev) {
+              ev.stopPropagation();
+              document.querySelectorAll('.sc-marker').forEach(function (m) { m.classList.remove('active'); });
+              el.classList.add('active');
+              var imgUrl = f['Hero Image'] || '';
+              var popupImg = document.getElementById('map-popup-img');
+              if (imgUrl) { popupImg.src = mapImage(imgUrl, 600); popupImg.style.display = 'block'; }
+              else { popupImg.style.display = 'none'; }
+              document.getElementById('map-popup-location').textContent = (f['Location label'] || f['Region'] || f['Country'] || '').toUpperCase();
+              document.getElementById('map-popup-name').textContent = f['Name'] || '';
+              document.getElementById('map-popup-link').href = '/properties/' + (f['Slug'] || '');
+              document.getElementById('map-popup').style.display = 'block';
+              map.flyTo({ center: [parseFloat(f['Longitude']), parseFloat(f['Latitude'])], zoom: 7, duration: 1000 });
+            });
+            new mapboxgl.Marker({ element: el })
+              .setLngLat([parseFloat(f['Longitude']), parseFloat(f['Latitude'])])
+              .addTo(map);
+          });
+        });
+      } catch (e) { console.error('Directory map error:', e); }
+    }
+
+    initDirectoryMap();
+
   </script>
 
 </body>
