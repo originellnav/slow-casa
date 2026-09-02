@@ -893,20 +893,6 @@
 
     // Mapbox lazy loader - loads Mapbox CSS+JS only when first needed
     var mapboxLoadPromise = null;
-    function loadMapbox() {
-      if (mapboxLoadPromise) return mapboxLoadPromise;
-      mapboxLoadPromise = new Promise(function(resolve) {
-        var css = document.createElement('link');
-        css.rel = 'stylesheet';
-        css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css';
-        document.head.appendChild(css);
-        var script = document.createElement('script');
-        script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js';
-        script.onload = function() { resolve(); };
-        document.head.appendChild(script);
-      });
-      return mapboxLoadPromise;
-    }
 
     // Cloudinary responsive transformer - keeps Cloudinary URLs but enforces sensible sizes
     function responsiveCloudinaryUrl(url, width) {
@@ -1057,126 +1043,7 @@
 
     fetchLatestPost();
 
-    // MAP
-    var MAPBOX_TOKEN = 'pk.eyJ1IjoibHVrZXJ5YSIsImEiOiJjbG96cmZ3OTMwMHRyMmlzNHc1bTZkZzI4In0.8Pmo8eeUh48QHBpzqHwNuQ';
-    var MAPBOX_STYLE = 'mapbox://styles/lukerya/cmoime20s006m01r68jvia13j';
-    var mapTeaser = null;
-    var mapFull = null;
-    var mapProperties = [];
-
-    async function initMaps() {
-      try {
-        var res = await fetch('/api/properties?all=true');
-        var data = await res.json();
-        var records = data.records || [];
-        mapProperties = records.filter(function(r) {
-          return r.fields['Latitude'] && r.fields['Longitude'] && r.fields['Name'];
-        });
-        await loadMapbox();
-        initTeaserMap();
-      } catch(e) { console.error('Map init error:', e); }
-    }
-
-    function initTeaserMap() {
-      if (!mapProperties.length) return;
-      mapboxgl.accessToken = MAPBOX_TOKEN;
-      mapTeaser = new mapboxgl.Map({
-        container: 'map-teaser-preview',
-        style: MAPBOX_STYLE,
-        center: [8, 42],
-        zoom: 3.2,
-        interactive: false,
-        attributionControl: false
-      });
-
-      mapTeaser.on('load', function() {
-        mapProperties.forEach(function(r) {
-          var f = r.fields;
-          var el = document.createElement('div');
-          el.className = 'sc-marker';
-          new mapboxgl.Marker({ element: el })
-            .setLngLat([parseFloat(f['Longitude']), parseFloat(f['Latitude'])])
-            .addTo(mapTeaser);
-        });
-      });
-    }
-
-    function openMapModal() {
-      var modal = document.getElementById('map-modal');
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-      if (!mapFull) {
-        loadMapbox().then(function() {
-          setTimeout(function() { initFullMap(); }, 50);
-        });
-      }
-    }
-
-    function closeMapModal() {
-      document.getElementById('map-modal').classList.remove('open');
-      document.getElementById('map-popup').style.display = 'none';
-      document.body.style.overflow = '';
-    }
-
-    function initFullMap() {
-      mapboxgl.accessToken = MAPBOX_TOKEN;
-      mapFull = new mapboxgl.Map({
-        container: 'map-full',
-        style: MAPBOX_STYLE,
-        center: [8, 42],
-        zoom: 3.2,
-        attributionControl: false
-      });
-
-      mapFull.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
-
-      mapFull.on('load', function() {
-        mapProperties.forEach(function(r) {
-          var f = r.fields;
-          var slug = f['Slug'];
-          var url = slug ? '/properties/' + slug : '#';
-          var imgUrl = f['Hero Image'] || '';
-          var el = document.createElement('div');
-          el.className = 'sc-marker';
-
-          el.addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.querySelectorAll('.sc-marker').forEach(function(m) { m.classList.remove('active'); });
-            el.classList.add('active');
-
-            document.getElementById('map-popup-location').textContent = (f['Location label'] || '').toUpperCase();
-            document.getElementById('map-popup-name').textContent = f['Name'] || '';
-            document.getElementById('map-popup-link').href = url;
-            var popupImg = document.getElementById('map-popup-img');
-            if (imgUrl) { popupImg.src = responsiveImageUrl(imgUrl, 600); popupImg.style.display = 'block'; }
-            else { popupImg.style.display = 'none'; }
-            document.getElementById('map-popup').style.display = 'block';
-
-            mapFull.flyTo({
-              center: [parseFloat(f['Longitude']), parseFloat(f['Latitude'])],
-              zoom: 8,
-              duration: 1200
-            });
-          });
-
-          new mapboxgl.Marker({ element: el })
-            .setLngLat([parseFloat(f['Longitude']), parseFloat(f['Latitude'])])
-            .addTo(mapFull);
-        });
-      });
-    }
-
-    // Close modal on escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeMapModal();
-    });
-
-    // Expose modal functions globally for inline onclick handlers
-    window.openMapModal = openMapModal;
-    window.closeMapModal = closeMapModal;
     window.handleTrySubscribe = handleTrySubscribe;
-
-    initMaps();
   });
   </script>
 <script>
