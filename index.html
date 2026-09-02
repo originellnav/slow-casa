@@ -850,7 +850,13 @@
   </section>
 
 
-
+  <section class="section posts">
+    <div class="section-header">
+      <p class="section-label">Vacation Homes</p>
+      <a class="section-link" href="/directory">All vacation homes</a>
+    </div>
+    <div class="property-grid" id="latest-homes"></div>
+  </section>
   <div class="map-teaser" onclick="openMapModal()">
     <div class="map-teaser-inner">
       <div class="map-teaser-left">
@@ -996,38 +1002,40 @@
 
     // Fetch featured property from API (single static hero image now)
 
-    function renderProperties(records) {
-      if (!records.length) return;
+       function renderProperties(records) {
+      var grid = document.getElementById('latest-homes');
+      if (!grid || !records.length) return;
 
-      // Sort by Date added descending, filter blanks
-      var sorted = records.filter(function(r) {
-  var f = r.fields;
-  if (!f['Name']) return false;
-  return !!f['Hero Image'] || !!f['Gallery Images'] || (f['Images'] && f['Images'].length > 0);
-}).sort(function(a, b) {
+      // Newest first, and only homes that actually have an image
+      var sorted = records.filter(function (r) {
+        var f = r.fields || {};
+        if (!f['Name'] || !f['Slug']) return false;
+        return !!f['Hero Image'] || !!f['Gallery Images'] || (f['Images'] && f['Images'].length > 0);
+      }).sort(function (a, b) {
         var da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
         var db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
         return db - da;
-      });
+      }).slice(0, 3);
 
-      if (!sorted.length) return;
-      var latest = sorted[0];
-      var f = latest.fields;
-      var slug = f['Slug'];
-      var url = '/properties/' + slug;
-      var imgUrl = f['Hero Image'] || getImageUrl(latest, 0);
-      var region = f['Region'] || f['Country'] || '';
-      var name = f['Name'] || '';
-      var desc = f['Description'] || '';
+      if (!sorted.length) { var sec = grid.closest('section'); if (sec) sec.style.display = 'none'; return; }
 
-      document.getElementById('featured-region').textContent = region.toUpperCase();
-      document.getElementById('featured-name').textContent = name;
-      document.getElementById('featured-desc').textContent = desc;
-      document.getElementById('featured-link').href = url;
-      document.getElementById('featured-img-link').href = url;
-      var img = document.getElementById('featured-img');
-      img.src = responsiveImageUrl(imgUrl, 1400);
-      img.alt = name;
+      function esc(str) {
+        return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      grid.innerHTML = sorted.map(function (r) {
+        var f = r.fields;
+        var img = f['Hero Image'] || getImageUrl(r, 0) || '';
+        var label = f['Location label'] || f['Region'] || f['Country'] || '';
+        return '<a class="property-card" href="/properties/' + esc(f['Slug']) + '">' +
+          '<div class="card-img">' + (img ? '<img src="' + esc(responsiveImageUrl(img, 800)) + '" alt="' + esc(f['Name']) + '" loading="lazy" />' : '') + '</div>' +
+          '<p class="card-location">' + esc(label) + '</p>' +
+          '<p class="card-name">' + esc(f['Name']) + '</p>' +
+          '<p class="card-detail"></p>' +
+          '</a>';
+      }).join('');
     }
 
     async function handleNewsletterSubscribe(e) {
