@@ -5,7 +5,8 @@
     { "source": "/property", "destination": "/directory", "permanent": true },
     { "source": "/journal", "destination": "/guides", "permanent": true },
     { "source": "/journal/:path*", "destination": "/guides", "permanent": true },
-    { "source": "/places/:slug", "destination": "/", "statusCode": 410 }
+    { "source": "/places/:slug", "destination": "/", "statusCode": 410 },
+    { "source": "/criteria", "destination": "/about", "permanent": true }
   ],
   "rewrites": [
     { "source": "/directory", "destination": "/api/directory" },
