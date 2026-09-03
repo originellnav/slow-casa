@@ -1,15 +1,18 @@
-   const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 
 module.exports = async function handler(req, res) {
   const base = 'https://slowcasa.com';
   const staticPages = [
     { url: '/', priority: '1.0', changefreq: 'weekly' },
     { url: '/directory', priority: '0.9', changefreq: 'weekly' },
-    { url: '/guides', priority: '0.8', changefreq: 'weekly' },
-    { url: '/criteria', priority: '0.5', changefreq: 'monthly' },
+    { url: '/house-tours', priority: '0.9', changefreq: 'weekly' },
+    { url: '/guides', priority: '0.9', changefreq: 'weekly' },
+    { url: '/how-to', priority: '0.9', changefreq: 'weekly' },
+    { url: '/design-directory', priority: '0.8', changefreq: 'weekly' },
+    { url: '/about', priority: '0.5', changefreq: 'monthly' },
   ];
   // Fetch properties from Airtable and guides from Sanity in parallel
-  const [propertyUrls, guideUrls] = await Promise.all([
+  const [propertyUrls, guideUrls, architectUrls] = await Promise.all([
     (async () => {
       try {
         const r = await fetch(
@@ -42,9 +45,26 @@ module.exports = async function handler(req, res) {
             lastmod: g.publishedAt ? g.publishedAt.split('T')[0] : ''
           }));
       } catch (e) { return []; }
+    })(),
+    (async () => {
+      try {
+        const r = await fetch(
+          'https://api.airtable.com/v0/appndrnWrdlgxRJAG/Architects?fields[]=Slug&fields[]=Status&maxRecords=200',
+          { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } }
+        );
+        const data = await r.json();
+        return (data.records || [])
+          .filter(rec => rec.fields['Slug'] && rec.fields['Status'] === 'Published')
+          .map(rec => ({
+            url: '/architects/' + rec.fields['Slug'],
+            priority: '0.7',
+            changefreq: 'monthly',
+            lastmod: ''
+          }));
+      } catch (e) { return []; }
     })()
   ]);
-  const allPages = [...staticPages, ...propertyUrls, ...guideUrls];
+  const allPages = [...staticPages, ...propertyUrls, ...guideUrls, ...architectUrls];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${allPages.map(p => `  <url>
