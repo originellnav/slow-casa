@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About | Slow Casa</title>
+  <meta name="description" content="Slow Casa is a journal about the houses of rural Europe and the people who build them. House tours, village guides, how-tos, and a directory of homes to rent." />
+  <link rel="canonical" href="https://slowcasa.com/about" />
+  <meta property="og:title" content="About | Slow Casa" />
+  <meta property="og:description" content="Slow Casa is a journal about the houses of rural Europe and the people who build them." />
+  <meta property="og:url" content="https://slowcasa.com/about" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Slow Casa" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About | Slow Casa" />
+  <meta name="twitter:description" content="Slow Casa is a journal about the houses of rural Europe and the people who build them." />
+
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/slow-casa.css" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-B930Z6F96Z');
+  </script>
+  <script async src="https://plausible.io/js/pa-aahRJ1iMPfiu0NJteNWEg.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
+
+  <style>
+    .about-lede {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 48px 56px;
+      text-align: center;
+    }
+    .about-lede h1 {
+      font-family: var(--serif);
+      font-size: clamp(30px, 4.4vw, 46px);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 22px;
+    }
+    .about-lede p {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--grey-1);
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    .about-hero {
+      width: 100%;
+      aspect-ratio: 21/9;
+      overflow: hidden;
+      background: var(--grey-4);
+      margin-bottom: 80px;
+    }
+    .about-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .about-section {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 48px 72px;
+    }
+    .about-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      margin-bottom: 24px;
+    }
+    .about-section p {
+      font-size: 17px;
+      line-height: 1.68;
+      margin-bottom: 20px;
+    }
+    .about-section p:last-child { margin-bottom: 0; }
+
+    .about-list {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 48px 72px;
+    }
+    .about-item {
+      border-top: 1px solid var(--line, #e4ddcd);
+      padding: 26px 0;
+    }
+    .about-item:last-child { border-bottom: 1px solid var(--line, #e4ddcd); }
+    .about-item h3 {
+      font-family: var(--serif);
+      font-size: 24px;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .about-item p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--grey-1);
+      margin-bottom: 12px;
+    }
+    .about-item a {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--black);
+      padding-bottom: 2px;
+    }
+
+    .about-cta {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 48px 96px;
+      text-align: center;
+    }
+    .about-cta h2 {
+      font-family: var(--serif);
+      font-size: 30px;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .about-cta p { font-size: 16px; color: var(--grey-1); margin-bottom: 26px; }
+    .about-btn {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 15px 30px;
+      background: var(--black);
+      color: #f9f7f2;
+      transition: opacity 0.2s;
+    }
+    .about-btn:hover { opacity: 0.82; }
+
+    @media (max-width: 768px) {
+      .about-lede { padding: 48px 24px 36px; }
+      .about-hero { aspect-ratio: 4/3; margin-bottom: 52px; }
+      .about-section, .about-list, .about-cta { padding-left: 24px; padding-right: 24px; padding-bottom: 52px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div></div>
+    <a href="/" class="wordmark">Slow Casa</a>
+    <ul class="nav-links">
+      <li><a href="/house-tours">House Tours</a></li>
+      <li><a href="/guides">Village Guides</a></li>
+      <li><a href="/how-to">How To</a></li>
+      <li><a href="/directory">Vacation Homes</a></li>
+    </ul>
+  </nav>
+
+  <header class="about-lede">
+    <h1>Slow Casa is a media company dedicated to design-first homes in rural European locations.</h1>
+    <p>We celebrate slow living, extraordinary architecture and homes rooted in nature.</p>
+  </header>
+
+  <div class="about-hero">
+    <!-- Replace with a wide landscape shot: a house in its setting, not an interior -->
+    <img src="https://res.cloudinary.com/dw1wmo2go/image/upload/f_auto,q_auto,w_2000/v1787649253/les_brumes3_fhz2r6.jpg" alt="Les Brumes, a circular glass house on a terraced hillside in the Baronnies Provencales, France" />
+  </div>
+
+  <section class="about-section">
+    <p class="about-label">About</p>
+    <p>Most of the best houses in Europe are not in cities. They are at the end of dirt roads, on hillsides above the sea, in valleys that emptied out a century ago and are slowly filling again. Some are new. Many are old buildings brought back by people who cared enough to do it properly.</p>
+    <p>Slow Casa exists to find them, and to tell you who made them and how. We are interested in the decisions behind a building as much as the finished thing: the material someone chose because it came from the next valley, the ruin somebody spent six years rebuilding by hand, the reason a window faces the way it does.</p>
+    <p>The houses are the way in. The people who build them are the point.</p>
+  </section>
+
+  <div class="about-list">
+    <p class="about-label">What we publish</p>
+
+    <div class="about-item">
+      <h3>House Tours</h3>
+      <p>Conversations with the architects, designers and owners behind the houses. How they found the place, what they kept, what it cost them.</p>
+      <a href="/house-tours">View house tours</a>
+    </div>
+
+    <div class="about-item">
+      <h3>Village Guides</h3>
+      <p>Where to eat, swim and stay in the villages and small towns these houses sit in. Named places, not lists of sights.</p>
+      <a href="/guides">View village guides</a>
+    </div>
+
+    <div class="about-item">
+      <h3>How To</h3>
+      <p>How these houses get made. House types, materials, methods, and the practical business of building well in a landscape.</p>
+      <a href="/how-to">View how-tos</a>
+    </div>
+
+    <div class="about-item">
+      <h3>Vacation Homes</h3>
+      <p>A directory of design-led houses across Europe that you can book. Every one chosen for the architecture and the place it sits in, and every one linked straight to the owner.</p>
+      <a href="/directory">View the directory</a>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <p class="about-label">History</p>
+    <p>Slow Casa started in 2026 as a directory of architect-designed houses to rent in rural Europe, built by Swedish and Australian duo Ida and Luke Jakobson. Inspired by their years spent living between the Stockholm archipelago and the Balearic islands, they set out to keep track of the most extraordinary houses worth knowing about, and it grew from there.</p>
+    <p>What became obvious quickly was that the houses were the smaller half of the story. Behind each one was an architect who had thought hard about a difficult site, or a family who had spent years rebuilding something everyone else had given up on. Those conversations were more interesting than the listings.</p>
+    <p>So Slow Casa is becoming a publication: still with the directory at its centre, but built around the people making these places rather than the places alone. Written first, with film to follow.</p>
+  </section>
+
+  <section class="about-cta">
+    <h2>The Slow Signal</h2>
+    <p>Weekly slow living intel, home inspiration, conversations, and more.</p>
+    <a class="about-btn" href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Subscribe</a>
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <span class="footer-copy">&copy; 2026 Slow Casa</span>
+      <a href="/privacy" class="footer-policy">Privacy Policy</a>
+    </div>
+    <div class="footer-links">
+      <a href="/house-tours">House Tours</a>
+      <a href="/guides">Village Guides</a>
+      <a href="/how-to">How To</a>
+      <a href="/directory">Vacation Homes</a>
+      <a href="/design-directory">Architects</a>
+      <a href="/about">About</a>
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
+    </div>
+  </footer>
+
+</body>
+</html>
