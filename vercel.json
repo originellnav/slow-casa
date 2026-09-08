@@ -15,6 +15,7 @@
     { "source": "/design-directory", "destination": "/api/architects-index" },
     { "source": "/architects/:slug", "destination": "/api/architect?slug=:slug" },
     { "source": "/guides", "destination": "/api/guides-index" },
+    { "source": "/places", "destination": "/api/guides-index?section=places" },
     { "source": "/house-tours", "destination": "/api/guides-index?section=house-tours" },
     { "source": "/how-to", "destination": "/api/guides-index?section=how-to" },
     { "source": "/guides/:slug", "destination": "/api/guide-page?slug=:slug" },
