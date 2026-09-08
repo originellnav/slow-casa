@@ -156,3 +156,15 @@ footer {
   footer { flex-direction: column; gap: 20px; padding: 32px 24px; text-align: center; }
   .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
 }
+/* NAV — larger, uppercase */
+nav .nav-links { gap: 40px; }
+nav .nav-links a {
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  nav .nav-links { gap: 20px; }
+  nav .nav-links a { font-size: 12px; letter-spacing: 0.06em; }
+}
