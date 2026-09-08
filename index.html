@@ -4,24 +4,24 @@
   <!-- v2026-06-11 -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Slow Casa | Exploring modern homes in European nature</title>
+  <title>Design Houses to Rent in Mallorca, Ibiza &amp; Menorca | Slow Casa</title>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Slow Casa" />
 <link rel="manifest" href="/site.webmanifest" />
-  <meta name="description" content="Home tours, location guides, how-tos and the design products behind them. A journal about modern homes in the wild and rural parts of Europe." />
+  <meta name="description" content="A curated directory of design-led houses to rent across the Balearic Islands, plus village guides to where to eat, swim and stay near each one." />
   <link rel="canonical" href="https://slowcasa.com/" />
-<meta property="og:title" content="Slow Casa | Exploring modern homes in European nature" />
-<meta property="og:description" content="Home tours, location guides, how-tos and the design products behind them. A journal about modern homes in the wild and rural parts of Europe." />
+<meta property="og:title" content="Design Houses to Rent in Mallorca, Ibiza &amp; Menorca | Slow Casa" />
+<meta property="og:description" content="A curated directory of design-led houses to rent across the Balearic Islands, plus village guides to where to eat, swim and stay near each one." />
 <meta property="og:url" content="https://slowcasa.com/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Slow Casa" />
 <meta property="og:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Slow Casa | Exploring modern homes in European nature" />
-<meta name="twitter:description" content="Home tours, location guides, how-tos and the design products behind them. A journal about modern homes in the wild and rural parts of Europe." />
+<meta name="twitter:title" content="Design Houses to Rent in Mallorca, Ibiza &amp; Menorca | Slow Casa" />
+<meta name="twitter:description" content="A curated directory of design-led houses to rent across the Balearic Islands, plus village guides to where to eat, swim and stay near each one." />
 <meta name="twitter:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
@@ -788,6 +788,15 @@
       .posts .section-label { font-size: 13px; }
       .posts .card-name { font-size: 22px; }
     }
+
+    .map-cta {
+      font-family: var(--serif);
+      font-size: clamp(22px, 3vw, 30px);
+      line-height: 1.3;
+      max-width: 760px;
+      color: #0f0f0f;
+    }
+    .map-cta a { border-bottom: 1px solid #0f0f0f; }
   </style>
   <!-- Google Analytics -->
   <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
@@ -805,10 +814,9 @@
     <div></div>
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
-      <li><a href="/house-tours">House Tours</a></li>
-      <li><a href="/guides">Village Guides</a></li>
-      <li><a href="/how-to">How To</a></li>
-      <li><a href="/directory">Vacation Homes</a></li>
+      <li><a href="/places">Places</a></li>
+      <li><a href="/directory">Houses</a></li>
+      <li><a href="/map">Map</a></li>
     </ul>
   </nav>
   <div class="hero">
@@ -819,43 +827,33 @@
     </picture>
     <div class="hero-top-gradient"></div>
     <div class="hero-overlay">
-           <h1 class="hero-headline">Exploring modern homes in European nature</h1>
-      <p class="hero-subhead">Home tours, location guides, how-tos, and the latest design products.</p>
+           <h1 class="hero-headline">The best houses to rent in Mallorca, Ibiza and Menorca</h1>
     </div>
   </div>
   </div>
 
    <section class="section posts">
     <div class="section-header">
-      <p class="section-label">Village Guides</p>
-      <a class="section-link" href="/guides">All village guides</a>
-    </div>
-    <div class="property-grid js-posts" data-categories="region-discovery" data-label="Village Guide"></div>
-  </section>
-
-  <section class="section posts">
-    <div class="section-header">
-      <p class="section-label">House Tours</p>
-      <a class="section-link" href="/house-tours">All house tours</a>
-    </div>
-    <div class="property-grid js-posts" data-categories="home-stories,architect-stories,architect-roundup" data-label="House Tour"></div>
-  </section>
-
-  <section class="section posts">
-    <div class="section-header">
-      <p class="section-label">How To</p>
-      <a class="section-link" href="/how-to">All how-tos</a>
-    </div>
-    <div class="property-grid js-posts" data-categories="typology-guide,terminology" data-label="How To"></div>
-  </section>
-
-
-  <section class="section posts">
-    <div class="section-header">
-      <p class="section-label">Vacation Homes</p>
-      <a class="section-link" href="/directory">All vacation homes</a>
+      <p class="section-label">Houses</p>
+      <a class="section-link" href="/directory">All houses</a>
     </div>
     <div class="property-grid" id="latest-homes"></div>
+  </section>
+
+  <section class="section posts">
+    <div class="section-header">
+      <p class="section-label">Places</p>
+      <a class="section-link" href="/places">All places</a>
+    </div>
+    <div class="property-grid js-posts" data-categories="region-discovery,home-stories,architect-stories,architect-roundup,typology-guide,terminology" data-label="Guide"></div>
+  </section>
+
+  <section class="section posts">
+    <div class="section-header">
+      <p class="section-label">The Map</p>
+      <a class="section-link" href="/map">Open the map</a>
+    </div>
+    <p class="map-cta">Every house, restaurant, beach and bar we rate across the Balearics, on one map. <a href="/map">Take a look.</a></p>
   </section>
 
 
@@ -954,11 +952,19 @@
         var f = r.fields || {};
         if (!f['Name'] || !f['Slug']) return false;
         return !!f['Hero Image'] || !!f['Gallery Images'] || (f['Images'] && f['Images'].length > 0);
+      }).filter(function (r) {
+        // Balearics only. Matched on text for now; an Island field in Airtable would be cleaner.
+        var f = r.fields;
+        var hay = ((f['Location label'] || '') + ' ' + (f['Region'] || '') + ' ' + (f['Town'] || '')).toLowerCase();
+        return hay.indexOf('mallorca') > -1 || hay.indexOf('majorca') > -1 ||
+               hay.indexOf('ibiza') > -1 || hay.indexOf('eivissa') > -1 ||
+               hay.indexOf('menorca') > -1 || hay.indexOf('minorca') > -1 ||
+               hay.indexOf('balear') > -1 || hay.indexOf('formentera') > -1;
       }).sort(function (a, b) {
         var da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
         var db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
         return db - da;
-      }).slice(0, 3);
+      }).slice(0, 9);
 
       if (!sorted.length) { var sec = grid.closest('section'); if (sec) sec.style.display = 'none'; return; }
 
