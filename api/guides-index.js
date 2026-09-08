@@ -47,6 +47,14 @@ function formatCategory(category) {
 //   /guides       -> (no param) Village Guides
 //   /how-to       -> ?section=how-to
 const PAGES = {
+  'places': {
+    categories: null,
+    title: 'Places | Slow Casa',
+    description: 'Guides to the villages of Mallorca, Ibiza and Menorca. Where to eat, swim and stay, and the houses worth booking near each one.',
+    canonical: 'https://slowcasa.com/places',
+    heading: 'Places',
+    intro: 'Guides to the villages of the Balearics, and the houses worth booking near them.'
+  },
   'village-guides': {
     categories: ['region-discovery'],
     title: 'Village Guides | Slow Casa',
