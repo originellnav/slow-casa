@@ -893,7 +893,7 @@ module.exports = async function handler(req, res) {
         var res = await fetch('/api/properties?all=true');
         var data = await res.json();
         var records = (data.records || []).filter(function (r) {
-          return r.fields['Latitude'] && r.fields['Longitude'] && r.fields['Name'];
+          return r.fields['Latitude'] && r.fields['Longitude'] && r.fields['Name'] && r.fields['Island'];
         });
         if (!records.length) { container.parentElement.style.display = 'none'; return; }
 
@@ -902,8 +902,8 @@ module.exports = async function handler(req, res) {
         var map = new mapboxgl.Map({
           container: 'dir-map',
           style: MAPBOX_STYLE,
-          center: [8, 45],
-          zoom: 3.4,
+          center: [2.8, 39.4],
+          zoom: 7.2,
           attributionControl: false
         });
         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
