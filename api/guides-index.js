@@ -34,7 +34,7 @@ function formatCategory(category) {
   'architect-roundup': 'Architects',
   'typology-guide': 'House Types',
   'region-discovery': 'Places',
-  'architectural-pilgrimage': 'Journeys',
+  'architectural-pilgrimage': 'Guide',
   'terminology': 'Terminology',
   'architect-stories': 'Architect Stories',
   'home-stories': 'Home Stories'
