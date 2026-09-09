@@ -1,1 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Map | Slow Casa</title>
+  <meta name="description" content="Every house, restaurant, beach and bar we rate across Mallorca, Ibiza and Menorca, on one map." />
+  <meta name="robots" content="noindex" />
+  <link rel="canonical" href="https://slowcasa.com/map" />
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/slow-casa.css" />
+  <style>
+    .map-lede { max-width: 620px; margin: 0 auto; padding: 96px 24px 48px; text-align: center; }
+    .map-eyebrow { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #888; margin-bottom: 20px; }
+    .map-lede h1 { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(30px, 4.4vw, 46px); line-height: 1.15; margin-bottom: 18px; }
+    .map-lede p { font-size: 17px; line-height: 1.6; color: #888; }
+    .map-form { max-width: 360px; margin: 32px auto 0; display: flex; flex-direction: column; gap: 10px; }
+    .map-input { font-size: 14px; padding: 14px 16px; border: 0.5px solid #d9d2c2; background: #fff; outline: none; text-align: center; }
+    .map-input:focus { border-color: #0f0f0f; }
+    .map-btn { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 15px; border: none; background: #0f0f0f; color: #f9f7f2; cursor: pointer; }
+    .map-btn:disabled { opacity: 0.5; }
+    .map-note { font-size: 11px; color: #bbb; margin-top: 14px; }
+    .map-box { max-width: 960px; margin: 56px auto 96px; padding: 0 24px; }
+    .map-box-inner { aspect-ratio: 16/9; background: #f5f5f3; border: 0.5px solid #e8e8e8; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; color: #bbb; }
+  </style>
+</head>
+<body>
 
+  <nav>
+    <div></div>
+    <a href="/" class="wordmark">Slow Casa</a>
+    <ul class="nav-links">
+      <li><a href="/places">Places</a></li>
+      <li><a href="/directory">Houses</a></li>
+      <li><a href="/map">Map</a></li>
+    </ul>
+  </nav>
+
+  <header class="map-lede">
+    <p class="map-eyebrow">Coming soon</p>
+    <h1>The Map</h1>
+    <p>Every house, restaurant, beach and bar we rate across Mallorca, Ibiza and Menorca, on one map. Free, and built as we go.</p>
+    <div class="map-form">
+      <input class="map-input" id="map-email" type="email" placeholder="Your email address" autocomplete="email" />
+      <button class="map-btn" id="map-btn" type="button" onclick="mapSubscribe()">Get early access</button>
+    </div>
+    <p class="map-note">We will email you once when it opens. Nothing else.</p>
+  </header>
+
+  <div class="map-box"><div class="map-box-inner">In progress</div></div>
+
+  <footer>
+    <div class="footer-left">
+      <span class="footer-copy">&copy; 2026 Slow Casa</span>
+      <a href="/privacy" class="footer-policy">Privacy Policy</a>
+    </div>
+    <div class="footer-links">
+      <a href="/places">Places</a>
+      <a href="/directory">Houses</a>
+      <a href="/map">Map</a>
+      <a href="/about">About</a>
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </footer>
+
+  <script>
+    async function mapSubscribe() {
+      var input = document.getElementById('map-email');
+      var btn = document.getElementById('map-btn');
+      var email = (input.value || '').trim();
+      if (!email || email.indexOf('@') === -1) { input.focus(); return; }
+      btn.disabled = true;
+      btn.textContent = 'Signing up...';
+      try {
+        var res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        btn.textContent = res.ok ? 'You are on the list' : 'Try again';
+        if (!res.ok) btn.disabled = false;
+      } catch (e) {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+      }
+    }
+  </script>
+
+</body>
+</html>
