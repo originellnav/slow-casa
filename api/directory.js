@@ -130,6 +130,17 @@ module.exports = async function handler(req, res) {
 
   // Build server-rendered cards
   const PAGE_SIZE = 12;
+  // Balearics only. Uses the Island field if present, otherwise falls back to
+  // text matching so the page still works before the field is populated.
+  const BAL = ['mallorca','majorca','ibiza','eivissa','menorca','minorca','formentera','balear'];
+  const anyIslandField = records.some(r => (r.fields && r.fields['Island']));
+  records = records.filter(r => {
+    const f = r.fields || {};
+    if (anyIslandField) return !!f['Island'];
+    const hay = ((f['Location label']||'') + ' ' + (f['Region']||'') + ' ' + (f['Town']||'') + ' ' + (f['Country']||'')).toLowerCase();
+    return BAL.some(k => hay.indexOf(k) !== -1);
+  });
+
   const cardsHtml = records.map((record, i) => {
     const f = record.fields;
     const name = escapeHtml(f['Name'] || '');
@@ -139,6 +150,18 @@ module.exports = async function handler(req, res) {
     const desc = escapeHtml(descRaw.substring(0, 100) + (descRaw.length > 100 ? '...' : ''));
     const country = escapeHtml((f['Country'] || '').toLowerCase());
     const region = escapeHtml((f['Region'] || '').toLowerCase());
+    const haystack = ((f['Island']||'') + ' ' + (f['Location label']||'') + ' ' + (f['Region']||'') + ' ' + (f['Town']||'')).toLowerCase();
+    const island = escapeHtml(
+      ['mallorca','majorca'].some(k => haystack.indexOf(k)!==-1) ? 'mallorca' :
+      ['ibiza','eivissa'].some(k => haystack.indexOf(k)!==-1) ? 'ibiza' :
+      ['menorca','minorca'].some(k => haystack.indexOf(k)!==-1) ? 'menorca' :
+      haystack.indexOf('formentera')!==-1 ? 'formentera' : ''
+    );
+    // Tags is a multi-select, so this holds every tag on the property, lowercased.
+    const tagsRaw = f['Tags'];
+    const setting = escapeHtml(
+      (Array.isArray(tagsRaw) ? tagsRaw.join(' ') : (tagsRaw || '')).toLowerCase()
+    );
 
     const imgUrl = getImageUrl(record, 0) || '';
     const imgUrl2 = getImageUrl(record, 1) || imgUrl;
@@ -148,7 +171,7 @@ module.exports = async function handler(req, res) {
     const pageNum = Math.floor(i / PAGE_SIZE);
     const hiddenClass = pageNum === 0 ? '' : ' card-hidden';
 
-    return `<a href="${url}" data-page="${pageNum}" data-country="${country}" data-region="${region}" class="card-link${hiddenClass}" style="text-decoration:none;color:inherit;">
+    return `<a href="${url}" data-page="${pageNum}" data-country="${country}" data-region="${region}" data-island="${island}" data-setting="${setting}" class="card-link${hiddenClass}" style="text-decoration:none;color:inherit;">
       <div class="property-card">
         <div class="card-img">
           ${imgUrl ? `<img src="${escapeHtml(responsiveImageUrl(imgUrl, 600))}" alt="${name}" loading="lazy" class="img-primary" />` : ''}
@@ -521,6 +544,65 @@ module.exports = async function handler(req, res) {
       .dir-map { height: 300px; }
       .map-popup { left: 44px; right: 44px; width: auto; }
     }
+
+    /* --- Balearics filter bar --- */
+    :root { --accent: #b5573a; }
+    .dir-h1 {
+      font-family: var(--serif);
+      font-size: clamp(30px, 4.2vw, 46px);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      color: var(--black);
+      margin-bottom: 12px;
+    }
+    .dir-sub {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(19px, 2.4vw, 26px);
+      color: var(--accent);
+    }
+    .dir-filters {
+      max-width: 1400px;
+      margin: 0 auto 40px;
+      padding: 0 48px;
+    }
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .filter-label {
+      font-size: 14px;
+      color: var(--black);
+      margin-right: 6px;
+      white-space: nowrap;
+    }
+    .filter-pin { color: var(--accent); display: flex; align-items: center; margin-right: 4px; }
+    .chip {
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 9px 15px;
+      border: 1px solid var(--black);
+      background: none;
+      color: var(--black);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .chip:hover { background: var(--black); color: #f9f7f2; }
+    .chip.active { background: var(--black); color: #f9f7f2; }
+    .chip-accent { border-color: var(--accent); color: var(--accent); }
+    .chip-accent:hover, .chip-accent.active { background: var(--accent); color: #f9f7f2; }
+    .chip-map { margin-left: auto; }
+    .dir-body { display: block; }
+    @media (max-width: 768px) {
+      .dir-filters { padding: 0 24px; }
+      .chip { font-size: 11px; padding: 8px 12px; }
+      .chip-map { margin-left: 0; }
+    }
   </style>
   <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
   <script>
@@ -535,7 +617,8 @@ module.exports = async function handler(req, res) {
     ${nav()}
 
   <div class="page-header">
-    <h1 class="page-subline" id="dir-sub">Modern vacation homes, rooted in nature.</h1>
+    <h1 class="dir-h1">Handpicked homes in the Balearic islands</h1>
+    <p class="dir-sub">Where do you want to go?</p>
   </div>
 
   <div class="dir-map-wrap">
@@ -555,18 +638,29 @@ module.exports = async function handler(req, res) {
     </div>
   </div>
 
-  <div class="dir-body">
-    <div class="dir-sidebar">
-      <button class="filter-btn active" onclick="setFilter('all', this); if(locationQuery) clearSearch();">All locations</button>
-      <button class="filter-btn" onclick="setFilter('Alps', this)">Alps</button>
-      <button class="filter-btn" onclick="setFilter('Spain', this)">Spain</button>
-      <button class="filter-btn" onclick="setFilter('Portugal', this)">Portugal</button>
-      <button class="filter-btn" onclick="setFilter('Italy', this)">Italy</button>
-      <button class="filter-btn" onclick="setFilter('France', this)">France</button>
-      <button class="filter-btn" onclick="setFilter('Greece', this)">Greece</button>
-      <button class="filter-btn" onclick="setFilter('Croatia', this)">Croatia</button>
-      <button class="filter-btn" onclick="setFilter('Germany', this)">Germany</button>
+  <div class="dir-filters">
+    <div class="filter-row">
+      <span class="filter-label">Select your stay &rarr;</span>
+      <button class="chip active" data-type="setting" data-value="all">All</button>
+      <button class="chip" data-type="setting" data-value="sea">Sea</button>
+      <button class="chip" data-type="setting" data-value="mountains">Mountains</button>
+      <button class="chip" data-type="setting" data-value="farm">Farm</button>
+      <button class="chip" data-type="setting" data-value="city">City</button>
     </div>
+    <div class="filter-row">
+      <span class="filter-pin" aria-hidden="true">
+        <svg width="13" height="17" viewBox="0 0 13 17" fill="none"><path d="M6.5 16S12 10.4 12 6.5A5.5 5.5 0 1 0 1 6.5C1 10.4 6.5 16 6.5 16z" stroke="currentColor" stroke-width="1.2"/><circle cx="6.5" cy="6.3" r="1.9" stroke="currentColor" stroke-width="1.2"/></svg>
+      </span>
+      <button class="chip chip-accent active" data-type="island" data-value="all">All islands</button>
+      <button class="chip chip-accent" data-type="island" data-value="mallorca">Mallorca</button>
+      <button class="chip chip-accent" data-type="island" data-value="ibiza">Ibiza</button>
+      <button class="chip chip-accent" data-type="island" data-value="menorca">Menorca</button>
+      <button class="chip chip-accent" data-type="island" data-value="formentera">Formentera</button>
+      <button class="chip chip-accent chip-map" onclick="document.getElementById('dir-map').scrollIntoView({behavior:'smooth'})">Map view</button>
+    </div>
+  </div>
+
+  <div class="dir-body">
     <div class="dir-main">
       <div class="property-grid" id="property-grid">
         ${gridContent}
@@ -643,27 +737,48 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    function setFilter(filter, btn) {
-      activeFilter = filter;
-      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
+    var activeSetting = 'all';
+    var activeIsland = 'all';
+
+    document.addEventListener('click', function (e) {
+      var chip = e.target.closest ? e.target.closest('.chip[data-type]') : null;
+      if (!chip) return;
+      var type = chip.getAttribute('data-type');
+      var value = chip.getAttribute('data-value');
+      if (type === 'setting') activeSetting = value; else activeIsland = value;
+      document.querySelectorAll('.chip[data-type="' + type + '"]').forEach(function (b) { b.classList.remove('active'); });
+      chip.classList.add('active');
       applyFilter();
+    });
+
+    function setFilter(filter, btn) { activeFilter = filter; applyFilter(); }
+
+    // Hide any filter chip that no property currently matches, so the bar only
+    // ever offers real choices. New tags or islands appear on their own.
+    function pruneChips() {
+      var cards = Array.from(document.querySelectorAll('.card-link'));
+      document.querySelectorAll('.chip[data-type]').forEach(function (chip) {
+        var value = chip.getAttribute('data-value');
+        if (value === 'all') return;
+        var attr = chip.getAttribute('data-type') === 'island' ? 'data-island' : 'data-setting';
+        var hit = cards.some(function (c) {
+          var v = c.getAttribute(attr) || '';
+          return attr === 'data-island' ? v === value : v.indexOf(value) !== -1;
+        });
+        if (!hit) chip.style.display = 'none';
+      });
     }
+    pruneChips();
 
     function applyFilter() {
       var allCards = Array.from(document.querySelectorAll('.card-link'));
       var filtered = [];
       allCards.forEach(function(card) {
-        var country = card.getAttribute('data-country') || '';
-        var region = card.getAttribute('data-region') || '';
-        var match = false;
-        if (activeFilter === 'all') {
-          match = true;
-        } else {
-          var f = activeFilter.toLowerCase();
-          match = country === f || region === f || country.indexOf(f) !== -1 || region.indexOf(f) !== -1;
-        }
-        if (match) filtered.push(card);
+        var island = card.getAttribute('data-island') || '';
+        var setting = card.getAttribute('data-setting') || '';
+        var okIsland = (activeIsland === 'all') || island === activeIsland;
+        var okSetting = (activeSetting === 'all') || setting.indexOf(activeSetting) !== -1;
+        if (okIsland && okSetting) filtered.push(card);
       });
       allCards.forEach(function(card) { card.classList.add('card-hidden'); });
       filtered.forEach(function(card, i) {
