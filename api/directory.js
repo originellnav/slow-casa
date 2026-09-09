@@ -506,12 +506,14 @@ module.exports = async function handler(req, res) {
     .dir-map-wrap {
       position: relative;
       max-width: 1400px;
-      margin: 0 auto 64px;
+      margin: 0 auto;
       padding: 0 48px;
+      display: none;
     }
+    .dir-map-wrap.open { display: block; margin-bottom: 48px; }
     .dir-map {
       width: 100%;
-      height: 380px;
+      height: 560px;
       background: var(--grey-4);
       border: 0.5px solid var(--grey-3);
     }
@@ -621,22 +623,6 @@ module.exports = async function handler(req, res) {
     <p class="dir-sub">Where do you want to go?</p>
   </div>
 
-  <div class="dir-map-wrap">
-    <div class="dir-map" id="dir-map"></div>
-    <div class="map-popup" id="map-popup" style="display:none;">
-      <img class="map-popup-img" id="map-popup-img" src="" alt="" loading="lazy" />
-      <div class="map-popup-body">
-        <p class="map-popup-location" id="map-popup-location"></p>
-        <p class="map-popup-name" id="map-popup-name"></p>
-        <a class="map-popup-link" id="map-popup-link" href="#">View property</a>
-      </div>
-      <button class="map-popup-close" onclick="document.getElementById('map-popup').style.display='none'">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <path d="M1 1l12 12M13 1L1 13" stroke="#888" stroke-width="1" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-  </div>
 
   <div class="dir-filters">
     <div class="filter-row">
@@ -656,7 +642,24 @@ module.exports = async function handler(req, res) {
       <button class="chip chip-accent" data-type="island" data-value="ibiza">Ibiza</button>
       <button class="chip chip-accent" data-type="island" data-value="menorca">Menorca</button>
       <button class="chip chip-accent" data-type="island" data-value="formentera">Formentera</button>
-      <button class="chip chip-accent chip-map" onclick="document.getElementById('dir-map').scrollIntoView({behavior:'smooth'})">Map view</button>
+      <button class="chip chip-accent chip-map" id="map-toggle" onclick="toggleMap()">Map view</button>
+    </div>
+  </div>
+
+  <div class="dir-map-wrap" id="dir-map-wrap">
+    <div class="dir-map" id="dir-map"></div>
+    <div class="map-popup" id="map-popup" style="display:none;">
+      <img class="map-popup-img" id="map-popup-img" src="" alt="" loading="lazy" />
+      <div class="map-popup-body">
+        <p class="map-popup-location" id="map-popup-location"></p>
+        <p class="map-popup-name" id="map-popup-name"></p>
+        <a class="map-popup-link" id="map-popup-link" href="#">View property</a>
+      </div>
+      <button class="map-popup-close" onclick="document.getElementById('map-popup').style.display='none'">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1l12 12M13 1L1 13" stroke="#888" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+      </button>
     </div>
   </div>
 
@@ -932,7 +935,18 @@ module.exports = async function handler(req, res) {
       } catch (e) { console.error('Directory map error:', e); }
     }
 
-    initDirectoryMap();
+    // The map is hidden until asked for. Mapbox cannot size itself inside a
+    // hidden element, so it is built on first open rather than on page load.
+    var mapReady = false;
+    function toggleMap() {
+      var wrap = document.getElementById('dir-map-wrap');
+      var btn = document.getElementById('map-toggle');
+      var open = wrap.classList.toggle('open');
+      btn.classList.toggle('active', open);
+      btn.textContent = open ? 'Hide map' : 'Map view';
+      if (open && !mapReady) { mapReady = true; initDirectoryMap(); }
+    }
+    window.toggleMap = toggleMap;
 
   </script>
 
