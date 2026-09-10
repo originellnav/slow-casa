@@ -927,10 +927,17 @@ module.exports = async function handler(req, res) {
               document.getElementById('map-popup').style.display = 'block';
               map.flyTo({ center: [parseFloat(f['Longitude']), parseFloat(f['Latitude'])], zoom: 7, duration: 1000 });
             });
-            new mapboxgl.Marker({ element: el })
+                        new mapboxgl.Marker({ element: el })
               .setLngLat([parseFloat(f['Longitude']), parseFloat(f['Latitude'])])
               .addTo(map);
           });
+
+          // Frame the islands tightly around whatever properties exist
+          var bounds = new mapboxgl.LngLatBounds();
+          records.forEach(function (r) {
+            bounds.extend([parseFloat(r.fields['Longitude']), parseFloat(r.fields['Latitude'])]);
+          });
+          map.fitBounds(bounds, { padding: 70, maxZoom: 9.5, duration: 0 });
         });
       } catch (e) { console.error('Directory map error:', e); }
     }
