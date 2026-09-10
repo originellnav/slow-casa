@@ -4,26 +4,120 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Map | Slow Casa</title>
-  <meta name="description" content="Every house, restaurant, beach and bar we rate across Mallorca, Ibiza and Menorca, on one map." />
-  <meta name="robots" content="noindex" />
+  <meta name="description" content="Every house, restaurant, beach and bar we rate across Mallorca, Ibiza and Menorca, on one map. Coming soon." />
   <link rel="canonical" href="https://slowcasa.com/map" />
+  <meta name="robots" content="noindex" />
+  <meta property="og:title" content="The Map | Slow Casa" />
+  <meta property="og:description" content="Every house, restaurant, beach and bar we rate across the Balearics, on one map." />
+  <meta property="og:url" content="https://slowcasa.com/map" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Slow Casa" />
+
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/slow-casa.css" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-B930Z6F96Z');
+  </script>
+  <script async src="https://plausible.io/js/pa-aahRJ1iMPfiu0NJteNWEg.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
+
   <style>
-    .map-lede { max-width: 620px; margin: 0 auto; padding: 96px 24px 48px; text-align: center; }
-    .map-eyebrow { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #888; margin-bottom: 20px; }
-    .map-lede h1 { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(30px, 4.4vw, 46px); line-height: 1.15; margin-bottom: 18px; }
-    .map-lede p { font-size: 17px; line-height: 1.6; color: #888; }
-    .map-form { max-width: 360px; margin: 32px auto 0; display: flex; flex-direction: column; gap: 10px; }
-    .map-input { font-size: 14px; padding: 14px 16px; border: 0.5px solid #d9d2c2; background: #fff; outline: none; text-align: center; }
-    .map-input:focus { border-color: #0f0f0f; }
-    .map-btn { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 15px; border: none; background: #0f0f0f; color: #f9f7f2; cursor: pointer; }
-    .map-btn:disabled { opacity: 0.5; }
-    .map-note { font-size: 11px; color: #bbb; margin-top: 14px; }
-    .map-box { max-width: 960px; margin: 56px auto 96px; padding: 0 24px; }
-    .map-box-inner { aspect-ratio: 16/9; background: #f5f5f3; border: 0.5px solid #e8e8e8; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; color: #bbb; }
+    .map-lede {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 96px 48px 40px;
+      text-align: center;
+    }
+    .map-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      margin-bottom: 20px;
+    }
+    .map-lede h1 {
+      font-family: var(--serif);
+      font-size: clamp(30px, 4.4vw, 46px);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+    }
+    .map-lede p {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--grey-1);
+    }
+    .map-form {
+      max-width: 380px;
+      margin: 34px auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .map-input {
+      font-family: var(--sans);
+      font-size: 14px;
+      padding: 14px 16px;
+      border: 0.5px solid #d9d2c2;
+      background: #fff;
+      outline: none;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .map-input:focus { border-color: var(--black); }
+    .map-btn {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 15px 16px;
+      border: none;
+      background: var(--black);
+      color: #f9f7f2;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .map-btn:hover { opacity: 0.82; }
+    .map-btn:disabled { opacity: 0.5; cursor: default; }
+    .map-note { font-size: 11px; color: var(--grey-2); margin-top: 14px; }
+
+    .map-preview {
+      max-width: 1000px;
+      margin: 64px auto 96px;
+      padding: 0 48px;
+    }
+    .map-preview-inner {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--grey-4);
+      border: 0.5px solid var(--grey-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--serif);
+      font-size: 20px;
+      color: var(--grey-2);
+    }
+
+    @media (max-width: 768px) {
+      .map-lede { padding: 56px 24px 32px; }
+      .map-preview { padding: 0 24px; margin: 44px auto 64px; }
+    }
   </style>
 </head>
 <body>
@@ -32,8 +126,8 @@
     <div></div>
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
+      <li><a href="/directory">Homes</a></li>
       <li><a href="/places">Places</a></li>
-      <li><a href="/directory">Houses</a></li>
       <li><a href="/map">Map</a></li>
     </ul>
   </nav>
@@ -42,25 +136,26 @@
     <p class="map-eyebrow">Coming soon</p>
     <h1>The Map</h1>
     <p>Every house, restaurant, beach and bar we rate across Mallorca, Ibiza and Menorca, on one map. Free, and built as we go.</p>
+
     <div class="map-form">
       <input class="map-input" id="map-email" type="email" placeholder="Your email address" autocomplete="email" />
       <button class="map-btn" id="map-btn" type="button" onclick="mapSubscribe()">Get early access</button>
     </div>
-        <p class="map-note">Join The Slow Signal and we will tell you the moment it opens.</p>
+    <p class="map-note">We will email you once when it opens. Nothing else.</p>
   </header>
 
-  <div class="map-box"><div class="map-box-inner">In progress</div></div>
+  <div class="map-preview">
+    <div class="map-preview-inner">In progress</div>
+  </div>
 
   <footer>
     <div class="footer-left">
       <span class="footer-copy">&copy; 2026 Slow Casa</span>
-      <a href="/privacy" class="footer-policy">Privacy Policy</a>
+      <a href="/privacy" class="footer-policy">Privacy</a>
     </div>
     <div class="footer-links">
-      <a href="/places">Places</a>
-      <a href="/directory">Houses</a>
-      <a href="/map">Map</a>
       <a href="/about">About</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
       <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
     </div>
   </footer>
@@ -79,8 +174,12 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email })
         });
-        btn.textContent = res.ok ? 'You are on the list' : 'Try again';
-        if (!res.ok) btn.disabled = false;
+        if (res.ok) {
+          btn.textContent = 'You are on the list';
+        } else {
+          btn.textContent = 'Try again';
+          btn.disabled = false;
+        }
       } catch (e) {
         btn.textContent = 'Try again';
         btn.disabled = false;
