@@ -505,16 +505,7 @@ module.exports = async function handler(req, res) {
     ${bodyHtml}
   </article>
 
-  <footer>
-    <div class="footer-left">
-      <span class="footer-copy">&copy; 2026 Slow Casa</span>
-      <a href="/privacy" class="footer-policy">Privacy Policy</a>
-    </div>
-    <div class="footer-links">
-      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
-    </div>
-  </footer>
+   ${footer()}
 
 </body>
 </html>`;
