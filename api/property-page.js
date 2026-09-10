@@ -1,4 +1,3 @@
-const { nav } = require('../lib/nav');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const PROPERTIES_TABLE = 'Properties';
@@ -264,7 +263,8 @@ module.exports = async function handler(req, res) {
       const pName = pf['Name'] || '';
       if (!pName) return '';
       const cat = pf['Category'] || '';
-      const link = pf['Link'] || '';
+      const rawLink = pf['Link'] || '';
+      const link = /^https?:\/\//i.test(rawLink.trim()) ? rawLink.trim() : '';
       const img = getPlaceImageUrl(p);
       const imgTag = img
         ? `<div class="place-img"><img src="${escapeHtml(responsiveImageUrl(img, 600))}" alt="${escapeHtml(pName)}" loading="lazy" ${IMG_ONERROR} /></div>`
@@ -775,7 +775,15 @@ module.exports = async function handler(req, res) {
 </head>
 <body>
 
-   ${nav()}
+  <nav>
+    <div></div>
+    <a href="/" class="wordmark">Slow Casa</a>
+    <ul class="nav-links">
+      <li><a href="/directory">Directory</a></li>
+      <li><a href="https://slowcasa.beehiiv.com/subscribe" target="_blank" rel="noopener">Newsletter</a></li>
+      <li><a href="/criteria">About</a></li>
+    </ul>
+  </nav>
 
   <div class="hero-split">
     <div class="hero-left">
@@ -842,7 +850,14 @@ async function renderNearbyHouses(currentRecord) {
       return !!rf['Hero Image'] || !!rf['Gallery Images'] || (rf['Images'] && rf['Images'].length > 0);
     };
 
-    const candidates = all.filter(r => r.id !== currentId && hasImage(r));
+    // Only suggest houses on the same island group. If the current property has
+    // no Island value, fall back to everything so older records still work.
+    const thisIsland = (currentRecord.fields || {})['Island'];
+    const candidates = all.filter(r => {
+      if (r.id === currentId || !hasImage(r)) return false;
+      if (!thisIsland) return true;
+      return !!(r.fields && r.fields['Island']);
+    });
     if (candidates.length === 0) return '';
 
     const byRecency = (a, b) => {
