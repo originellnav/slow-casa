@@ -1,4 +1,4 @@
-const { nav } = require('../lib/nav');
+const { nav, footer } = require('../lib/nav');
 const SANITY_PROJECT_ID = 'hchp27po';
 const SANITY_DATASET = 'production';
 const SANITY_API_VERSION = '2024-01-01';
