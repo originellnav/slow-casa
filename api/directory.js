@@ -619,7 +619,7 @@ module.exports = async function handler(req, res) {
     ${nav()}
 
   <div class="page-header">
-    <h1 class="dir-h1">Handpicked homes in the Balearic islands</h1>
+    <h1 class="dir-h1">Handpicked homes in the Balearic Islands</h1>
     <p class="dir-sub">Where do you want to go?</p>
   </div>
 
@@ -893,7 +893,7 @@ module.exports = async function handler(req, res) {
         var res = await fetch('/api/properties?all=true');
         var data = await res.json();
         var records = (data.records || []).filter(function (r) {
-          return r.fields['Latitude'] && r.fields['Longitude'] && r.fields['Name'] && r.fields['Island'];
+          return r.fields['Latitude'] && r.fields['Longitude'] && r.fields['Name'];
         });
         if (!records.length) { container.parentElement.style.display = 'none'; return; }
 
@@ -902,8 +902,8 @@ module.exports = async function handler(req, res) {
         var map = new mapboxgl.Map({
           container: 'dir-map',
           style: MAPBOX_STYLE,
-          center: [2.8, 39.4],
-          zoom: 7.2,
+          center: [8, 45],
+          zoom: 3.4,
           attributionControl: false
         });
         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
@@ -927,17 +927,10 @@ module.exports = async function handler(req, res) {
               document.getElementById('map-popup').style.display = 'block';
               map.flyTo({ center: [parseFloat(f['Longitude']), parseFloat(f['Latitude'])], zoom: 7, duration: 1000 });
             });
-                        new mapboxgl.Marker({ element: el })
+            new mapboxgl.Marker({ element: el })
               .setLngLat([parseFloat(f['Longitude']), parseFloat(f['Latitude'])])
               .addTo(map);
           });
-
-          // Frame the islands tightly around whatever properties exist
-          var bounds = new mapboxgl.LngLatBounds();
-          records.forEach(function (r) {
-            bounds.extend([parseFloat(r.fields['Longitude']), parseFloat(r.fields['Latitude'])]);
-          });
-          map.fitBounds(bounds, { padding: 70, maxZoom: 9.5, duration: 0 });
         });
       } catch (e) { console.error('Directory map error:', e); }
     }
