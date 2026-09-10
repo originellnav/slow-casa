@@ -216,6 +216,7 @@ module.exports = async function handler(req, res) {
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
+    <link rel="stylesheet" href="/slow-casa.css" />
   <style>
     @font-face {
       font-family: 'DM Sans';
