@@ -121,8 +121,11 @@ module.exports = async function handler(req, res) {
   // Which route are we serving? Unknown values fall back to Village Guides.
   const section = (req.query && req.query.section) || 'village-guides';
   const page = PAGES[section] || PAGES['village-guides'];
-  if (page.categories) {
+    if (page.categories) {
     guides = guides.filter(g => page.categories.indexOf(g.category) !== -1);
+  }
+  if (page.exclude) {
+    guides = guides.filter(g => page.exclude.indexOf(g.category) === -1);
   }
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
