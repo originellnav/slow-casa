@@ -168,3 +168,52 @@ nav .nav-links a {
   nav .nav-links { gap: 20px; }
   nav .nav-links a { font-size: 12px; letter-spacing: 0.06em; }
 }
+/* ============================================
+   GLOBAL NAV + FOOTER
+   Selectors are deliberately specific so they beat the
+   inline <style> blocks inside the serverless page functions.
+   ============================================ */
+
+nav .nav-links { gap: 40px; }
+nav .nav-links a {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--black);
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+nav .nav-links a:hover { opacity: 0.55; }
+
+nav.hero-nav .nav-links a { color: #fff; }
+nav.hero-nav .nav-links a:hover { color: #fff; opacity: 0.7; }
+
+footer .footer-links { gap: 32px; }
+footer .footer-links a,
+footer .footer-left .footer-policy {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--grey-1);
+  transition: color 0.2s;
+}
+footer .footer-links a:hover,
+footer .footer-left .footer-policy:hover { color: var(--black); }
+footer .footer-copy {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--grey-1);
+}
+
+@media (max-width: 768px) {
+  nav .nav-links { gap: 18px; }
+  nav .nav-links a { font-size: 11px; letter-spacing: 0.08em; }
+  footer .footer-links { gap: 20px; }
+  footer .footer-links a,
+  footer .footer-left .footer-policy { font-size: 11px; }
+}
