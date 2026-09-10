@@ -1,4 +1,4 @@
-const { nav } = require('../lib/nav');
+const { nav, footer } = require('../lib/nav');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const ARCHITECTS_TABLE = 'Architects';
