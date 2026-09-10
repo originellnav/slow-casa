@@ -47,7 +47,8 @@ function formatCategory(category) {
 //   /guides       -> (no param) Village Guides
 //   /how-to       -> ?section=how-to
 const PAGES = {
-    'places': {
+        'places': {
+    categories: ['region-discovery'],
     title: 'Places | Slow Casa',
     description: 'Guides to the villages of Mallorca, Ibiza and Menorca. Where to eat, swim and stay, and the houses worth booking near each one.',
     canonical: 'https://slowcasa.com/places',
@@ -121,9 +122,6 @@ module.exports = async function handler(req, res) {
   const page = PAGES[section] || PAGES['village-guides'];
     if (page.categories) {
     guides = guides.filter(g => page.categories.indexOf(g.category) !== -1);
-  }
-  if (page.exclude) {
-    guides = guides.filter(g => page.exclude.indexOf(g.category) === -1);
   }
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
