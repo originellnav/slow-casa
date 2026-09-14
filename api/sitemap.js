@@ -37,14 +37,19 @@ module.exports = async function handler(req, res) {
     })(),
     (async () => {
       try {
-        const query = '*[_type == "guide" && defined(publishedAt) && defined(slug.current)] | order(publishedAt desc) { "slug": slug.current, publishedAt }';
+        const query = '*[_type == "guide" && defined(publishedAt) && defined(slug.current)] | order(publishedAt desc) { "slug": slug.current, publishedAt, island }';
         const sanityUrl = 'https://hchp27po.apicdn.sanity.io/v2024-01-01/data/query/production?query=' + encodeURIComponent(query);
         const r = await fetch(sanityUrl);
         const data = await r.json();
         return (data.result || [])
           .filter(g => g.slug)
           .map(g => ({
-            url: '/guides/' + g.slug,
+            url: (function () {
+              const isl = String(g.island || '').trim().toLowerCase();
+              return ['mallorca','ibiza','menorca','formentera'].indexOf(isl) !== -1
+                ? '/' + isl + '/' + g.slug
+                : '/guides/' + g.slug;
+            })(),
             priority: '0.7',
             changefreq: 'monthly',
             lastmod: g.publishedAt ? g.publishedAt.split('T')[0] : ''
