@@ -4,9 +4,9 @@ module.exports = async function handler(req, res) {
   const base = 'https://slowcasa.com';
   const staticPages = [
     { url: '/', priority: '1.0', changefreq: 'weekly' },
-    { url: '/directory', priority: '0.9', changefreq: 'weekly' },
+    { url: '/houses', priority: '0.9', changefreq: 'weekly' },
     { url: '/house-tours', priority: '0.9', changefreq: 'weekly' },
-    { url: '/guides', priority: '0.9', changefreq: 'weekly' },
+    { url: '/places', priority: '0.9', changefreq: 'weekly' },
     { url: '/how-to', priority: '0.9', changefreq: 'weekly' },
     { url: '/design-directory', priority: '0.8', changefreq: 'weekly' },
     { url: '/about', priority: '0.5', changefreq: 'monthly' },
@@ -16,14 +16,19 @@ module.exports = async function handler(req, res) {
     (async () => {
       try {
         const r = await fetch(
-          'https://api.airtable.com/v0/appndrnWrdlgxRJAG/Properties?fields[]=Slug&fields[]=Date+added&maxRecords=100',
+          'https://api.airtable.com/v0/appndrnWrdlgxRJAG/Properties?fields[]=Slug&fields[]=Date+added&fields[]=Island&maxRecords=100',
           { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } }
         );
         const data = await r.json();
         return (data.records || [])
           .filter(rec => rec.fields['Slug'])
           .map(rec => ({
-            url: '/properties/' + rec.fields['Slug'],
+            url: (function () {
+              const isl = String(rec.fields['Island'] || '').trim().toLowerCase();
+              return ['mallorca','ibiza','menorca','formentera'].indexOf(isl) !== -1
+                ? '/' + isl + '/houses/' + rec.fields['Slug']
+                : '/properties/' + rec.fields['Slug'];
+            })(),
             priority: '0.8',
             changefreq: 'monthly',
             lastmod: rec.fields['Date added'] ? rec.fields['Date added'].split('T')[0] : ''
