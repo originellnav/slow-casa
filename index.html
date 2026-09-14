@@ -814,7 +814,7 @@
     <div></div>
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
-      <li><a href="/directory">Homes</a></li>
+      <li><a href="/houses">Houses</a></li>
       <li><a href="/places">Places</a></li>
       <li><a href="/map">Map</a></li>
     </ul>
@@ -835,7 +835,7 @@
    <section class="section posts">
     <div class="section-header">
       <p class="section-label">Houses</p>
-      <a class="section-link" href="/directory">All houses</a>
+      <a class="section-link" href="/houses">All houses</a>
     </div>
     <div class="property-grid" id="latest-homes"></div>
   </section>
@@ -973,7 +973,11 @@
         var f = r.fields;
         var img = f['Hero Image'] || getImageUrl(r, 0) || '';
         var label = f['Location label'] || f['Region'] || f['Country'] || '';
-        return '<a class="property-card" href="/properties/' + esc(f['Slug']) + '">' +
+        var isl = String(f['Island'] || '').trim().toLowerCase();
+        var href = ['mallorca','ibiza','menorca','formentera'].indexOf(isl) !== -1
+          ? '/' + isl + '/houses/' + esc(f['Slug'])
+          : '/properties/' + esc(f['Slug']);
+        return '<a class="property-card" href="' + href + '">' +
           '<div class="card-img">' + (img ? '<img src="' + esc(responsiveImageUrl(img, 800)) + '" alt="' + esc(f['Name']) + '" loading="lazy" />' : '') + '</div>' +
           '<p class="card-location">' + esc(label) + '</p>' +
           '<p class="card-name">' + esc(f['Name']) + '</p>' +
