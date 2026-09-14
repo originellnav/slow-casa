@@ -214,6 +214,19 @@ module.exports = async function handler(req, res) {
     setCached(slug, record);
   }
 
+  // Old /properties/:slug URLs 301 to the island path for Balearic houses.
+  // Driven by the Island field, so it stays correct as houses are added.
+  if (req.query && req.query.legacy && record.fields && record.fields['Island']) {
+    const island = String(record.fields['Island']).trim().toLowerCase();
+    const slugVal2 = record.fields['Slug'];
+    if (['mallorca','ibiza','menorca','formentera'].indexOf(island) !== -1 && slugVal2) {
+      res.statusCode = 301;
+      res.setHeader('Location', '/' + island + '/houses/' + slugVal2);
+      return res.end();
+    }
+  }
+
+
   const f = record.fields;
   const name = f['Name'] || '';
   const slugVal = f['Slug'] || slug;
@@ -320,7 +333,10 @@ module.exports = async function handler(req, res) {
   const title = `${name}${location ? ' — ' + location : ''} | Slow Casa`;
   const metaDescBase = description ? description.replace(/\n/g, ' ') : `${name} on Slow Casa, a curated directory of architect-designed vacation homes in rural Europe.`;
   const metaDesc = metaDescBase.length > 155 ? metaDescBase.substring(0, 152) + '...' : metaDescBase;
-  const canonicalUrl = `https://slowcasa.com/properties/${slugVal}`;
+  const canonIsland = String((f['Island'] || '')).trim().toLowerCase();
+  const canonicalUrl = ['mallorca','ibiza','menorca','formentera'].indexOf(canonIsland) !== -1
+    ? `https://slowcasa.com/${canonIsland}/houses/${slugVal}`
+    : `https://slowcasa.com/properties/${slugVal}`;
   const ogImage = heroImage || '';
 
   // JSON-LD LodgingBusiness schema
@@ -877,7 +893,10 @@ async function renderNearbyHouses(currentRecord) {
       const rf = r.fields;
       const img = getImageUrl(r, 0) || '';
       const slug = rf['Slug'] || '';
-      const url = '/properties/' + slug;
+      const isl = String((rf['Island'] || '')).trim().toLowerCase();
+      const url = ['mallorca','ibiza','menorca','formentera'].indexOf(isl) !== -1
+        ? '/' + isl + '/houses/' + slug
+        : '/properties/' + slug;
       return '<a class="prop-other-card" href="' + escapeHtml(url) + '">' +
             '<div class="card-img">' + (img ? '<img src="' + escapeHtml(responsiveImageUrl(img, 600)) + '" alt="' + escapeHtml(rf['Name']||'') + '" loading="lazy" ' + IMG_ONERROR + ' />' : '') + '</div>' +
             '<p class="card-location">' + escapeHtml(rf['Location label']||'') + '</p>' +
