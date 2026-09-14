@@ -1,20 +1,33 @@
 {
   "cleanUrls": true,
   "redirects": [
-    { "source": "/property.html", "destination": "/directory", "permanent": true },
-    { "source": "/property", "destination": "/directory", "permanent": true },
-    { "source": "/journal", "destination": "/guides", "permanent": true },
-    { "source": "/journal/:path*", "destination": "/guides", "permanent": true },
-    { "source": "/places/:slug", "destination": "/", "statusCode": 410 },
-    { "source": "/criteria", "destination": "/about", "permanent": true }
+    { "source": "/property.html", "destination": "/houses", "permanent": true },
+    { "source": "/property", "destination": "/houses", "permanent": true },
+    { "source": "/directory", "destination": "/houses", "permanent": true },
+    { "source": "/journal", "destination": "/places", "permanent": true },
+    { "source": "/journal/:path*", "destination": "/places", "permanent": true },
+    { "source": "/criteria", "destination": "/about", "permanent": true },
+    { "source": "/guides/santa-gertrudis", "destination": "/ibiza/santa-gertrudis", "permanent": true },
+    { "source": "/places/:slug", "destination": "/", "statusCode": 410 }
   ],
   "rewrites": [
-    { "source": "/directory", "destination": "/api/directory" },
+    { "source": "/houses", "destination": "/api/directory" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/properties/:slug", "destination": "/api/property-page?slug=:slug" },
     { "source": "/design-directory", "destination": "/api/architects-index" },
     { "source": "/architects/:slug", "destination": "/api/architect?slug=:slug" },
-    { "source": "/guides", "destination": "/api/guides-index" },
+
+    { "source": "/mallorca/houses/:slug", "destination": "/api/property-page?slug=:slug" },
+    { "source": "/ibiza/houses/:slug", "destination": "/api/property-page?slug=:slug" },
+    { "source": "/menorca/houses/:slug", "destination": "/api/property-page?slug=:slug" },
+    { "source": "/formentera/houses/:slug", "destination": "/api/property-page?slug=:slug" },
+
+    { "source": "/mallorca/:slug", "destination": "/api/guide-page?slug=:slug" },
+    { "source": "/ibiza/:slug", "destination": "/api/guide-page?slug=:slug" },
+    { "source": "/menorca/:slug", "destination": "/api/guide-page?slug=:slug" },
+    { "source": "/formentera/:slug", "destination": "/api/guide-page?slug=:slug" },
+
+    { "source": "/properties/:slug", "destination": "/api/property-page?slug=:slug&legacy=1" },
+    { "source": "/guides", "destination": "/api/guides-index?section=places" },
     { "source": "/places", "destination": "/api/guides-index?section=places" },
     { "source": "/house-tours", "destination": "/api/guides-index?section=house-tours" },
     { "source": "/how-to", "destination": "/api/guides-index?section=how-to" },
