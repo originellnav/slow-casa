@@ -1,4 +1,4 @@
-const { nav, footer } = require('../lib/nav');
+const { nav } = require('../lib/nav');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 
@@ -43,6 +43,17 @@ async function getProperties() {
   }
 
   return records;
+}
+
+
+function houseUrl(record) {
+  const f = (record && record.fields) || {};
+  const slug = f['Slug'] || '';
+  const island = String(f['Island'] || '').trim().toLowerCase();
+  if (['mallorca','ibiza','menorca','formentera'].indexOf(island) !== -1) {
+    return '/' + island + '/houses/' + slug;
+  }
+  return '/properties/' + slug;
 }
 
 function escapeHtml(str) {
@@ -166,7 +177,7 @@ module.exports = async function handler(req, res) {
     const imgUrl = getImageUrl(record, 0) || '';
     const imgUrl2 = getImageUrl(record, 1) || imgUrl;
 
-    const url = '/properties/' + slug;
+    const url = houseUrl(record);
     const featured = i < 2 ? '<span class="card-featured">&#9679; Featured</span>' : '';
     const pageNum = Math.floor(i / PAGE_SIZE);
     const hiddenClass = pageNum === 0 ? '' : ' card-hidden';
@@ -207,16 +218,15 @@ module.exports = async function handler(req, res) {
 <meta name="apple-mobile-web-app-title" content="Slow Casa" />
 <link rel="manifest" href="/site.webmanifest" />
   <meta name="description" content="Every design-first vacation home in the Slow Casa directory. Filter by setting — sea, mountains, farm." />
-  <link rel="canonical" href="https://slowcasa.com/directory" />
+  <link rel="canonical" href="https://slowcasa.com/houses" />
   <meta property="og:title" content="Directory — Slow Casa" />
   <meta property="og:description" content="Every design-first vacation home in the Slow Casa directory." />
-  <meta property="og:url" content="https://slowcasa.com/directory" />
+  <meta property="og:url" content="https://slowcasa.com/houses" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Slow Casa" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
-    <link rel="stylesheet" href="/slow-casa.css" />
   <style>
     @font-face {
       font-family: 'DM Sans';
@@ -676,7 +686,17 @@ module.exports = async function handler(req, res) {
     <div id="pagination-inner" style="display:inline-flex;align-items:center;gap:8px;"></div>
   </div>
 
-    ${footer()}
+  <footer>
+    <div class="footer-left">
+      <span class="footer-copy">&copy; 2026 Slow Casa</span>
+      <a href="/privacy" class="footer-policy">Privacy Policy</a>
+    </div>
+    <div class="footer-links">
+      <a href="/guides">Guides</a>
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
+    </div>
+  </footer>
 
   <script>
     var activeFilter = 'all';
@@ -686,12 +706,12 @@ module.exports = async function handler(req, res) {
     var currentFiltered = [];
 
     function clearSearch() {
-      window.location.href = '/directory';
+      window.location.href = '/houses';
     }
 
     function goToLocation(location) {
       if (!location) return;
-      window.location.href = '/directory?location=' + encodeURIComponent(location);
+      window.location.href = '/houses?location=' + encodeURIComponent(location);
     }
 
     var sublines = [
@@ -914,7 +934,11 @@ module.exports = async function handler(req, res) {
               else { popupImg.style.display = 'none'; }
               document.getElementById('map-popup-location').textContent = (f['Location label'] || f['Region'] || f['Country'] || '').toUpperCase();
               document.getElementById('map-popup-name').textContent = f['Name'] || '';
-              document.getElementById('map-popup-link').href = '/properties/' + (f['Slug'] || '');
+              var isl = String(f['Island'] || '').trim().toLowerCase();
+              document.getElementById('map-popup-link').href =
+                ['mallorca','ibiza','menorca','formentera'].indexOf(isl) !== -1
+                  ? '/' + isl + '/houses/' + (f['Slug'] || '')
+                  : '/properties/' + (f['Slug'] || '');
               document.getElementById('map-popup').style.display = 'block';
               map.flyTo({ center: [parseFloat(f['Longitude']), parseFloat(f['Latitude'])], zoom: 7, duration: 1000 });
             });
