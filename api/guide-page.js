@@ -1,4 +1,3 @@
-const { nav, footer } = require('../lib/nav');
 const SANITY_PROJECT_ID = 'hchp27po';
 const SANITY_DATASET = 'production';
 const SANITY_API_VERSION = '2024-01-01';
@@ -52,10 +51,8 @@ function formatCategory(category) {
   'architect-roundup': 'Architects',
   'typology-guide': 'House Types',
   'region-discovery': 'Places',
-    'architectural-pilgrimage': 'Guide',
-    'terminology': 'Terminology',
-    'architect-stories': 'Architect Stories',
-    'home-stories': 'Home Stories'
+  'architectural-pilgrimage': 'Journeys',
+    'terminology': 'Terminology'
 };
   return labels[category] || 'Guide';
 }
@@ -66,6 +63,7 @@ async function fetchGuideBySlug(slug) {
   const query = `*[_type == "guide" && slug.current == "${escapedSlug}"][0]{
     title,
     category,
+    island,
     "slug": slug.current,
     metaTitle,
     metaDescription,
@@ -249,7 +247,22 @@ module.exports = async function handler(req, res) {
     <img src="${escapeHtml(sanityImageUrl(heroUrl, 1200))}" alt="${escapeHtml(heroAlt)}" fetchpriority="high" loading="eager" />
   </figure>` : '';
 
-  const canonicalUrl = `https://slowcasa.com/guides/${slug}`;
+  // One guide, one URL. If the guide carries an island, any other island path
+  // (or the legacy /guides/ path) 301s to the canonical one, so the same page
+  // is never served from four different URLs.
+  const guideIsland = String(guide.island || '').trim().toLowerCase();
+  const ISLANDS = ['mallorca', 'ibiza', 'menorca', 'formentera'];
+  if (ISLANDS.indexOf(guideIsland) !== -1) {
+    const requested = String((req.query && req.query.island) || '').trim().toLowerCase();
+    if (requested !== guideIsland) {
+      res.statusCode = 301;
+      res.setHeader('Location', '/' + guideIsland + '/' + slug);
+      return res.end();
+    }
+  }
+  const canonicalUrl = ISLANDS.indexOf(guideIsland) !== -1
+    ? `https://slowcasa.com/${guideIsland}/${slug}`
+    : `https://slowcasa.com/guides/${slug}`;
 
   // JSON-LD Article schema
   const structuredData = {
@@ -493,7 +506,16 @@ module.exports = async function handler(req, res) {
 </head>
 <body>
 
-  ${nav()}
+  <nav>
+    <div></div>
+    <a href="/" class="wordmark">Slow Casa</a>
+    <ul class="nav-links">
+      <li><a href="/directory">Directory</a></li>
+      <li><a href="/guides">Guides</a></li>
+      <li><a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a></li>
+      <li><a href="/criteria">About</a></li>
+    </ul>
+  </nav>
 
   <header class="guide-header">
     <p class="guide-category">${escapeHtml(categoryLabel)}</p>
@@ -505,7 +527,16 @@ module.exports = async function handler(req, res) {
     ${bodyHtml}
   </article>
 
-   ${footer()}
+  <footer>
+    <div class="footer-left">
+      <span class="footer-copy">&copy; 2026 Slow Casa</span>
+      <a href="/privacy" class="footer-policy">Privacy Policy</a>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
+    </div>
+  </footer>
 
 </body>
 </html>`;
