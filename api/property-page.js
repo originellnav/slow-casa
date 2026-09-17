@@ -308,6 +308,45 @@ module.exports = async function handler(req, res) {
   }
 
   const heroImage = getImageUrl(record, 0);
+
+  // Top collage: first four images, alternating landscape and portrait
+  const topImgs = allImages.slice(0, 4);
+  const topGalleryHtml = topImgs.map((src, i) => {
+    const shape = i % 2 === 0 ? 'land' : 'port';
+    return `<div class="prop-top-img ${shape}"><img src="${responsiveImageUrl(src, 1400)}" alt="${escapeHtml(name)}" ${i === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"'} ${IMG_ONERROR} /></div>`;
+  }).join('');
+
+  // Everything after the first four goes in the lower gallery
+  const restImgs = allImages.slice(4);
+  const restGalleryHtml = restImgs.map((src, i) => {
+    const shape = i % 3 === 1 ? 'port' : 'land';
+    return `<div class="prop-rest-img ${shape}"><img src="${responsiveImageUrl(src, 1400)}" alt="${escapeHtml(name)}" loading="lazy" ${IMG_ONERROR} /></div>`;
+  }).join('');
+
+  // Island and tag chips, linked into the filtered directory
+  const islandVal = String(f['Island'] || '').trim();
+  const islandTagHtml = islandVal
+    ? `<a class="prop-tag prop-tag-accent" href="/houses">${escapeHtml(islandVal)}</a>`
+    : '';
+  const tagList = Array.isArray(f['Tags']) ? f['Tags'] : String(f['Tags'] || '').split(',');
+  const tagChipsHtml = tagList
+    .map(t => String(t).trim())
+    .filter(Boolean)
+    .map(t => `<a class="prop-tag" href="/houses">${escapeHtml(t)}</a>`)
+    .join('');
+
+  const metaLineHtml = [
+    architect ? `Architecture by ${escapeHtml(architect)}` : null,
+    sleeps ? `Sleeps ${escapeHtml(String(sleeps))}` : null,
+    location ? escapeHtml(location) : null
+  ].filter(Boolean).length
+    ? `<p class="prop-meta">${[
+        architect ? `Architecture by ${escapeHtml(architect)}` : null,
+        sleeps ? `Sleeps ${escapeHtml(String(sleeps))}` : null,
+        location ? escapeHtml(location) : null
+      ].filter(Boolean).join(' &middot; ')}</p>`
+    : '';
+
   const allImages = getAllImageUrls(record);
   const galleryImages = allImages.slice(1);
 
@@ -464,14 +503,14 @@ module.exports = async function handler(req, res) {
       font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #f9f7f2; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
+    html, body { background: #ffffff; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
     a { color: inherit; text-decoration: none; }
     h1, h2, h3, h4 { font-weight: 400; }
 
     nav {
       display: grid; grid-template-columns: 1fr auto 1fr;
       align-items: center; padding: 28px 48px;
-      background: #f9f7f2; z-index: 10; position: relative;
+      background: #ffffff; z-index: 10; position: relative;
     }
     .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: #0f0f0f; }
     .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
@@ -503,7 +542,7 @@ module.exports = async function handler(req, res) {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      background: #f9f7f2;
+      background: #ffffff;
     }
     .hero-location { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #888; margin-bottom: 16px; }
     .hero-title { font-family: 'DM Serif Display', Georgia, serif; font-size: 72px; line-height: 0.95; letter-spacing: -0.02em; color: #0f0f0f; margin-bottom: 28px; }
@@ -614,7 +653,7 @@ module.exports = async function handler(req, res) {
       display: inline-block;
       padding: 18px 48px;
       background: #0f0f0f;
-      color: #f9f7f2;
+      color: #ffffff;
       font-family: 'DM Sans', sans-serif;
       font-size: 12px;
       font-weight: 500;
@@ -788,46 +827,177 @@ module.exports = async function handler(req, res) {
 
     /* shown when an image fails to load, in place of a broken-image icon */
     .img-fallback { background: linear-gradient(150deg, #e6ded0, #d7cdbb) !important; }
+
+    /* ============================================
+       PROPERTY PAGE — editorial layout
+       ============================================ */
+    :root { --accent: #b5573a; --ink: #111111; --muted: #7a7a7a; --line: #e6e6e6; }
+    html, body { background: #ffffff; }
+
+    .prop-top {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 24px 40px 0;
+      align-items: start;
+    }
+    .prop-top-img { overflow: hidden; background: #f2f2f2; }
+    .prop-top-img.land { aspect-ratio: 4/3; }
+    .prop-top-img.port { aspect-ratio: 3/4; margin-top: 40px; }
+    .prop-top-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .prop-head {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 72px 40px 0;
+      text-align: center;
+    }
+    .prop-crumb {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 26px;
+    }
+    .prop-name {
+      font-family: var(--serif);
+      font-size: clamp(38px, 6vw, 68px);
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+    .prop-sub {
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(18px, 2.4vw, 25px);
+      line-height: 1.3;
+      color: var(--muted);
+      margin-bottom: 30px;
+    }
+    .prop-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .prop-tag {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .prop-tag:hover { border-color: var(--ink); color: var(--ink); }
+    .prop-tag-accent { border-color: var(--accent); color: var(--accent); }
+    .prop-tag-accent:hover { background: var(--accent); color: #fff; }
+
+    .prop-book {
+      display: inline-block;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 16px 44px;
+      background: var(--accent);
+      color: #fff;
+      transition: opacity 0.2s;
+    }
+    .prop-book:hover { opacity: 0.85; }
+    .prop-book-lg { padding: 20px 60px; font-size: 13px; }
+
+    .prop-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 22px;
+      letter-spacing: 0.02em;
+    }
+
+    .prop-body {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 64px 40px 0;
+    }
+    .prop-body p {
+      font-size: 18px;
+      line-height: 1.75;
+      color: #2a2a2a;
+      margin-bottom: 24px;
+    }
+    .prop-body p:last-child { margin-bottom: 0; }
+
+    .prop-rest {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 72px 40px 0;
+      align-items: start;
+    }
+    .prop-rest-img { overflow: hidden; background: #f2f2f2; }
+    .prop-rest-img.land { aspect-ratio: 4/3; }
+    .prop-rest-img.port { aspect-ratio: 3/4; }
+    .prop-rest-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .prop-cta { text-align: center; padding: 80px 40px 40px; }
+
+    @media (max-width: 900px) {
+      .prop-top { grid-template-columns: repeat(2, 1fr); padding: 16px 20px 0; }
+      .prop-top-img.port { margin-top: 0; }
+      .prop-rest { grid-template-columns: repeat(2, 1fr); padding: 48px 20px 0; }
+      .prop-head { padding: 48px 24px 0; }
+      .prop-body { padding: 44px 24px 0; }
+      .prop-cta { padding: 56px 24px 32px; }
+    }
+    @media (max-width: 560px) {
+      .prop-top, .prop-rest { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
   ${nav()}
 
-  <div class="hero-split">
-    <div class="hero-left">
-      ${heroImage ? `<img src="${responsiveImageUrl(heroImage, 1400)}" alt="${name}, ${location}" fetchpriority="high" loading="eager" ${IMG_ONERROR} />` : '<div style="width:100%;height:100%;background:#e8e8e8;"></div>'}
-    </div>
-    <div class="hero-right">
-      ${location ? `<p class="hero-location">${location}</p>` : ''}
-      <h1 class="hero-title">${name}</h1>
-      ${(architect || sleeps) ? `<p class="hero-meta">${[
-        architect ? `Architecture by ${architect}` : null,
-        sleeps ? `Sleeps ${sleeps}` : null
-      ].filter(Boolean).join(' · ')}</p>` : ''}
-    </div>
+  <div class="prop-top">
+    ${topGalleryHtml}
   </div>
 
-  ${editorialTitle || introOne || introTwo ? `
-  <section class="prop-intro">
-    ${editorialTitle ? `<h2 class="prop-editorial-title">${escapeHtml(editorialTitle)}</h2>` : ''}
-    <div class="prop-intro-text">
-      ${introOne ? `<p>${escapeHtml(introOne)}</p>` : ''}
-      ${introTwo ? `<p>${escapeHtml(introTwo)}</p>` : ''}
+  <section class="prop-head">
+    <a class="prop-crumb" href="/houses">Houses</a>
+    <h1 class="prop-name">${name}</h1>
+    ${editorialTitle ? `<h2 class="prop-sub">${escapeHtml(editorialTitle)}</h2>` : ''}
+
+    <div class="prop-tags">
+      ${islandTagHtml}
+      ${tagChipsHtml}
     </div>
-  </section>` : ''}
 
-  ${galleryImages.length > 0 ? `
-  <section class="prop-gallery">
-    ${galleryHtml}
-  </section>` : ''}
+    ${bookingUrl ? `<a href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener" class="prop-book">Book</a>` : ''}
 
-  ${bookingUrl ? `
-  <section class="prop-cta">
-    <a href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener" class="prop-cta-button">Rent this house</a>
+    ${metaLineHtml}
+  </section>
+
+  ${introOne || introTwo ? `
+  <section class="prop-body">
+    ${introOne ? `<p>${escapeHtml(introOne)}</p>` : ''}
+    ${introTwo ? `<p>${escapeHtml(introTwo)}</p>` : ''}
   </section>` : ''}
 
   ${buildPlaces(places)}
+
+  ${restGalleryHtml ? `<section class="prop-rest">${restGalleryHtml}</section>` : ''}
+
+  ${bookingUrl ? `
+  <section class="prop-cta">
+    <a href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener" class="prop-book prop-book-lg">Book this house</a>
+  </section>` : ''}
 
   ${await renderNearbyHouses(record)}
 
