@@ -313,42 +313,51 @@ module.exports = async function handler(req, res) {
   const allImages = getAllImageUrls(record);
   const galleryImages = allImages.slice(1);
 
-  // Top collage: first four images, alternating landscape and portrait
-  const topImgs = allImages.slice(0, 4);
-  const topGalleryHtml = topImgs.map((src, i) => {
-    const shape = i % 2 === 0 ? 'land' : 'port';
-    return `<div class="prop-top-img ${shape}"><img src="${responsiveImageUrl(src, 1400)}" alt="${escapeHtml(name)}" ${i === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"'} ${IMG_ONERROR} /></div>`;
-  }).join('');
-
-  // Everything after the first four goes in the lower gallery
-  const restImgs = allImages.slice(4);
-  const restGalleryHtml = restImgs.map((src, i) => {
-    const shape = i % 3 === 1 ? 'port' : 'land';
-    return `<div class="prop-rest-img ${shape}"><img src="${responsiveImageUrl(src, 1400)}" alt="${escapeHtml(name)}" loading="lazy" ${IMG_ONERROR} /></div>`;
-  }).join('');
-
-  // Island and tag chips, linked into the filtered directory
+  // ---- Italy Segreta style: images left, text right ----
   const islandVal = String(f['Island'] || '').trim();
-  const islandTagHtml = islandVal
-    ? `<a class="prop-tag prop-tag-accent" href="/houses">${escapeHtml(islandVal)}</a>`
-    : '';
-  const tagList = Array.isArray(f['Tags']) ? f['Tags'] : String(f['Tags'] || '').split(',');
-  const tagChipsHtml = tagList
-    .map(t => String(t).trim())
-    .filter(Boolean)
-    .map(t => `<a class="prop-tag" href="/houses">${escapeHtml(t)}</a>`)
-    .join('');
+  const tagList = (Array.isArray(f['Tags']) ? f['Tags'] : String(f['Tags'] || '').split(','))
+    .map(t => String(t).trim()).filter(Boolean);
+  const primaryTag = tagList[0] || '';
 
-  const metaLineHtml = [
-    architect ? `Architecture by ${escapeHtml(architect)}` : null,
-    sleeps ? `Sleeps ${escapeHtml(String(sleeps))}` : null,
-    location ? escapeHtml(location) : null
-  ].filter(Boolean).length
-    ? `<p class="prop-meta">${[
-        architect ? `Architecture by ${escapeHtml(architect)}` : null,
-        sleeps ? `Sleeps ${escapeHtml(String(sleeps))}` : null,
-        location ? escapeHtml(location) : null
-      ].filter(Boolean).join(' &middot; ')}</p>`
+  // Images after the hero: first three sit beside the story, the rest below
+  const storyImgs = allImages.slice(1, 4);
+  const storyImagesHtml = storyImgs.map(src =>
+    `<figure class="is-fig"><img src="${responsiveImageUrl(src, 1200)}" alt="${escapeHtml(name)}" loading="lazy" ${IMG_ONERROR} /></figure>`
+  ).join('');
+
+  const restImgs = allImages.slice(4);
+  const restGalleryHtml = restImgs.map(src =>
+    `<figure class="is-fig"><img src="${responsiveImageUrl(src, 1200)}" alt="${escapeHtml(name)}" loading="lazy" ${IMG_ONERROR} /></figure>`
+  ).join('');
+
+  // Label / value spec table
+  const specRows = [
+    sleeps ? ['Sleeps', String(sleeps)] : null,
+    architect ? ['Architecture', architect] : null,
+    location ? ['Where', location] : null,
+    tagList.length ? ['Good for', tagList.join(', ')] : null
+  ].filter(Boolean);
+  const specsHtml = specRows.map(([k, v]) =>
+    `<div class="is-spec"><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`
+  ).join('');
+
+  // Owner recommendations, attributed where we know the name
+  const ownerName = String(f['Owner name'] || '').trim();
+  const secretsHtml = (places && places.length)
+    ? `<div class="is-secrets">
+        <p class="is-secrets-head">${ownerName ? `A few secrets from ${escapeHtml(ownerName)}:` : 'A few places we love nearby:'}</p>
+        ${places.map(pl => {
+          const pf = pl.fields || {};
+          const pname = pf['Name'] || '';
+          const pdesc = pf['Description'] || pf['Note'] || '';
+          const praw = (pf['Link'] || '').trim();
+          const plink = /^https?:\/\//i.test(praw) ? praw : '';
+          const label = plink
+            ? `<a href="${escapeHtml(plink)}" target="_blank" rel="noopener">${escapeHtml(pname)}</a>`
+            : escapeHtml(pname);
+          return `<p class="is-secret"><strong>${label}</strong>${pdesc ? ` &ndash; ${escapeHtml(pdesc)}` : ''}</p>`;
+        }).join('')}
+      </div>`
     : '';
 
   // Gallery render - apply responsive sizing
@@ -960,45 +969,179 @@ module.exports = async function handler(req, res) {
     @media (max-width: 560px) {
       .prop-top, .prop-rest { grid-template-columns: 1fr; }
     }
+
+    /* ============================================
+       PROPERTY PAGE — two columns, images left, text right
+       ============================================ */
+    :root { --accent: #b5573a; --ink: #111; --muted: #6f6f6f; --rule: #111; }
+    html, body { background: #fff; }
+
+    .is-wrap {
+      border-top: 1px solid var(--rule);
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    .is-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+    .is-left { padding: 28px 28px 0 28px; }
+    .is-right {
+      padding: 28px 40px 60px;
+      border-left: 1px solid var(--rule);
+      min-height: 100%;
+    }
+
+    .is-fig { margin: 0 0 28px; background: #f4f4f4; }
+    .is-fig img { width: 100%; height: auto; display: block; }
+
+    .is-crumb {
+      display: inline-block;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 56px;
+    }
+    .is-title {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(34px, 4.6vw, 62px);
+      line-height: 1.02;
+      letter-spacing: 0.01em;
+      text-align: center;
+      color: var(--ink);
+      margin: 0 0 14px;
+    }
+    .is-tilde {
+      text-align: center;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+    .is-sub {
+      text-align: center;
+      font-size: clamp(15px, 1.5vw, 19px);
+      line-height: 1.45;
+      color: var(--ink);
+      max-width: 34ch;
+      margin: 0 auto 64px;
+    }
+
+    .is-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 64px;
+    }
+    .is-place {
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .is-type {
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .is-bookwrap { text-align: center; margin-bottom: 64px; }
+    .is-book {
+      display: inline-block;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 14px 52px;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      transition: background 0.2s, color 0.2s;
+    }
+    .is-book:hover { background: var(--ink); color: #fff; }
+
+    .is-specs { font-size: 14px; line-height: 1.5; }
+    .is-spec { display: grid; grid-template-columns: 150px 1fr; gap: 12px; margin-bottom: 6px; }
+    .is-spec dt { color: var(--muted); }
+    .is-spec dd { color: var(--ink); margin: 0; }
+
+    .is-prose p {
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+    .is-secrets { margin-top: 36px; }
+    .is-secrets-head { font-weight: 500; margin-bottom: 20px; }
+    .is-secret { margin-bottom: 16px; }
+    .is-secret strong { font-weight: 500; }
+    .is-secret a { border-bottom: 1px solid var(--ink); }
+
+    .is-row-imgs {
+      border-left: none;
+      padding: 0 28px;
+      gap: 0 28px;
+    }
+    .is-row-imgs .is-fig { margin-bottom: 28px; }
+
+    @media (max-width: 900px) {
+      .is-row { grid-template-columns: 1fr; }
+      .is-left { padding: 18px 20px 0; }
+      .is-right { padding: 32px 20px 48px; border-left: none; border-top: 1px solid var(--rule); }
+      .is-crumb { margin-bottom: 28px; }
+      .is-sub { margin-bottom: 36px; }
+      .is-labels, .is-bookwrap { margin-bottom: 36px; }
+      .is-spec { grid-template-columns: 110px 1fr; }
+      .is-row-imgs { padding: 0 20px; }
+    }
   </style>
 </head>
 <body>
 
   ${nav()}
 
-  <div class="prop-top">
-    ${topGalleryHtml}
-  </div>
+  <div class="is-wrap">
 
-  <section class="prop-head">
-    <a class="prop-crumb" href="/houses">Houses</a>
-    <h1 class="prop-name">${name}</h1>
-    ${editorialTitle ? `<h2 class="prop-sub">${escapeHtml(editorialTitle)}</h2>` : ''}
+    <!-- ROW 1: hero image left, title block right -->
+    <div class="is-row">
+      <div class="is-left">
+        ${heroImage ? `<figure class="is-fig"><img src="${responsiveImageUrl(heroImage, 1400)}" alt="${escapeHtml(name)}" fetchpriority="high" loading="eager" ${IMG_ONERROR} /></figure>` : ''}
+      </div>
+      <div class="is-right">
+        <a class="is-crumb" href="/houses">Houses</a>
+        <h1 class="is-title">${escapeHtml(name)}</h1>
+        <div class="is-tilde">&#126;</div>
+        ${editorialTitle ? `<p class="is-sub">${escapeHtml(editorialTitle)}</p>` : ''}
 
-    <div class="prop-tags">
-      ${islandTagHtml}
-      ${tagChipsHtml}
+        <div class="is-labels">
+          <a class="is-place" href="/houses">${escapeHtml(islandVal || location)}</a>
+          <span class="is-type">${escapeHtml(primaryTag || 'House')}</span>
+        </div>
+
+        ${bookingUrl ? `<div class="is-bookwrap"><a class="is-book" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener">Book</a></div>` : ''}
+
+        <dl class="is-specs">${specsHtml}</dl>
+      </div>
     </div>
 
-    ${bookingUrl ? `<a href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener" class="prop-book">Book</a>` : ''}
+    <!-- ROW 2: images left, story right -->
+    <div class="is-row">
+      <div class="is-left">
+        ${storyImagesHtml}
+      </div>
+      <div class="is-right is-prose">
+        ${introOne ? `<p>${escapeHtml(introOne)}</p>` : ''}
+        ${introTwo ? `<p>${escapeHtml(introTwo)}</p>` : ''}
+        ${secretsHtml}
+      </div>
+    </div>
 
-    ${metaLineHtml}
-  </section>
+    <!-- ROW 3: remaining images, both columns -->
+    ${restGalleryHtml ? `<div class="is-row is-row-imgs">${restGalleryHtml}</div>` : ''}
 
-  ${introOne || introTwo ? `
-  <section class="prop-body">
-    ${introOne ? `<p>${escapeHtml(introOne)}</p>` : ''}
-    ${introTwo ? `<p>${escapeHtml(introTwo)}</p>` : ''}
-  </section>` : ''}
-
-  ${buildPlaces(places)}
-
-  ${restGalleryHtml ? `<section class="prop-rest">${restGalleryHtml}</section>` : ''}
-
-  ${bookingUrl ? `
-  <section class="prop-cta">
-    <a href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener" class="prop-book prop-book-lg">Book this house</a>
-  </section>` : ''}
+  </div>
 
   ${await renderNearbyHouses(record)}
 
