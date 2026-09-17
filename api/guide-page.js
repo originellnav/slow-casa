@@ -1,3 +1,4 @@
+const { nav, footer } = require('../lib/nav');
 const SANITY_PROJECT_ID = 'hchp27po';
 const SANITY_DATASET = 'production';
 const SANITY_API_VERSION = '2024-01-01';
@@ -506,16 +507,7 @@ module.exports = async function handler(req, res) {
 </head>
 <body>
 
-  <nav>
-    <div></div>
-    <a href="/" class="wordmark">Slow Casa</a>
-    <ul class="nav-links">
-      <li><a href="/directory">Directory</a></li>
-      <li><a href="/guides">Guides</a></li>
-      <li><a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a></li>
-      <li><a href="/criteria">About</a></li>
-    </ul>
-  </nav>
+  ${nav()}
 
   <header class="guide-header">
     <p class="guide-category">${escapeHtml(categoryLabel)}</p>
@@ -527,16 +519,7 @@ module.exports = async function handler(req, res) {
     ${bodyHtml}
   </article>
 
-  <footer>
-    <div class="footer-left">
-      <span class="footer-copy">&copy; 2026 Slow Casa</span>
-      <a href="/privacy" class="footer-policy">Privacy Policy</a>
-    </div>
-    <div class="footer-links">
-      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
-    </div>
-  </footer>
+  ${footer()}
 
 </body>
 </html>`;
