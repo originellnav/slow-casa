@@ -1,4 +1,3 @@
-const { nav, footer } = require('../lib/nav');
 const SANITY_PROJECT_ID = 'hchp27po';
 const SANITY_DATASET = 'production';
 const SANITY_API_VERSION = '2024-01-01';
@@ -34,7 +33,7 @@ function formatCategory(category) {
   'architect-roundup': 'Architects',
   'typology-guide': 'House Types',
   'region-discovery': 'Places',
-  'architectural-pilgrimage': 'Guide',
+  'architectural-pilgrimage': 'Journeys',
   'terminology': 'Terminology',
   'architect-stories': 'Architect Stories',
   'home-stories': 'Home Stories'
@@ -47,14 +46,6 @@ function formatCategory(category) {
 //   /guides       -> (no param) Village Guides
 //   /how-to       -> ?section=how-to
 const PAGES = {
-        'places': {
-    categories: ['region-discovery'],
-    title: 'Places | Slow Casa',
-    description: 'Guides to the villages of Mallorca, Ibiza and Menorca. Where to eat, swim and stay, and the houses worth booking near each one.',
-    canonical: 'https://slowcasa.com/places',
-    heading: 'Places',
-    intro: 'Guides to the villages of the Balearics, and the houses worth booking near them.'
-  },
   'village-guides': {
     categories: ['region-discovery'],
     title: 'Village Guides | Slow Casa',
@@ -120,7 +111,7 @@ module.exports = async function handler(req, res) {
   // Which route are we serving? Unknown values fall back to Village Guides.
   const section = (req.query && req.query.section) || 'village-guides';
   const page = PAGES[section] || PAGES['village-guides'];
-    if (page.categories) {
+  if (page.categories) {
     guides = guides.filter(g => page.categories.indexOf(g.category) !== -1);
   }
 
@@ -237,14 +228,14 @@ module.exports = async function handler(req, res) {
       font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #f9f7f2; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
+    html, body { background: #ffffff; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
     a { color: inherit; text-decoration: none; }
     h1, h2, h3 { font-weight: 400; }
 
     nav {
       display: grid; grid-template-columns: 1fr auto 1fr;
       align-items: center; padding: 28px 48px;
-      background: #f9f7f2; z-index: 10; position: relative;
+      background: #ffffff; z-index: 10; position: relative;
     }
     .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: #0f0f0f; }
     .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
@@ -391,7 +382,16 @@ module.exports = async function handler(req, res) {
 </head>
 <body>
 
-  ${nav()}
+  <nav>
+    <div></div>
+    <a href="/" class="wordmark">Slow Casa</a>
+    <ul class="nav-links">
+      <li><a href="/directory">Directory</a></li>
+      <li><a href="/guides">Guides</a></li>
+      <li><a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a></li>
+      <li><a href="/criteria">About</a></li>
+    </ul>
+  </nav>
 
   <header class="guides-header">
     <h1 class="guides-title">${escapeHtml(page.heading)}</h1>
@@ -402,7 +402,16 @@ module.exports = async function handler(req, res) {
     ${guidesHtml}
   </main>
 
-   ${footer()}
+  <footer>
+    <div class="footer-left">
+      <span class="footer-copy">&copy; 2026 Slow Casa</span>
+      <a href="/privacy" class="footer-policy">Privacy Policy</a>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
+    </div>
+  </footer>
 
 </body>
 </html>`;
