@@ -282,10 +282,10 @@ module.exports = async function handler(req, res) {
       --sans: 'DM Sans', system-ui, sans-serif;
     }
     html { font-size: 16px; -webkit-font-smoothing: antialiased; }
-    body { font-family: var(--sans); background: #f9f7f2 !important; color: var(--black); min-height: 100vh; }
+    body { font-family: var(--sans); background: #ffffff !important; color: var(--black); min-height: 100vh; }
     a { color: inherit; text-decoration: none; }
 
-    nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 28px 48px; background: #f9f7f2; }
+    nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 28px 48px; background: #ffffff; }
     .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: #2a2a28; text-transform: none; }
     .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
     .nav-links a { font-size: 13px; color: var(--grey-1); letter-spacing: 0.03em; transition: color 0.2s; }
@@ -490,7 +490,7 @@ module.exports = async function handler(req, res) {
     .page-btn.active {
       background: #2a2a28;
       border-color: #2a2a28;
-      color: #f9f7f2;
+      color: #ffffff;
       font-weight: 500;
     }
 
@@ -530,7 +530,7 @@ module.exports = async function handler(req, res) {
     }
     .sc-marker {
       width: 11px; height: 11px; border-radius: 50%;
-      background: #0f0f0f; border: 2px solid #f9f7f2;
+      background: #0f0f0f; border: 2px solid #ffffff;
       cursor: pointer; transition: transform 0.2s ease, background 0.2s ease;
     }
     .sc-marker:hover { transform: scale(1.4); }
@@ -605,10 +605,10 @@ module.exports = async function handler(req, res) {
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
     }
-    .chip:hover { background: var(--black); color: #f9f7f2; }
-    .chip.active { background: var(--black); color: #f9f7f2; }
+    .chip:hover { background: var(--black); color: #ffffff; }
+    .chip.active { background: var(--black); color: #ffffff; }
     .chip-accent { border-color: var(--accent); color: var(--accent); }
-    .chip-accent:hover, .chip-accent.active { background: var(--accent); color: #f9f7f2; }
+    .chip-accent:hover, .chip-accent.active { background: var(--accent); color: #ffffff; }
     .chip-map { margin-left: auto; }
     .dir-body { display: block; }
     @media (max-width: 768px) {
