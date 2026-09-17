@@ -375,14 +375,14 @@ module.exports = async function handler(req, res) {
       font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #f9f7f2; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
+    html, body { background: #ffffff; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
     a { color: inherit; text-decoration: none; }
     h1, h2, h3, h4 { font-weight: 400; }
 
     nav {
       display: grid; grid-template-columns: 1fr auto 1fr;
       align-items: center; padding: 28px 48px;
-      background: #f9f7f2; z-index: 10; position: relative;
+      background: #ffffff; z-index: 10; position: relative;
     }
     .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: #0f0f0f; }
     .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
