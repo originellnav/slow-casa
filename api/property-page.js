@@ -309,6 +309,10 @@ module.exports = async function handler(req, res) {
 
   const heroImage = getImageUrl(record, 0);
 
+
+  const allImages = getAllImageUrls(record);
+  const galleryImages = allImages.slice(1);
+
   // Top collage: first four images, alternating landscape and portrait
   const topImgs = allImages.slice(0, 4);
   const topGalleryHtml = topImgs.map((src, i) => {
@@ -346,9 +350,6 @@ module.exports = async function handler(req, res) {
         location ? escapeHtml(location) : null
       ].filter(Boolean).join(' &middot; ')}</p>`
     : '';
-
-  const allImages = getAllImageUrls(record);
-  const galleryImages = allImages.slice(1);
 
   // Gallery render - apply responsive sizing
   let galleryHtml = '';
