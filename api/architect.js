@@ -52,7 +52,7 @@ async function getAllProperties() {
 }
 
 async function fetchArchitectBySlug(slug) {
-  const formula = encodeURIComponent(`{Slug} = "${slug}"`);
+    const formula = encodeURIComponent(`LOWER(TRIM({Slug})) = "${slug}"`);
   const url = `https://api.airtable.com/v0/${BASE_ID}/${ARCHITECTS_TABLE}?filterByFormula=${formula}&maxRecords=1`;
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Cache-Control': 'no-cache' }
