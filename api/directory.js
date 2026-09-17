@@ -1,4 +1,4 @@
-const { nav } = require('../lib/nav');
+const { nav, footer } = require('../lib/nav');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 
@@ -227,6 +227,7 @@ module.exports = async function handler(req, res) {
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
+  <link rel="stylesheet" href="/slow-casa.css" />
   <style>
     @font-face {
       font-family: 'DM Sans';
@@ -686,17 +687,7 @@ module.exports = async function handler(req, res) {
     <div id="pagination-inner" style="display:inline-flex;align-items:center;gap:8px;"></div>
   </div>
 
-  <footer>
-    <div class="footer-left">
-      <span class="footer-copy">&copy; 2026 Slow Casa</span>
-      <a href="/privacy" class="footer-policy">Privacy Policy</a>
-    </div>
-    <div class="footer-links">
-      <a href="/guides">Guides</a>
-      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
-    </div>
-  </footer>
+  ${footer()}
 
   <script>
     var activeFilter = 'all';
