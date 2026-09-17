@@ -28,7 +28,7 @@
 
 html { font-size: 16px; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, h4, h5, h6 { font-weight: 400; }
-body { font-family: var(--sans); background: #f9f7f2; color: var(--black); min-height: 100vh; }
+body { font-family: var(--sans); background: #ffffff; color: var(--black); min-height: 100vh; }
 a { color: inherit; text-decoration: none; }
 
 /* NAV — default (white background pages) */
@@ -38,7 +38,7 @@ nav {
   align-items: center;
   padding: 28px 48px;
   border-bottom: none;
-  background: #f9f7f2;
+  background: #ffffff;
 }
 
 /* NAV — hero overlay variant (homepage) */
