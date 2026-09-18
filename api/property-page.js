@@ -417,7 +417,28 @@ module.exports = async function handler(req, res) {
     if (!isNaN(sleepsNum)) structuredData.maximumAttendeeCapacity = sleepsNum;
   }
 
-  const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`;
+  const crumbIsland = String((f['Island'] || '')).trim();
+  const crumbItems = [
+    { "@type": "ListItem", "position": 1, "name": "Slow Casa", "item": "https://slowcasa.com" },
+    { "@type": "ListItem", "position": 2, "name": "Houses", "item": "https://slowcasa.com/houses" }
+  ];
+  if (crumbIsland) {
+    crumbItems.push({
+      "@type": "ListItem", "position": 3, "name": crumbIsland,
+      "item": "https://slowcasa.com/" + crumbIsland.toLowerCase()
+    });
+  }
+  crumbItems.push({
+    "@type": "ListItem", "position": crumbItems.length + 1, "name": name, "item": canonicalUrl
+  });
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": crumbItems
+  };
+
+  const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>
+  <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
