@@ -1,4 +1,3 @@
-const { nav, footer } = require('../lib/nav');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const ARCHITECTS_TABLE = 'Architects';
@@ -52,7 +51,7 @@ async function getAllProperties() {
 }
 
 async function fetchArchitectBySlug(slug) {
-    const formula = encodeURIComponent(`LOWER(TRIM({Slug})) = "${slug}"`);
+  const formula = encodeURIComponent(`{Slug} = "${slug}"`);
   const url = `https://api.airtable.com/v0/${BASE_ID}/${ARCHITECTS_TABLE}?filterByFormula=${formula}&maxRecords=1`;
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Cache-Control': 'no-cache' }
@@ -202,15 +201,19 @@ module.exports = async function handler(req, res) {
     if (country) structuredData.address.addressCountry = country;
   }
   if (pagePhoto) structuredData.image = pagePhoto;
-  if (linkedProperties.length > 0) {
-    structuredData.subjectOf = linkedProperties.slice(0, 6).map(p => ({
-      "@type": "LodgingBusiness",
-      "name": p.fields['Name'] || '',
-      "url": `https://slowcasa.com/properties/${p.fields['Slug'] || ''}`
-    }));
-  }
 
-  const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`;
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Slow Casa", "item": "https://slowcasa.com" },
+      { "@type": "ListItem", "position": 2, "name": "Architects", "item": "https://slowcasa.com/design-directory" },
+      { "@type": "ListItem", "position": 3, "name": name, "item": canonicalUrl }
+    ]
+  };
+
+  const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>
+  <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
 
   // Render property cards
   const propertyCardsHtml = linkedProperties.map(record => {
@@ -219,7 +222,10 @@ module.exports = async function handler(req, res) {
     const pslug = pf['Slug'] || '';
     const plocation = escapeHtml(pf['Location label'] || '');
     const pimg = getPropertyImageUrl(record, 0) || '';
-    const purl = '/properties/' + pslug;
+    const pisl = String(pf['Island'] || '').trim().toLowerCase();
+    const purl = ['mallorca','ibiza','menorca','formentera'].indexOf(pisl) !== -1
+      ? '/' + pisl + '/houses/' + pslug
+      : '/properties/' + pslug;
     return `<a href="${purl}" class="prop-card">
       <div class="prop-card-img">
         ${pimg ? `<img src="${escapeHtml(pimg)}" alt="${pname}" loading="lazy" />` : ''}
@@ -504,7 +510,17 @@ module.exports = async function handler(req, res) {
 </head>
 <body>
 
- ${nav()}
+  <nav>
+    <div></div>
+    <a href="/" class="wordmark">Slow Casa</a>
+    <ul class="nav-links">
+      <li><a href="/directory">Directory</a></li>
+      <li><a href="/design-directory">Architects</a></li>
+      <li><a href="/guides">Guides</a></li>
+      <li><a href="https://newsletter.slowcasa.com" target="_blank" rel="noopener">Newsletter</a></li>
+      <li><a href="/criteria">About</a></li>
+    </ul>
+  </nav>
 
   <section class="arch-hero">
     <p class="arch-eyebrow">Architect</p>
@@ -547,11 +563,20 @@ module.exports = async function handler(req, res) {
     `}
   </section>
 
-   ${footer()}
+  <footer>
+    <div class="footer-left">
+      <span class="footer-copy">&copy; 2026 Slow Casa</span>
+      <a href="/privacy" class="footer-policy">Privacy Policy</a>
+    </div>
+    <div class="footer-links">
+      <a href="/guides">Guides</a>
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
+    </div>
+  </footer>
 
 </body>
 </html>`;
 
   res.status(200).send(html);
 };
-
