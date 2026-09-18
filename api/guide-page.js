@@ -286,7 +286,29 @@ module.exports = async function handler(req, res) {
   if (publishedAt) structuredData.datePublished = publishedAt;
   if (heroUrl) structuredData.image = heroUrl;
 
-  const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`;
+  const gCrumbs = [
+    { "@type": "ListItem", "position": 1, "name": "Slow Casa", "item": "https://slowcasa.com" },
+    { "@type": "ListItem", "position": 2, "name": "Places", "item": "https://slowcasa.com/places" }
+  ];
+  if (guideIsland) {
+    gCrumbs.push({
+      "@type": "ListItem", "position": 3,
+      "name": guideIsland.charAt(0).toUpperCase() + guideIsland.slice(1),
+      "item": "https://slowcasa.com/" + guideIsland
+    });
+  }
+  gCrumbs.push({
+    "@type": "ListItem", "position": gCrumbs.length + 1,
+    "name": guide.title || '', "item": canonicalUrl
+  });
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": gCrumbs
+  };
+
+  const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>
+  <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
