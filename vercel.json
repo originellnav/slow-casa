@@ -38,6 +38,9 @@
     }
   ],
   "rewrites": [
+    { "source": "/mallorca", "destination": "/api/island?island=mallorca" },
+{ "source": "/ibiza", "destination": "/api/island?island=ibiza" },
+{ "source": "/menorca", "destination": "/api/island?island=menorca" },
     {
       "source": "/houses",
       "destination": "/api/directory"
