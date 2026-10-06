@@ -15,12 +15,19 @@ module.exports = async function handler(req, res) {
   const [propertyUrls, guideUrls, architectUrls] = await Promise.all([
     (async () => {
       try {
-        const r = await fetch(
-          'https://api.airtable.com/v0/appndrnWrdlgxRJAG/Properties?fields[]=Slug&fields[]=Date+added&fields[]=Island&maxRecords=100',
-          { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } }
-        );
-        const data = await r.json();
-        return (data.records || [])
+                let recs = [];
+        let offset = null;
+        let attempts = 0;
+        do {
+          let url = 'https://api.airtable.com/v0/appndrnWrdlgxRJAG/Properties?fields[]=Slug&fields[]=Date+added&fields[]=Island&pageSize=100';
+          if (offset) url += '&offset=' + encodeURIComponent(offset);
+          const r = await fetch(url, { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } });
+          const data = await r.json();
+          recs = recs.concat(data.records || []);
+          offset = data.offset;
+          attempts++;
+        } while (offset && attempts < 10);
+        return recs
                     .filter(rec => rec.fields['Slug'] && rec.fields['Island'])
           .map(rec => ({
             url: (function () {
