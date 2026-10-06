@@ -456,7 +456,8 @@ module.exports = async function handler(req, res) {
 <meta name="apple-mobile-web-app-title" content="Slow Casa" />
 <link rel="manifest" href="/site.webmanifest" />
   <meta name="description" content="${escapeHtml(metaDesc)}" />
-  <link rel="canonical" href="${canonicalUrl}" />
+    <link rel="canonical" href="${canonicalUrl}" />
+  ${f['Island'] ? '' : '<meta name="robots" content="noindex, follow" />'}
   ${jsonLdScript}
   <meta property="og:title" content="${escapeHtml(title)}" />
   <meta property="og:description" content="${escapeHtml(metaDesc)}" />
