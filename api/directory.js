@@ -933,12 +933,11 @@ module.exports = async function handler(req, res) {
               document.getElementById('map-popup').style.display = 'block';
               map.flyTo({ center: [parseFloat(f['Longitude']), parseFloat(f['Latitude'])], zoom: 7, duration: 1000 });
             });
-            n            new mapboxgl.Marker({ element: el })
+            new mapboxgl.Marker({ element: el })
               .setLngLat([parseFloat(f['Longitude']), parseFloat(f['Latitude'])])
               .addTo(map);
           });
 
-          // Frame whatever houses are on the map, so it stays right as more are added.
           var bounds = new mapboxgl.LngLatBounds();
           records.forEach(function (r) {
             var lng = parseFloat(r.fields['Longitude']);
