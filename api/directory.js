@@ -904,8 +904,8 @@ module.exports = async function handler(req, res) {
         var map = new mapboxgl.Map({
           container: 'dir-map',
           style: MAPBOX_STYLE,
-          center: [8, 45],
-          zoom: 3.4,
+          center: [2.75, 39.6],
+          zoom: 7,
           attributionControl: false
         });
         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
@@ -933,10 +933,19 @@ module.exports = async function handler(req, res) {
               document.getElementById('map-popup').style.display = 'block';
               map.flyTo({ center: [parseFloat(f['Longitude']), parseFloat(f['Latitude'])], zoom: 7, duration: 1000 });
             });
-            new mapboxgl.Marker({ element: el })
+            n            new mapboxgl.Marker({ element: el })
               .setLngLat([parseFloat(f['Longitude']), parseFloat(f['Latitude'])])
               .addTo(map);
           });
+
+          // Frame whatever houses are on the map, so it stays right as more are added.
+          var bounds = new mapboxgl.LngLatBounds();
+          records.forEach(function (r) {
+            var lng = parseFloat(r.fields['Longitude']);
+            var lat = parseFloat(r.fields['Latitude']);
+            if (isFinite(lng) && isFinite(lat)) bounds.extend([lng, lat]);
+          });
+          if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 60, maxZoom: 9, duration: 0 });
         });
       } catch (e) { console.error('Directory map error:', e); }
     }
