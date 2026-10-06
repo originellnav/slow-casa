@@ -21,7 +21,7 @@ module.exports = async function handler(req, res) {
         );
         const data = await r.json();
         return (data.records || [])
-          .filter(rec => rec.fields['Slug'])
+                    .filter(rec => rec.fields['Slug'] && rec.fields['Island'])
           .map(rec => ({
             url: (function () {
               const isl = String(rec.fields['Island'] || '').trim().toLowerCase();
