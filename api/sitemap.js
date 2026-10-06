@@ -4,7 +4,10 @@ module.exports = async function handler(req, res) {
   const base = 'https://slowcasa.com';
   const staticPages = [
     { url: '/', priority: '1.0', changefreq: 'weekly' },
-    { url: '/houses', priority: '0.9', changefreq: 'weekly' },
+        { url: '/houses', priority: '0.9', changefreq: 'weekly' },
+    { url: '/mallorca', priority: '0.9', changefreq: 'weekly' },
+    { url: '/ibiza', priority: '0.9', changefreq: 'weekly' },
+    { url: '/menorca', priority: '0.9', changefreq: 'weekly' },
     { url: '/house-tours', priority: '0.9', changefreq: 'weekly' },
     { url: '/places', priority: '0.9', changefreq: 'weekly' },
     { url: '/how-to', priority: '0.9', changefreq: 'weekly' },
