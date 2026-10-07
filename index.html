@@ -797,6 +797,124 @@
       color: #0f0f0f;
     }
     .map-cta a { border-bottom: 1px solid #0f0f0f; }
+  
+    /* ---------- HOMEPAGE 2026 ---------- */
+
+    .home-hero { text-align: center; padding: 104px 48px 92px; max-width: 1100px; margin: 0 auto; }
+    .home-eyebrow {
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--black); opacity: 0.6; margin: 0 0 34px;
+    }
+    .home-headline {
+      font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
+      font-size: clamp(38px, 5.6vw, 76px); line-height: 1.06; letter-spacing: -0.005em;
+      margin: 0 auto 46px; max-width: 17ch;
+    }
+    .home-cta {
+      display: inline-block; border: 1px solid var(--black); padding: 17px 34px;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--black); transition: background 0.2s, color 0.2s;
+    }
+    .home-cta:hover { background: var(--black); color: #fff; }
+
+    .home-film { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+    .home-film-frame {
+      width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+      background: var(--grey-4); display: block;
+    }
+    .home-film-still {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transform-origin: center;
+      animation: film-drift 26s ease-in-out infinite alternate;
+    }
+    @keyframes film-drift {
+      from { transform: scale(1); }
+      to   { transform: scale(1.06); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .home-film-still { animation: none; }
+    }
+
+    .home-intro { max-width: 1200px; margin: 0 auto; padding: 96px 48px 0; }
+    .home-intro p {
+      max-width: 58ch; text-indent: 2.2em;
+      font-size: 17px; line-height: 1.72; margin: 0;
+    }
+
+    .home-collection { max-width: 1200px; margin: 0 auto; padding: 104px 48px 0; }
+    .home-collection-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 24px; margin-bottom: 40px;
+    }
+    .home-collection-head h2 {
+      font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
+      font-size: clamp(26px, 3.4vw, 40px); letter-spacing: 0.01em; margin: 0;
+    }
+    .home-collection-link {
+      font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--grey-1); white-space: nowrap; transition: color 0.2s;
+    }
+    .home-collection-link:hover { color: var(--black); }
+
+    .island-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .island-card { display: block; color: inherit; }
+    .island-img { width: 100%; aspect-ratio: 4 / 3; overflow: hidden; background: var(--grey-4); margin-bottom: 16px; }
+    .island-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+    .island-card:hover .island-img img { transform: scale(1.03); }
+    .island-name { font-size: 13px; letter-spacing: 0.13em; text-transform: uppercase; margin: 0 0 4px; }
+    .island-count { font-size: 13px; color: var(--grey-1); margin: 0; }
+
+    @media (max-width: 768px) {
+      .home-hero { padding: 56px 16px 52px; }
+      .home-headline { font-size: clamp(30px, 8.5vw, 44px); max-width: none; }
+      .home-eyebrow { margin-bottom: 22px; }
+      .home-film { padding: 0 16px; }
+      .home-intro { padding: 56px 16px 0; }
+      .home-intro p { font-size: 16px; }
+      .home-collection { padding: 64px 16px 0; }
+      .home-collection-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .island-grid { grid-template-columns: 1fr; gap: 36px; }
+    }
+  
+    .home-map { max-width: 1200px; margin: 0 auto; padding: 104px 48px 0; }
+    .home-map .section-header { padding-top: 0; }
+    .home-map .map-cta { font-size: 15px; line-height: 1.6; color: var(--grey-1); margin: 20px 0 0; max-width: 62ch; }
+    .home-map .map-cta a { color: var(--black); border-bottom: 1px solid var(--grey-3); }
+    .home-map .map-cta a:hover { border-color: var(--black); }
+    .home-map-frame {
+      position: relative; display: block; width: 100%; overflow: hidden;
+      background: var(--grey-4); border: 1px solid var(--grey-3);
+      min-height: 260px;
+    }
+    .home-map-frame img { width: 100%; height: auto; display: block; transition: transform 0.6s ease; }
+    .home-map-frame:hover img { transform: scale(1.02); }
+    .home-map-cta {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: #fff; color: var(--black); border: 1px solid var(--black);
+      padding: 16px 32px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      transition: background 0.2s, color 0.2s; white-space: nowrap;
+    }
+    .home-map-frame:hover .home-map-cta { background: var(--black); color: #fff; }
+    .home-map-credit { font-size: 10px; color: var(--grey-2); margin: 10px 0 0; letter-spacing: 0.04em; }
+
+    .home-signup { max-width: 1200px; margin: 96px auto 0; padding: 0 48px; }
+    .home-signup-inner {
+      display: flex; align-items: center; justify-content: space-between; gap: 32px;
+      border-top: 1px solid var(--grey-3); padding-top: 28px;
+    }
+    .home-signup-text { font-size: 14px; color: var(--grey-1); margin: 0; }
+    .home-signup-text strong { color: var(--black); font-weight: 500; }
+    .home-signup .try-form { max-width: 380px; margin: 0; flex: 0 1 380px; }
+    .home-signup .try-email { font-size: 13px; padding: 11px 14px; }
+    .home-signup .try-btn { font-size: 10px; padding: 11px 20px; }
+
+    @media (max-width: 768px) {
+      .home-map { padding: 64px 16px 0; }
+      .home-map-cta { padding: 13px 22px; font-size: 10px; }
+      .home-signup { margin-top: 56px; padding: 0 16px; }
+      .home-signup-inner { flex-direction: column; align-items: stretch; gap: 16px; }
+      .home-signup .try-form { flex: 1 1 auto; max-width: none; }
+    }
   </style>
   <!-- Google Analytics -->
   <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
@@ -825,64 +943,78 @@
 </head>
 <body>
 
-  <div class="hero-wrapper">
-    <nav id="main-nav" class="hero-nav">
-    <div></div>
+  <nav>
     <a href="/" class="wordmark">Slow Casa</a>
     <ul class="nav-links">
-      <li><a href="/houses">Houses</a></li>
+      <li><a href="/houses">The Collection</a></li>
       <li><a href="/places">Places</a></li>
       <li><a href="/map">Map</a></li>
     </ul>
   </nav>
-  <div class="hero">
-    <picture>
-      <source media="(max-width: 768px)" srcset="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_800,h_900,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
-      <source media="(max-width: 1200px)" srcset="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1400,h_900,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
-      <img class="hero-image" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_2400,h_1200,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" alt="A modern concrete villa in an olive grove on the south coast of Crete" fetchpriority="high" />
-    </picture>
-    <div class="hero-top-gradient"></div>
-    <div class="hero-overlay">
-           <h1 class="hero-headline">The best houses to rent in Mallorca, Ibiza and Menorca</h1>
-    </div>
-  </div>
-  </div>
 
-   <section class="section posts">
-    <div class="section-header">
-      <p class="section-label">Houses</p>
-      <a class="section-link" href="/houses">All houses</a>
+  <header class="home-hero">
+    <p class="home-eyebrow">Design holiday homes</p>
+    <h1 class="home-headline">The best houses to rent in Mallorca, Ibiza and Menorca</h1>
+    <a class="home-cta" href="/houses">Explore collection (<span data-count="all">18</span>)</a>
+  </header>
+
+  <section class="home-film">
+    <div class="home-film-frame">
+      <img class="home-film-still" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_16:9,g_auto,w_1600,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg" alt="Mallorca" loading="lazy" />
     </div>
-    <div class="property-grid" id="latest-homes"></div>
   </section>
 
-  <section class="section posts">
-    <div class="section-header">
-      <p class="section-label">Places</p>
-      <a class="section-link" href="/places">All places</a>
-    </div>
-    <div class="property-grid js-posts" data-categories="region-discovery,home-stories,architect-stories,architect-roundup,typology-guide,terminology" data-label="Guide"></div>
+  <section class="home-intro">
+    <p>Slow Casa is a curated collection of exceptional homes throughout Mallorca, Menorca and Ibiza. Every home is personally selected for its design, location, and quality. You too can live the Balearic lifestyle. Our community of properties and owners shares our values, and each authentic place offers the opportunity for a slow living stay.</p>
   </section>
 
-  <section class="section posts">
+  <section class="home-collection">
+    <div class="home-collection-head">
+      <h2>The Collection</h2>
+      <a class="home-collection-link" href="/houses">See all houses (<span data-count="all">18</span>) &rsaquo;</a>
+    </div>
+    <div class="island-grid">
+      <a class="island-card" href="/mallorca">
+        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:3,g_auto,q_auto,f_auto,w_900/v1791362039/mallorca_card_v6tx57.jpg" alt="Port de Soller on the north-west coast of Mallorca" loading="lazy" /></div>
+        <p class="island-name">Mallorca</p>
+        <p class="island-count"><span data-count="mallorca">14</span> houses</p>
+      </a>
+      <a class="island-card" href="/menorca">
+        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:3,g_auto,q_auto,f_auto,w_900/v1791362040/menorca_card_ywifq5.jpg" alt="Houses above the limestone cliffs on the coast of Menorca" loading="lazy" /></div>
+        <p class="island-name">Menorca</p>
+        <p class="island-count"><span data-count="menorca">2</span> houses</p>
+      </a>
+      <a class="island-card" href="/ibiza">
+        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:3,g_auto,q_auto,f_auto,w_900/v1791362038/ibiza_card_bbuc6x.jpg" alt="A street in Dalt Vila, the old town of Ibiza" loading="lazy" /></div>
+        <p class="island-name">Ibiza</p>
+        <p class="island-count"><span data-count="ibiza">2</span> houses</p>
+      </a>
+    </div>
+  </section>
+
+
+  <section class="home-map">
     <div class="section-header">
       <p class="section-label">The Map</p>
       <a class="section-link" href="/map">Open the map</a>
     </div>
+    <a class="home-map-frame" href="/map">
+      <img src="https://api.mapbox.com/styles/v1/lukerya/cmoime20s006m01r68jvia13j/static/2.75,39.62,6.4/1280x520@2x?access_token=pk.eyJ1IjoibHVrZXJ5YSIsImEiOiJjbG96cmZ3OTMwMHRyMmlzNHc1bTZkZzI4In0.8Pmo8eeUh48QHBpzqHwNuQ&logo=false&attribution=false" alt="Map of Mallorca, Ibiza and Menorca showing every house in the collection" loading="lazy" />
+      <span class="home-map-cta">Take a look</span>
+    </a>
     <p class="map-cta">Every house, restaurant, beach and bar we rate across the Balearics, on one map. <a href="/map">Take a look.</a></p>
+    <p class="home-map-credit">&copy; Mapbox &nbsp;&copy; OpenStreetMap</p>
   </section>
 
-
-
-  </div>
-
-  <div class="try-section">
-        <h2 class="try-headline"><strong>The Slow Signal.</strong> Weekly slow living intel, home inspiration, conversations, and more.</h2>
-    <div class="try-form">
-      <input class="try-email" id="try-email-input" type="email" placeholder="Your email address" />
-      <button class="try-btn" type="button" onclick="handleTrySubscribe()">Sign up</button>
+  <section class="home-signup">
+    <div class="home-signup-inner">
+      <p class="home-signup-text"><strong>The Slow Signal.</strong> Notes on the houses and the islands, now and then.</p>
+      <div class="try-form">
+        <input class="try-email" id="try-email-input" type="email" placeholder="Your email address" />
+        <button class="try-btn" type="button" onclick="handleTrySubscribe()">Sign up</button>
+      </div>
     </div>
-  </div>
+  </section>
 
     <footer>
     <div class="footer-left">
@@ -1055,7 +1187,8 @@
       }
     }
 
-    fetchProperties().then(renderProperties);
+    // Houses grid removed from the homepage; the island cards replace it.
+    // fetchProperties().then(renderProperties);
 
     // Fetch latest journal post - DISABLED until journal section is re-added with proper content
     async function fetchLatestPost() {
@@ -1109,5 +1242,30 @@
     .catch(function () { /* sections stay empty rather than breaking the page */ });
 })();
 </script>
+
+  <script>
+  // The island counts are written into the HTML so they are visible without JavaScript.
+  // This corrects them from Airtable after load, so they stay right as houses are added.
+  (function () {
+    var nodes = document.querySelectorAll('[data-count]');
+    if (!nodes.length) return;
+    fetch('/api/properties?all=true')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var recs = (d && d.records) || [];
+        if (!recs.length) return;
+        var tally = { all: recs.length, mallorca: 0, ibiza: 0, menorca: 0 };
+        recs.forEach(function (r) {
+          var isl = String((r.fields && r.fields['Island']) || '').trim().toLowerCase();
+          if (tally[isl] !== undefined) tally[isl]++;
+        });
+        nodes.forEach(function (n) {
+          var key = n.getAttribute('data-count');
+          if (tally[key] !== undefined) n.textContent = tally[key];
+        });
+      })
+      .catch(function () { /* leave the numbers in the HTML */ });
+  })();
+  </script>
 </body>
 </html>
