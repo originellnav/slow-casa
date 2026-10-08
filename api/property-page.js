@@ -240,7 +240,6 @@ module.exports = async function handler(req, res) {
   const editorialTitle = f['Editorial Title'] || '';
   const sleeps = f['Sleeps'] || '';
   const bookingUrl = f['Booking URL'] || '';
-  const architect = f['Architect'] || '';
   const ownerName = String(f['Owner name'] || '').trim();
 
   // Text sections. Intro and Location text read their new names first and fall
@@ -536,7 +535,6 @@ module.exports = async function handler(req, res) {
     .pp-name { font-family: var(--sans); font-weight: 400; font-size: 28px; letter-spacing: 0.04em; text-transform: uppercase; margin: 0 0 6px; line-height: 1.15; }
     .pp-where { font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-1); margin: 0; }
     .pp-editorial { font-family: var(--serif); font-size: 21px; line-height: 1.35; margin: 22px 0 0; max-width: 32ch; }
-    .pp-arch { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-1); margin: 14px 0 0; }
     .pp-actions { display: flex; align-items: center; gap: 28px; flex-shrink: 0; }
     .pp-share { background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--sans); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); }
     .pp-btn {
@@ -677,7 +675,6 @@ module.exports = async function handler(req, res) {
           <h1 class="pp-name">${escapeHtml(name)}</h1>
           ${location ? `<p class="pp-where">${escapeHtml(location)}</p>` : ''}
           ${editorialTitle ? `<p class="pp-editorial">${escapeHtml(editorialTitle)}</p>` : ''}
-          ${architect ? `<p class="pp-arch">Architecture: ${escapeHtml(architect)}</p>` : ''}
         </div>
         <div class="pp-actions">
           <button class="pp-share" type="button" id="pp-share">Share</button>
