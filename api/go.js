@@ -27,7 +27,12 @@ async function getBookingMap() {
     const data = await resp.json();
     for (const rec of data.records || []) {
       const slug = rec.fields && rec.fields['Slug'];
-      const booking = rec.fields && rec.fields['Booking URL'];
+      let booking = String((rec.fields && rec.fields['Booking URL']) || '').trim();
+      // Accept "www.example.com" as well as "https://www.example.com".
+      // The house page shows Book whenever this field is filled, so /go must work too.
+      if (booking && !/^https?:\/\//i.test(booking) && /^[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(booking)) {
+        booking = 'https://' + booking;
+      }
       if (slug && booking && /^https?:\/\//i.test(booking)) {
         map[String(slug).trim().toLowerCase()] = booking.trim();
       }
