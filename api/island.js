@@ -177,7 +177,7 @@ module.exports = async function handler(req, res) {
     return `<a href="${url}" class="card-link" style="text-decoration:none;color:inherit;">
       <div class="property-card">
         <div class="card-img">
-          ${imgUrl ? `<img src="${escapeHtml(responsiveImageUrl(imgUrl, 600))}" alt="${name}" loading="lazy" />` : '<div class="card-img-placeholder"></div>'}
+          ${imgUrl ? `<img src="${escapeHtml(responsiveImageUrl(imgUrl, 800))}" alt="${name}" loading="lazy" />` : '<div class="card-img-placeholder"></div>'}
         </div>
         <p class="card-location">${locationLabel}</p>
         <p class="card-name">${name}</p>
