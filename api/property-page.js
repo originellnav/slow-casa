@@ -238,14 +238,51 @@ module.exports = async function handler(req, res) {
   const longitude = f['Longitude'];
   const description = f['Description'] || '';
   const editorialTitle = f['Editorial Title'] || '';
-  const introOne = f['Intro One'] || '';
-  const introTwo = f['Intro Two'] || '';
   const sleeps = f['Sleeps'] || '';
-  const tags = f['Tags'] || '';
   const bookingUrl = f['Booking URL'] || '';
   const architect = f['Architect'] || '';
-  const architectUrl = f['Architect URL'] || '';
-  // Places we love - pulled from the linked "Places" table.
+  const ownerName = String(f['Owner name'] || '').trim();
+
+  // Text sections. Intro and Location text read their new names first and fall
+  // back to the old ones, so the Airtable renames can happen after this deploys.
+  const introText    = f['Intro'] || f['Intro Two'] || '';
+  const locationText = f['Location text'] || f['Intro One'] || '';
+  const livingText   = f['Living text'] || '';
+  const bedroomsText = f['Bedrooms text'] || '';
+  const outdoorText  = f['Outdoor text'] || '';
+
+  // Key facts
+  const bedrooms  = f['Bedrooms'];
+  const bathrooms = f['Bathrooms'];
+  const houseType = f['Type'] || '';
+  const features  = Array.isArray(f['Features'])
+    ? f['Features']
+    : String(f['Features'] || '').split(',').map(s => s.trim()).filter(Boolean);
+
+  // Images. One Cloudinary URL per line in each field.
+  const urlLines = (v) => String(v || '').split('\n').map(s => s.trim()).filter(isValidImageUrl);
+  const heroImage   = getImageUrl(record, 0);
+  const overviewSet = urlLines(f['Overview images']);
+  const livingSet   = urlLines(f['Living images']);
+  const bedroomsSet = urlLines(f['Bedrooms images']);
+  const outdoorSet  = urlLines(f['Outdoor images']);
+  const hasSections = overviewSet.length || livingSet.length || bedroomsSet.length || outdoorSet.length;
+  // Houses not yet moved to the new image fields lay out Gallery Images as the overview.
+  const legacySet   = getAllImageUrls(record).slice(1);
+  const overviewImgs = hasSections ? overviewSet : legacySet;
+
+  const allImgs = [];
+  [heroImage].concat(overviewImgs, livingSet, bedroomsSet, outdoorSet).forEach(u => {
+    if (u && allImgs.indexOf(u) === -1) allImgs.push(u);
+  });
+
+  const img = (src, w, cls, eager) =>
+    `<img${cls ? ` class="${cls}"` : ''} src="${escapeHtml(responsiveImageUrl(src, w))}" alt="${escapeHtml(name)}" ${eager ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"'} ${IMG_ONERROR} />`;
+
+  const paras = (txt) => String(txt || '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
+    .map(p => `<p>${escapeHtml(p)}</p>`).join('');
+
+  // ---- Neighbourhood recs: linked Places ----
   let places = [];
   try {
     const allPlaces = await getAllPlaces();
@@ -254,133 +291,143 @@ module.exports = async function handler(req, res) {
       const linked = pf['Properties'];
       const isLinked = Array.isArray(linked) && linked.indexOf(record.id) !== -1;
       const status = String(pf['Status'] || '').toLowerCase();
-      const notDraft = status !== 'draft'; // show Published or unset, hide Draft
-      return isLinked && notDraft && pf['Name'];
+      return isLinked && status !== 'draft' && pf['Name'];
     });
   } catch (e) { places = []; }
 
-  function buildPlaces(items) {
-    if (!items || !items.length) return '';
-    // Category display order; anything unlisted falls to the end.
-    const order = ['Eat', 'Drink', 'Stay', 'Swim', 'Play', 'See', 'Do'];
-    const sorted = items.slice().sort((a, b) => {
-      const ca = order.indexOf(a.fields.Category || '');
-      const cb = order.indexOf(b.fields.Category || '');
-      const ra = ca === -1 ? 99 : ca;
-      const rb = cb === -1 ? 99 : cb;
-      if (ra !== rb) return ra - rb;
-      return String(a.fields.Name || '').localeCompare(String(b.fields.Name || ''));
-    });
+  const catOrder = ['Eat', 'Drink', 'Stay', 'Swim', 'Play', 'See', 'Do'];
+  places.sort((a, b) => {
+    const ra = catOrder.indexOf(a.fields.Category || ''); const rb = catOrder.indexOf(b.fields.Category || '');
+    return (ra === -1 ? 99 : ra) - (rb === -1 ? 99 : rb);
+  });
 
-    const cards = sorted.map(p => {
-      const pf = p.fields || {};
-      const pName = pf['Name'] || '';
-      if (!pName) return '';
-      const cat = pf['Category'] || '';
-      const rawLink = pf['Link'] || '';
-      const link = /^https?:\/\//i.test(rawLink.trim()) ? rawLink.trim() : '';
-      const img = getPlaceImageUrl(p);
-      const imgTag = img
-        ? `<div class="place-img"><img src="${escapeHtml(responsiveImageUrl(img, 600))}" alt="${escapeHtml(pName)}" loading="lazy" ${IMG_ONERROR} /></div>`
-        : `<div class="place-img place-img-empty"></div>`;
-      const inner = `${imgTag}
-            ${cat ? `<p class="place-cat">${escapeHtml(cat)}</p>` : ''}
-            <h3 class="place-name">${escapeHtml(pName)}</h3>`;
-      return link
-        ? `<article class="place-card"><a href="${escapeHtml(link)}" target="_blank" rel="noopener">${inner}</a></article>`
-        : `<article class="place-card">${inner}</article>`;
-    }).join('');
-
-    if (!cards) return '';
-
-    return `
-  <section class="prop-places">
-    <div class="prop-places-inner">
-      <div class="prop-places-head">
-        <h2 class="prop-places-title">Places we love</h2>
-        <p class="prop-places-sub">Local spots to eat, drink, stay or swim.</p>
-      </div>
-      <div class="prop-places-grid">
-        ${cards}
-      </div>
+  const recsHtml = places.length ? `
+  <section class="pp-section pp-recs">
+    <div class="pp-recs-head">
+      <h2 class="pp-h2">Neighbourhood Recs</h2>
+      ${ownerName ? `<p class="pp-recs-from">From ${escapeHtml(ownerName)}</p>` : ''}
     </div>
+    <div class="pp-recs-grid">
+      ${places.map(p => {
+        const pf = p.fields || {};
+        const pName = pf['Name'] || '';
+        const sub = [pf['Category'], pf['Area']].filter(Boolean).map(escapeHtml).join(' <span class="pp-dot">&bull;</span> ');
+        const raw = String(pf['Link'] || '').trim();
+        const link = /^https?:\/\//i.test(raw) ? raw : '';
+        const pimg = getPlaceImageUrl(p);
+        const inner = `
+          <div class="pp-rec-img">${pimg ? `<img src="${escapeHtml(responsiveImageUrl(pimg, 900))}" alt="${escapeHtml(pName)}" loading="lazy" ${IMG_ONERROR} />` : ''}</div>
+          <h3 class="pp-rec-name">${escapeHtml(pName)}</h3>
+          ${sub ? `<p class="pp-rec-sub">${sub}</p>` : ''}`;
+        return link
+          ? `<a class="pp-rec" href="${escapeHtml(link)}" target="_blank" rel="noopener">${inner}</a>`
+          : `<div class="pp-rec">${inner}</div>`;
+      }).join('')}
+    </div>
+  </section>` : '';
+
+  // ---- Key facts ----
+  const facts = [
+    sleeps ? ['Max guests', sleeps] : null,
+    (bedrooms !== undefined && bedrooms !== null && bedrooms !== '') ? ['Bedrooms', bedrooms] : null,
+    (bathrooms !== undefined && bathrooms !== null && bathrooms !== '') ? ['Bathrooms', bathrooms] : null,
+    houseType ? ['Type', houseType] : null
+  ].filter(Boolean);
+  const factsHtml = facts.length ? `
+  <div class="pp-facts" style="--cols:${facts.length}">
+    ${facts.map(([k, v]) => `<div class="pp-fact"><p class="pp-fact-k">${escapeHtml(k)}</p><p class="pp-fact-v">${escapeHtml(String(v))}</p></div>`).join('')}
+  </div>` : '';
+
+  const featuresHtml = features.length ? `
+  <div class="pp-features">
+    ${features.map(t => `<div class="pp-feature">${escapeHtml(t)}</div>`).join('')}
+  </div>` : '';
+
+  // ---- Overview mosaic: rows of three, alternating wide/narrow ----
+  let overviewHtml = '';
+  if (overviewImgs.length) {
+    const rows = [];
+    for (let i = 0; i < overviewImgs.length; i += 3) rows.push(overviewImgs.slice(i, i + 3));
+    overviewHtml = `
+  <section class="pp-section pp-overview">
+    <h2 class="pp-h2">Overview</h2>
+    ${rows.map((row, r) => `<div class="pp-mosaic pp-mosaic-${row.length}${r % 2 ? ' pp-mosaic-flip' : ''}">${row.map(s => `<figure>${img(s, 1100)}</figure>`).join('')}</div>`).join('')}
   </section>`;
   }
 
-  const heroImage = getImageUrl(record, 0);
-
-
-  const allImages = getAllImageUrls(record);
-  const galleryImages = allImages.slice(1);
-
-  // ---- Italy Segreta style: images left, text right ----
-  const islandVal = String(f['Island'] || '').trim();
-  const tagList = (Array.isArray(f['Tags']) ? f['Tags'] : String(f['Tags'] || '').split(','))
-    .map(t => String(t).trim()).filter(Boolean);
-  const primaryTag = tagList[0] || '';
-
-  // Images after the hero: first three sit beside the story, the rest below
-  const storyImgs = allImages.slice(1, 4);
-  const storyImagesHtml = storyImgs.map(src =>
-    `<figure class="is-fig"><img src="${responsiveImageUrl(src, 1200)}" alt="${escapeHtml(name)}" loading="lazy" ${IMG_ONERROR} /></figure>`
-  ).join('');
-
-  const restImgs = allImages.slice(4);
-  const restGalleryHtml = restImgs.map(src =>
-    `<figure class="is-fig"><img src="${responsiveImageUrl(src, 1200)}" alt="${escapeHtml(name)}" loading="lazy" ${IMG_ONERROR} /></figure>`
-  ).join('');
-
-  // Label / value spec table
-  const specRows = [
-    sleeps ? ['Sleeps', String(sleeps)] : null,
-    architect ? ['Architecture', architect] : null,
-    location ? ['Where', location] : null,
-    tagList.length ? ['Good for', tagList.join(', ')] : null
-  ].filter(Boolean);
-  const specsHtml = specRows.map(([k, v]) =>
-    `<div class="is-spec"><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`
-  ).join('');
-
-  // Owner recommendations, attributed where we know the name
-  const ownerName = String(f['Owner name'] || '').trim();
-  const secretsHtml = (places && places.length)
-    ? `<div class="is-secrets">
-        <p class="is-secrets-head">${ownerName ? `A few secrets from ${escapeHtml(ownerName)}:` : 'A few places we love nearby:'}</p>
-        ${places.map(pl => {
-          const pf = pl.fields || {};
-          const pname = pf['Name'] || '';
-          const pdesc = pf['Description'] || pf['Note'] || '';
-          const praw = (pf['Link'] || '').trim();
-          const plink = /^https?:\/\//i.test(praw) ? praw : '';
-          const label = plink
-            ? `<a href="${escapeHtml(plink)}" target="_blank" rel="noopener">${escapeHtml(pname)}</a>`
-            : escapeHtml(pname);
-          return `<p class="is-secret"><strong>${label}</strong>${pdesc ? ` &ndash; ${escapeHtml(pdesc)}` : ''}</p>`;
-        }).join('')}
-      </div>`
-    : '';
-
-  // Gallery render - apply responsive sizing
-  let galleryHtml = '';
-  const imgs = galleryImages;
-  for (let i = 0; i < imgs.length; i += 2) {
-    if (i + 1 < imgs.length) {
-      galleryHtml += `
-        <div class="prop-gallery-row">
-          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i], 1200)}" alt="${name}" loading="lazy" ${IMG_ONERROR} /></div>
-          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i+1], 1200)}" alt="${name}" loading="lazy" ${IMG_ONERROR} /></div>
-        </div>`;
-    } else {
-      galleryHtml += `
-        <div class="prop-gallery-row">
-          <div class="prop-gallery-img"><img src="${responsiveImageUrl(imgs[i], 1600)}" alt="${name}" loading="lazy" ${IMG_ONERROR} /></div>
-        </div>`;
+  // ---- Story sections: heading left, paragraph right, images below ----
+  const imagesBelow = (set) => {
+    if (!set.length) return '';
+    const first = `<figure class="pp-wide">${img(set[0], 1800)}</figure>`;
+    let pairs = '';
+    const rest = set.slice(1);
+    for (let i = 0; i < rest.length; i += 2) {
+      const pair = rest.slice(i, i + 2);
+      pairs += `<div class="pp-pair pp-pair-${pair.length}">${pair.map(s => `<figure>${img(s, 1400)}</figure>`).join('')}</div>`;
     }
+    return first + pairs;
+  };
+  const pairsOnly = (set) => {
+    let out = '';
+    for (let i = 0; i < set.length; i += 2) {
+      const pair = set.slice(i, i + 2);
+      out += `<div class="pp-pair pp-pair-${pair.length}">${pair.map(s => `<figure>${img(s, 1400)}</figure>`).join('')}</div>`;
+    }
+    return out;
+  };
+  const story = (heading, text, imagesHtml, cls) => (text || imagesHtml) ? `
+  <section class="pp-section pp-story ${cls || ''}">
+    <div class="pp-split">
+      <h2 class="pp-h2">${heading}</h2>
+      <div class="pp-prose">${paras(text)}</div>
+    </div>
+    ${imagesHtml}
+  </section>` : '';
+
+  const livingHtml   = story('Living Spaces', livingText, imagesBelow(livingSet));
+  const bedroomsHtml = story('Bedrooms &amp; Bathrooms', bedroomsText, pairsOnly(bedroomsSet));
+
+  // The environment: big image right, paragraph tucked bottom left, as on the reference
+  let outdoorHtml = '';
+  if (outdoorText || outdoorSet.length) {
+    const lead = outdoorSet[0];
+    outdoorHtml = `
+  <section class="pp-section pp-env">
+    <h2 class="pp-h2">The Environment</h2>
+    <div class="pp-env-grid${lead ? '' : ' pp-env-noimg'}">
+      <div class="pp-prose pp-env-text">${paras(outdoorText)}</div>
+      ${lead ? `<figure class="pp-env-img">${img(lead, 1800)}</figure>` : ''}
+    </div>
+    ${pairsOnly(outdoorSet.slice(1))}
+  </section>`;
   }
+
+  const viewAllHtml = allImgs.length > 1 ? `
+  <div class="pp-viewall-wrap"><button class="pp-btn" type="button" id="pp-viewall">View all images</button></div>
+  <div class="pp-lightbox" id="pp-lightbox" hidden>
+    <button class="pp-lightbox-close" type="button" id="pp-lightbox-close" aria-label="Close">&times;</button>
+    <div class="pp-lightbox-inner">
+      ${allImgs.map(s => `<figure>${img(s, 1800)}</figure>`).join('')}
+    </div>
+  </div>` : '';
+
+  const coords = getCoords(record);
+  const locationHtml = (coords || locationText) ? `
+  <section class="pp-section pp-location">
+    <h2 class="pp-h2">The Location</h2>
+    <div class="pp-loc-grid${coords ? '' : ' pp-loc-nomap'}">
+      ${coords ? `<div class="pp-map" id="pp-map"></div>` : ''}
+      <div class="pp-prose pp-loc-text">${paras(locationText)}</div>
+    </div>
+  </section>` : '';
+
+  const mapData = coords
+    ? JSON.stringify({ lat: coords.lat, lon: coords.lon }).replace(/</g, '\\u003c')
+    : 'null';
 
   // SEO
   const title = `${name}${location ? ' — ' + location : ''} | Slow Casa`;
-  const metaDescBase = description ? description.replace(/\n/g, ' ') : `${name} on Slow Casa, a curated directory of architect-designed vacation homes in rural Europe.`;
+  const metaDescBase = description ? description.replace(/\n/g, ' ') : `${name} on Slow Casa, a curated collection of houses to rent in Mallorca, Ibiza and Menorca.`;
   const metaDesc = metaDescBase.length > 155 ? metaDescBase.substring(0, 152) + '...' : metaDescBase;
   const canonIsland = String((f['Island'] || '')).trim().toLowerCase();
   const canonicalUrl = ['mallorca','ibiza','menorca','formentera'].indexOf(canonIsland) !== -1
@@ -388,7 +435,6 @@ module.exports = async function handler(req, res) {
     : `https://slowcasa.com/properties/${slugVal}`;
   const ogImage = heroImage || '';
 
-  // JSON-LD LodgingBusiness schema
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "LodgingBusiness",
@@ -398,16 +444,10 @@ module.exports = async function handler(req, res) {
   };
   if (ogImage) structuredData.image = ogImage;
   if (latitude && longitude) {
-    structuredData.geo = {
-      "@type": "GeoCoordinates",
-      "latitude": latitude,
-      "longitude": longitude
-    };
+    structuredData.geo = { "@type": "GeoCoordinates", "latitude": latitude, "longitude": longitude };
   }
   if (town || region || country) {
-    structuredData.address = {
-      "@type": "PostalAddress"
-    };
+    structuredData.address = { "@type": "PostalAddress" };
     if (town) structuredData.address.addressLocality = town;
     if (region) structuredData.address.addressRegion = region;
     if (country) structuredData.address.addressCountry = country;
@@ -423,22 +463,16 @@ module.exports = async function handler(req, res) {
     { "@type": "ListItem", "position": 2, "name": "Houses", "item": "https://slowcasa.com/houses" }
   ];
   if (crumbIsland) {
-    crumbItems.push({
-      "@type": "ListItem", "position": 3, "name": crumbIsland,
-      "item": "https://slowcasa.com/" + crumbIsland.toLowerCase()
-    });
+    crumbItems.push({ "@type": "ListItem", "position": 3, "name": crumbIsland, "item": "https://slowcasa.com/" + crumbIsland.toLowerCase() });
   }
-  crumbItems.push({
-    "@type": "ListItem", "position": crumbItems.length + 1, "name": name, "item": canonicalUrl
-  });
-  const breadcrumb = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": crumbItems
-  };
+  crumbItems.push({ "@type": "ListItem", "position": crumbItems.length + 1, "name": name, "item": canonicalUrl });
+  const breadcrumb = { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": crumbItems };
 
-  const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>
-  <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
+  const safeJson = (o) => JSON.stringify(o).replace(/</g, '\\u003c');
+  const jsonLdScript = `<script type="application/ld+json">${safeJson(structuredData)}</script>
+  <script type="application/ld+json">${safeJson(breadcrumb)}</script>`;
+
+  const nearbyHtml = await renderNearbyHouses(record);
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
@@ -450,13 +484,13 @@ module.exports = async function handler(req, res) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(title)}</title>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Slow Casa" />
-<link rel="manifest" href="/site.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Slow Casa" />
+  <link rel="manifest" href="/site.webmanifest" />
   <meta name="description" content="${escapeHtml(metaDesc)}" />
-    <link rel="canonical" href="${canonicalUrl}" />
+  <link rel="canonical" href="${canonicalUrl}" />
   ${f['Island'] ? '' : '<meta name="robots" content="noindex, follow" />'}
   ${jsonLdScript}
   <meta property="og:title" content="${escapeHtml(title)}" />
@@ -472,7 +506,6 @@ module.exports = async function handler(req, res) {
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
   <link rel="stylesheet" href="/slow-casa.css" />
-  <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.io/js/pa-aahRJ1iMPfiu0NJteNWEg.js"></script>
   <script>
     window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
@@ -486,637 +519,148 @@ module.exports = async function handler(req, res) {
     gtag('config', 'G-B930Z6F96Z');
   </script>
   <style>
-    @font-face {
-      font-family: 'DM Sans';
-      src: url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2');
-      font-weight: 300;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'DM Sans';
-      src: url('/fonts/dm-sans-v17-latin-300italic.woff2') format('woff2');
-      font-weight: 300;
-      font-style: italic;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'DM Sans';
-      src: url('/fonts/dm-sans-v17-latin-regular.woff2') format('woff2');
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'DM Sans';
-      src: url('/fonts/dm-sans-v17-latin-500.woff2') format('woff2');
-      font-weight: 500;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'DM Serif Display';
-      src: url('/fonts/dm-serif-display-v17-latin-regular.woff2') format('woff2');
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'DM Serif Display';
-      src: url('/fonts/dm-serif-display-v17-latin-italic.woff2') format('woff2');
-      font-weight: 400;
-      font-style: italic;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'TT Norms Pro';
-      src: url('/TT_Norms_Pro_Regular.woff2') format('woff2');
-      font-weight: 400;
-      font-display: swap;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #ffffff; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
-    a { color: inherit; text-decoration: none; }
-    h1, h2, h3, h4 { font-weight: 400; }
+    @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-v17-latin-300italic.woff2') format('woff2'); font-weight: 300; font-style: italic; font-display: swap; }
 
-    nav {
-      display: grid; grid-template-columns: 1fr auto 1fr;
-      align-items: center; padding: 28px 48px;
-      background: #ffffff; z-index: 10; position: relative;
-    }
-    .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: #0f0f0f; }
-    .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
-    .nav-links a { font-size: 13px; color: #0f0f0f; opacity: 0.7; letter-spacing: 0.03em; transition: opacity 0.2s; }
-    .nav-links a:hover { opacity: 1; }
+    body { background: #ffffff; }
+    .pp { max-width: 1440px; margin: 0 auto; padding: 0 40px; }
+    .pp figure { margin: 0; overflow: hidden; background: var(--grey-4); }
+    .pp figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-fallback { background: var(--grey-4); }
 
-    .hero-split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      height: clamp(440px, calc(100vh - 88px), 760px);
-    }
-    .hero-left {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #e8e8e8;
-    }
-    .hero-left img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .hero-right {
-      padding: 80px 64px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      background: #ffffff;
-    }
-    .hero-location { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #888; margin-bottom: 16px; }
-    .hero-title { font-family: 'DM Serif Display', Georgia, serif; font-size: 72px; line-height: 0.95; letter-spacing: -0.02em; color: #0f0f0f; margin-bottom: 28px; }
-    .hero-meta { font-size: 11px; color: #888; letter-spacing: 0.08em; }
-    .hero-meta a { border-bottom: 0.5px solid #888; padding-bottom: 1px; transition: color 0.2s, border-color 0.2s; }
-    .hero-meta a:hover { color: #0f0f0f; border-color: #0f0f0f; }
-    .hero-meta-sep { display: inline-block; margin: 0 12px; opacity: 0.6; }
+    /* Hero */
+    .pp-hero { aspect-ratio: 16 / 8.5; max-height: 86vh; width: 100%; }
 
-    .prop-intro {
-      position: relative;
-      z-index: 1;
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 120px 48px 0;
-      text-align: center;
+    /* Title row */
+    .pp-titlebar { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; padding: 64px 0 88px; }
+    .pp-name { font-family: var(--sans); font-weight: 400; font-size: 28px; letter-spacing: 0.04em; text-transform: uppercase; margin: 0 0 6px; line-height: 1.15; }
+    .pp-where { font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-1); margin: 0; }
+    .pp-editorial { font-family: var(--serif); font-size: 21px; line-height: 1.35; margin: 22px 0 0; max-width: 32ch; }
+    .pp-arch { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-1); margin: 14px 0 0; }
+    .pp-actions { display: flex; align-items: center; gap: 28px; flex-shrink: 0; }
+    .pp-share { background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--sans); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); }
+    .pp-btn {
+      display: inline-block; border: 1px solid var(--black); background: #fff; color: var(--black);
+      padding: 17px 34px; font-family: var(--sans); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
     }
-    .prop-editorial-title {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: clamp(28px, 3.6vw, 40px);
-      line-height: 1.15;
-      letter-spacing: -0.01em;
-      color: #0f0f0f;
-      margin-bottom: 56px;
-    }
-    .prop-intro-text {
-      font-family: 'TT Norms Pro', 'DM Sans', sans-serif;
-      font-size: 19px;
-      font-weight: 300;
-      line-height: 1.7;
-      color: #2a2a28;
-    }
-    .prop-intro-text p { margin-bottom: 1.4em; }
-    .prop-intro-text p:last-child { margin-bottom: 0; }
+    .pp-btn:hover { background: var(--black); color: #fff; }
 
-    .prop-gallery {
-      max-width: 1200px;
-      margin: 96px auto 0;
-      padding: 0 48px;
-    }
-    .prop-gallery-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-bottom: 24px;
-    }
-    .prop-gallery-row:has(> .prop-gallery-img:only-child) {
-      grid-template-columns: 1fr;
-    }
-    .prop-gallery-img {
-      width: 100%;
-      aspect-ratio: 3/2;
-      overflow: hidden;
-      background: #e8e8e8;
-    }
-    .prop-gallery-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    /* Key facts + features, full-bleed rules */
+    .pp-band { border-top: 1px solid var(--grey-3); }
+    .pp-facts { display: grid; grid-template-columns: repeat(var(--cols), 1fr); max-width: 1440px; margin: 0 auto; padding: 0 40px; }
+    .pp-fact { text-align: center; padding: 30px 12px; }
+    .pp-fact-k { font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 14px; }
+    .pp-fact-v { font-size: 22px; margin: 0; }
+    .pp-features-band { border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
+    .pp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; max-width: 1440px; margin: 0 auto; padding: 26px 40px; }
+    .pp-feature { border: 1px solid var(--grey-3); padding: 22px 12px; text-align: center; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
 
-    .prop-favs {
-      max-width: 720px;
-      margin: 96px auto 0;
-      padding: 0 48px;
-    }
-    .prop-favs-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #0f0f0f;
-      margin-bottom: 28px;
-    }
-    .favs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 32px;
-    }
-    .favs-group { display: flex; flex-direction: column; gap: 8px; }
-    .favs-cat {
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #888;
-      margin-bottom: 4px;
-    }
-    .favs-link {
-      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
-      font-size: 14px;
-      font-weight: 300;
-      color: #0f0f0f;
-      border-bottom: 0.5px solid #e8e8e8;
-      padding-bottom: 2px;
-      transition: border-color 0.2s;
-      display: inline-block;
-      width: fit-content;
-    }
-    .favs-link:hover { border-color: #0f0f0f; }
+    /* Shared section rhythm */
+    .pp-section { padding-top: 150px; }
+    .pp-h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 3.6vw, 52px); line-height: 1.05; margin: 0; text-transform: uppercase; letter-spacing: 0.01em; }
+    .pp-prose p { font-size: 17px; line-height: 1.75; margin: 0 0 16px; text-indent: 3.5em; }
+    .pp-prose p:last-child { margin-bottom: 0; }
 
-    .prop-cta {
-      max-width: 720px;
-      margin: 96px auto 0;
-      padding: 0 48px;
-      text-align: center;
-    }
-    .prop-cta-button {
-      display: inline-block;
-      padding: 18px 48px;
-      background: #0f0f0f;
-      color: #ffffff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      transition: background 0.2s;
-    }
-    .prop-cta-button:hover { background: #2a2a28; }
+    /* Intro: right column only */
+    .pp-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding-top: 170px; }
+    .pp-intro .pp-prose { grid-column: 2; }
 
-    .prop-other {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 120px 48px 0;
-    }
-    .prop-other-header {
-      text-align: center;
-      margin-bottom: 64px;
-    }
-    .prop-other-title {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: clamp(28px, 3.6vw, 40px);
-      font-weight: 400;
-      color: #0f0f0f;
-    }
-    .prop-other-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 48px 32px;
-    }
-    .prop-other-grid > a { cursor: pointer; text-decoration: none; color: inherit; display: block; }
-    .card-img {
-      width: 100%;
-      aspect-ratio: 4/3;
-      overflow: hidden;
-      margin-bottom: 16px;
-      background: #e8e8e8;
-    }
-    .card-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.5s ease;
-    }
+    /* Overview mosaic */
+    .pp-overview .pp-h2 { margin-bottom: 72px; }
+    .pp-mosaic { display: grid; gap: 18px; margin-bottom: 18px; }
+    .pp-mosaic figure { height: clamp(220px, 26vw, 470px); }
+    .pp-mosaic-3 { grid-template-columns: 3fr 3fr 2fr; }
+    .pp-mosaic-3.pp-mosaic-flip { grid-template-columns: 2fr 3fr 3fr; }
+    .pp-mosaic-2 { grid-template-columns: 1fr 1fr; }
+    .pp-mosaic-1 { grid-template-columns: 1fr; }
+
+    /* Story sections */
+    .pp-split { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-bottom: 120px; }
+    .pp-wide { margin-left: 26% !important; aspect-ratio: 16 / 10; margin-bottom: 18px !important; }
+    .pp-pair { display: grid; gap: 70px; margin-bottom: 18px; }
+    .pp-pair-2 { grid-template-columns: 1fr 1fr; }
+    .pp-pair-1 { grid-template-columns: 1fr; }
+    .pp-pair figure { aspect-ratio: 4 / 4.6; }
+    .pp-pair-1 figure { aspect-ratio: 16 / 9; }
+
+    /* The environment */
+    .pp-env .pp-h2 { margin-bottom: 64px; }
+    .pp-env-grid { display: grid; grid-template-columns: 1fr 2.65fr; gap: 56px; align-items: end; margin-bottom: 18px; }
+    .pp-env-grid.pp-env-noimg { grid-template-columns: 1fr 1fr; }
+    .pp-env-noimg .pp-env-text { grid-column: 2; }
+    .pp-env-img { aspect-ratio: 16 / 10; }
+    .pp-env-text p { font-size: 16px; }
+
+    /* View all */
+    .pp-viewall-wrap { text-align: center; padding-top: 110px; }
+    .pp-lightbox { position: fixed; inset: 0; background: #fff; z-index: 100; overflow-y: auto; }
+    .pp-lightbox[hidden] { display: none; }
+    .pp-lightbox-inner { max-width: 1100px; margin: 0 auto; padding: 80px 24px; display: grid; gap: 20px; }
+    .pp-lightbox-inner figure { margin: 0; }
+    .pp-lightbox-inner img { width: 100%; height: auto; display: block; }
+    .pp-lightbox-close { position: fixed; top: 18px; right: 26px; background: #fff; border: 0; font-size: 40px; line-height: 1; cursor: pointer; z-index: 101; }
+
+    /* Location */
+    .pp-location .pp-h2 { margin-bottom: 72px; }
+    .pp-loc-grid { display: grid; grid-template-columns: 2.6fr 1fr; gap: 56px; align-items: end; }
+    .pp-loc-grid.pp-loc-nomap { grid-template-columns: 1fr 1fr; }
+    .pp-loc-nomap .pp-loc-text { grid-column: 2; }
+    .pp-map { aspect-ratio: 16 / 11; background: var(--grey-4); border: 1px solid var(--grey-3); }
+    .pp-loc-text p { font-size: 16px; text-indent: 0; text-align: center; }
+    .pp-marker { width: 22px; height: 22px; background: var(--black); transform: rotate(45deg); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+
+    /* Neighbourhood recs */
+    .pp-recs-head { margin-bottom: 72px; }
+    .pp-recs-from { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin: 14px 0 0; }
+    .pp-recs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 72px; }
+    .pp-rec { display: block; color: inherit; }
+    .pp-rec-img { aspect-ratio: 1 / 1; overflow: hidden; background: var(--grey-4); margin-bottom: 26px; }
+    .pp-rec-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+    a.pp-rec:hover .pp-rec-img img { transform: scale(1.03); }
+    .pp-rec-name { font-family: var(--sans); font-weight: 400; font-size: 22px; letter-spacing: 0.05em; text-transform: uppercase; margin: 0 0 10px; }
+    .pp-rec-sub { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-1); margin: 0; }
+    .pp-dot { margin: 0 8px; font-size: 10px; }
+
+    /* Nearby houses */
+    .prop-other { max-width: 1440px; margin: 0 auto; padding: 150px 40px 0; }
+    .prop-other-header { margin-bottom: 56px; }
+    .prop-other-title { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 3vw, 40px); text-transform: uppercase; margin: 0; }
+    .prop-other-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px 32px; }
+    .prop-other-grid > a { display: block; color: inherit; }
     .prop-other-grid > a:hover .card-img img { transform: scale(1.03); }
-    .card-location {
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #888;
-      margin-bottom: 6px;
-    }
-    .card-name {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 18px;
-      font-weight: 400;
-      line-height: 1.2;
-      color: #0f0f0f;
-    }
-
-    footer {
-      padding: 80px 48px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 120px auto 0;
-      border-top: 0.5px solid #e8e8e8;
-    }
-    .footer-left { display: flex; align-items: center; gap: 32px; }
-    .footer-copy { font-size: 12px; color: #888; }
-    .footer-policy { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-policy:hover { color: #0f0f0f; }
-    .footer-links { display: flex; gap: 28px; }
-    .footer-links a { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-links a:hover { color: #0f0f0f; }
+    footer { margin-top: 140px; }
 
     @media (max-width: 900px) {
-      .hero-split { grid-template-columns: 1fr; height: auto; }
-      .hero-left { height: 60vh; }
-      .hero-right { padding: 64px 32px; }
-      .hero-title { font-size: 38px; }
-      .prop-other-grid { grid-template-columns: repeat(2, 1fr); gap: 40px 24px; }
-    }
-
-    @media (max-width: 768px) {
-      nav { padding: 20px 24px; }
-      .nav-links { display: none; }
-      .prop-intro { padding: 80px 24px 0; }
-      .prop-intro-text { font-size: 17px; }
-      .prop-gallery { padding: 0 24px; margin-top: 64px; }
-      .prop-gallery-row { grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
-      .prop-cta { padding: 0 24px; margin-top: 64px; }
-      .prop-favs { padding: 0 24px; margin-top: 64px; }
-      .prop-other { padding: 80px 24px 0; }
-      .prop-other-grid { grid-template-columns: 1fr; gap: 40px; }
-      footer { padding: 56px 24px 24px; margin-top: 80px; flex-direction: column; gap: 16px; text-align: center; }
-      .footer-left { flex-direction: column; gap: 12px; }
-    }
-
-    /* --- Places we love (image-led, in its own band) --- */
-    .prop-places {
-      margin-top: 80px;
-      padding: 80px 0 96px;
-      background: #f3efe6;
-      border-top: 1px solid #e3ded3;
-      border-bottom: 1px solid #e3ded3;
-    }
-    .prop-places-inner { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
-    .prop-places-head { text-align: center; max-width: 640px; margin: 0 auto 56px; }
-    .prop-places-title {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: clamp(30px, 3.6vw, 44px);
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-      color: #0f0f0f;
-      margin-bottom: 14px;
-    }
-    .prop-places-sub {
-      font-family: 'TT Norms Pro', 'DM Sans', sans-serif;
-      font-size: 17px;
-      font-weight: 300;
-      color: #555;
-    }
-    .prop-places-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 36px 32px;
-    }
-    .place-card a { display: block; color: inherit; }
-    .place-img {
-      width: 100%;
-      aspect-ratio: 4/5;
-      overflow: hidden;
-      background: #e6e0d4;
-      margin-bottom: 18px;
-    }
-    .place-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.5s ease;
-    }
-    .place-card a:hover .place-img img { transform: scale(1.03); }
-    .place-img-empty { background: linear-gradient(150deg, #e6ded0, #d7cdbb); }
-    .place-cat {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #8a857c;
-      margin-bottom: 9px;
-    }
-    .place-name {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 22px;
-      line-height: 1.2;
-      color: #0f0f0f;
-      margin-bottom: 0;
-    }
-    .place-card a:hover .place-name { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-    @media (max-width: 900px) {
-      .prop-places-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
-    }
-    @media (max-width: 768px) {
-      .prop-places { margin-top: 56px; padding: 56px 0 64px; }
-      .prop-places-inner { padding: 0 24px; }
-      .prop-places-grid { grid-template-columns: 1fr 1fr; gap: 24px 16px; }
-      .place-name { font-size: 18px; }
-    }
-
-    /* shown when an image fails to load, in place of a broken-image icon */
-    .img-fallback { background: linear-gradient(150deg, #e6ded0, #d7cdbb) !important; }
-
-    /* ============================================
-       PROPERTY PAGE — editorial layout
-       ============================================ */
-    :root { --accent: #b5573a; --ink: #111111; --muted: #7a7a7a; --line: #e6e6e6; }
-    html, body { background: #ffffff; }
-
-    .prop-top {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 24px 40px 0;
-      align-items: start;
-    }
-    .prop-top-img { overflow: hidden; background: #f2f2f2; }
-    .prop-top-img.land { aspect-ratio: 4/3; }
-    .prop-top-img.port { aspect-ratio: 3/4; margin-top: 40px; }
-    .prop-top-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .prop-head {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 72px 40px 0;
-      text-align: center;
-    }
-    .prop-crumb {
-      display: inline-block;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 26px;
-    }
-    .prop-name {
-      font-family: var(--serif);
-      font-size: clamp(38px, 6vw, 68px);
-      line-height: 1.02;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-      margin-bottom: 14px;
-    }
-    .prop-sub {
-      font-family: var(--serif);
-      font-style: italic;
-      font-weight: 400;
-      font-size: clamp(18px, 2.4vw, 25px);
-      line-height: 1.3;
-      color: var(--muted);
-      margin-bottom: 30px;
-    }
-    .prop-tags {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 32px;
-    }
-    .prop-tag {
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 8px 14px;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .prop-tag:hover { border-color: var(--ink); color: var(--ink); }
-    .prop-tag-accent { border-color: var(--accent); color: var(--accent); }
-    .prop-tag-accent:hover { background: var(--accent); color: #fff; }
-
-    .prop-book {
-      display: inline-block;
-      font-size: 12px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      padding: 16px 44px;
-      background: var(--accent);
-      color: #fff;
-      transition: opacity 0.2s;
-    }
-    .prop-book:hover { opacity: 0.85; }
-    .prop-book-lg { padding: 20px 60px; font-size: 13px; }
-
-    .prop-meta {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 22px;
-      letter-spacing: 0.02em;
-    }
-
-    .prop-body {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 64px 40px 0;
-    }
-    .prop-body p {
-      font-size: 18px;
-      line-height: 1.75;
-      color: #2a2a2a;
-      margin-bottom: 24px;
-    }
-    .prop-body p:last-child { margin-bottom: 0; }
-
-    .prop-rest {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 72px 40px 0;
-      align-items: start;
-    }
-    .prop-rest-img { overflow: hidden; background: #f2f2f2; }
-    .prop-rest-img.land { aspect-ratio: 4/3; }
-    .prop-rest-img.port { aspect-ratio: 3/4; }
-    .prop-rest-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .prop-cta { text-align: center; padding: 80px 40px 40px; }
-
-    @media (max-width: 900px) {
-      .prop-top { grid-template-columns: repeat(2, 1fr); padding: 16px 20px 0; }
-      .prop-top-img.port { margin-top: 0; }
-      .prop-rest { grid-template-columns: repeat(2, 1fr); padding: 48px 20px 0; }
-      .prop-head { padding: 48px 24px 0; }
-      .prop-body { padding: 44px 24px 0; }
-      .prop-cta { padding: 56px 24px 32px; }
+      .pp { padding: 0 20px; }
+      .pp-titlebar { flex-direction: column; padding: 40px 0 56px; }
+      .pp-facts { grid-template-columns: repeat(2, 1fr); padding: 0 20px; }
+      .pp-features { grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 20px; }
+      .pp-section, .pp-intro { padding-top: 90px; }
+      .pp-intro, .pp-split { grid-template-columns: 1fr; gap: 28px; }
+      .pp-intro .pp-prose { grid-column: 1; }
+      .pp-split { margin-bottom: 48px; }
+      .pp-wide { margin-left: 0 !important; }
+      .pp-mosaic-3, .pp-mosaic-3.pp-mosaic-flip { grid-template-columns: 1fr 1fr; }
+      .pp-mosaic-3 figure:first-child { grid-column: 1 / -1; }
+      .pp-pair { gap: 18px; }
+      .pp-env-grid, .pp-loc-grid { grid-template-columns: 1fr; gap: 28px; }
+      .pp-env-noimg .pp-env-text, .pp-loc-nomap .pp-loc-text { grid-column: 1; }
+      .pp-env-text { order: 2; }
+      .pp-loc-text p { text-align: left; }
+      .pp-recs-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .prop-other { padding: 90px 20px 0; }
+      .prop-other-grid { grid-template-columns: 1fr 1fr; gap: 32px 20px; }
+      .pp-overview .pp-h2, .pp-env .pp-h2, .pp-location .pp-h2, .pp-recs-head { margin-bottom: 36px; }
     }
     @media (max-width: 560px) {
-      .prop-top, .prop-rest { grid-template-columns: 1fr; }
-    }
-
-    /* ============================================
-       PROPERTY PAGE — two columns, images left, text right
-       ============================================ */
-    :root { --accent: #b5573a; --ink: #111; --muted: #6f6f6f; --rule: #111; }
-    html, body { background: #fff; }
-
-    .is-wrap {
-      border-top: 1px solid var(--rule);
-      max-width: 1600px;
-      margin: 0 auto;
-    }
-    .is-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: start;
-    }
-    .is-left { padding: 28px 28px 0 28px; }
-    .is-right {
-      padding: 28px 40px 60px;
-      border-left: 1px solid var(--rule);
-      min-height: 100%;
-    }
-
-    .is-fig { margin: 0 0 28px; background: #f4f4f4; }
-    .is-fig img { width: 100%; height: auto; display: block; }
-
-    .is-crumb {
-      display: inline-block;
-      font-size: 13px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 56px;
-    }
-    .is-title {
-      font-family: var(--serif);
-      font-weight: 400;
-      font-size: clamp(34px, 4.6vw, 62px);
-      line-height: 1.02;
-      letter-spacing: 0.01em;
-      text-align: center;
-      color: var(--ink);
-      margin: 0 0 14px;
-    }
-    .is-tilde {
-      text-align: center;
-      font-size: 22px;
-      line-height: 1;
-      color: var(--ink);
-      margin-bottom: 20px;
-    }
-    .is-sub {
-      text-align: center;
-      font-size: clamp(15px, 1.5vw, 19px);
-      line-height: 1.45;
-      color: var(--ink);
-      max-width: 34ch;
-      margin: 0 auto 64px;
-    }
-
-    .is-labels {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 64px;
-    }
-    .is-place {
-      font-size: 14px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .is-type {
-      font-size: 14px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-
-    .is-bookwrap { text-align: center; margin-bottom: 64px; }
-    .is-book {
-      display: inline-block;
-      font-size: 14px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 14px 52px;
-      border: 1px solid var(--ink);
-      color: var(--ink);
-      transition: background 0.2s, color 0.2s;
-    }
-    .is-book:hover { background: var(--ink); color: #fff; }
-
-    .is-specs { font-size: 14px; line-height: 1.5; }
-    .is-spec { display: grid; grid-template-columns: 150px 1fr; gap: 12px; margin-bottom: 6px; }
-    .is-spec dt { color: var(--muted); }
-    .is-spec dd { color: var(--ink); margin: 0; }
-
-    .is-prose p {
-      font-size: 17px;
-      line-height: 1.55;
-      color: var(--ink);
-      margin-bottom: 20px;
-    }
-    .is-secrets { margin-top: 36px; }
-    .is-secrets-head { font-weight: 500; margin-bottom: 20px; }
-    .is-secret { margin-bottom: 16px; }
-    .is-secret strong { font-weight: 500; }
-    .is-secret a { border-bottom: 1px solid var(--ink); }
-
-    .is-row-imgs {
-      border-left: none;
-      padding: 0 28px;
-      gap: 0 28px;
-    }
-    .is-row-imgs .is-fig { margin-bottom: 28px; }
-
-    @media (max-width: 900px) {
-      .is-row { grid-template-columns: 1fr; }
-      .is-left { padding: 18px 20px 0; }
-      .is-right { padding: 32px 20px 48px; border-left: none; border-top: 1px solid var(--rule); }
-      .is-crumb { margin-bottom: 28px; }
-      .is-sub { margin-bottom: 36px; }
-      .is-labels, .is-bookwrap { margin-bottom: 36px; }
-      .is-spec { grid-template-columns: 110px 1fr; }
-      .is-row-imgs { padding: 0 20px; }
+      .pp-hero { aspect-ratio: 4 / 5; max-height: none; }
+      .pp-name { font-size: 23px; }
+      .pp-fact-v { font-size: 19px; }
+      .pp-features { grid-template-columns: 1fr; }
+      .pp-mosaic-3, .pp-mosaic-3.pp-mosaic-flip, .pp-mosaic-2, .pp-pair-2 { grid-template-columns: 1fr; }
+      .pp-recs-grid, .prop-other-grid { grid-template-columns: 1fr; }
+      .pp-prose p { text-indent: 2em; }
     }
   </style>
 </head>
@@ -1124,50 +668,102 @@ module.exports = async function handler(req, res) {
 
   ${nav()}
 
-  <div class="is-wrap">
+  <main>
+    <div class="pp">
+      ${heroImage ? `<figure class="pp-hero">${img(heroImage, 2400, '', true)}</figure>` : ''}
 
-    <!-- ROW 1: hero image left, title block right -->
-    <div class="is-row">
-      <div class="is-left">
-        ${heroImage ? `<figure class="is-fig"><img src="${responsiveImageUrl(heroImage, 1400)}" alt="${escapeHtml(name)}" fetchpriority="high" loading="eager" ${IMG_ONERROR} /></figure>` : ''}
-      </div>
-      <div class="is-right">
-        <a class="is-crumb" href="/houses">Houses</a>
-        <h1 class="is-title">${escapeHtml(name)}</h1>
-        <div class="is-tilde">&#126;</div>
-        ${editorialTitle ? `<p class="is-sub">${escapeHtml(editorialTitle)}</p>` : ''}
-
-        <div class="is-labels">
-          <a class="is-place" href="/houses">${escapeHtml(islandVal || location)}</a>
-          <span class="is-type">${escapeHtml(primaryTag || 'House')}</span>
+      <div class="pp-titlebar">
+        <div>
+          <h1 class="pp-name">${escapeHtml(name)}</h1>
+          ${location ? `<p class="pp-where">${escapeHtml(location)}</p>` : ''}
+          ${editorialTitle ? `<p class="pp-editorial">${escapeHtml(editorialTitle)}</p>` : ''}
+          ${architect ? `<p class="pp-arch">Architecture: ${escapeHtml(architect)}</p>` : ''}
         </div>
-
-        ${bookingUrl ? `<div class="is-bookwrap"><a class="is-book" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener">Book</a></div>` : ''}
-
-        <dl class="is-specs">${specsHtml}</dl>
+        <div class="pp-actions">
+          <button class="pp-share" type="button" id="pp-share">Share</button>
+          ${bookingUrl ? `<a class="pp-btn" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener">Book</a>` : ''}
+        </div>
       </div>
     </div>
 
-    <!-- ROW 2: images left, story right -->
-    <div class="is-row">
-      <div class="is-left">
-        ${storyImagesHtml}
-      </div>
-      <div class="is-right is-prose">
-        ${introOne ? `<p>${escapeHtml(introOne)}</p>` : ''}
-        ${introTwo ? `<p>${escapeHtml(introTwo)}</p>` : ''}
-        ${secretsHtml}
-      </div>
+    ${factsHtml ? `<div class="pp-band">${factsHtml}</div>` : ''}
+    ${featuresHtml ? `<div class="pp-features-band">${featuresHtml}</div>` : (factsHtml ? '<div class="pp-band"></div>' : '')}
+
+    <div class="pp">
+      ${introText ? `<section class="pp-intro"><div class="pp-prose">${paras(introText)}</div></section>` : ''}
+      ${overviewHtml}
+      ${livingHtml}
+      ${bedroomsHtml}
+      ${outdoorHtml}
+      ${viewAllHtml}
+      ${locationHtml}
+      ${recsHtml}
     </div>
+  </main>
 
-    <!-- ROW 3: remaining images, both columns -->
-    ${restGalleryHtml ? `<div class="is-row is-row-imgs">${restGalleryHtml}</div>` : ''}
-
-  </div>
-
-  ${await renderNearbyHouses(record)}
+  ${nearbyHtml}
 
 ${footer()}
+
+  <script>
+  (function () {
+    // Share: native sheet on phones, copy link elsewhere
+    var share = document.getElementById('pp-share');
+    if (share) share.addEventListener('click', function () {
+      var url = window.location.href;
+      if (navigator.share) { navigator.share({ title: document.title, url: url }).catch(function () {}); return; }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function () {
+          share.textContent = 'Link copied';
+          setTimeout(function () { share.textContent = 'Share'; }, 2000);
+        });
+      }
+    });
+
+    // View all images
+    var open = document.getElementById('pp-viewall');
+    var box = document.getElementById('pp-lightbox');
+    var close = document.getElementById('pp-lightbox-close');
+    function shut() { box.hidden = true; document.body.style.overflow = ''; }
+    if (open && box) {
+      open.addEventListener('click', function () { box.hidden = false; document.body.style.overflow = 'hidden'; });
+      close.addEventListener('click', shut);
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) shut(); });
+    }
+
+    // Location map, loaded only when it scrolls near the viewport
+    var HOUSE = ${mapData};
+    var el = document.getElementById('pp-map');
+    if (!HOUSE || !el) return;
+    var TOKEN = 'pk.eyJ1IjoibHVrZXJ5YSIsImEiOiJjbG96cmZ3OTMwMHRyMmlzNHc1bTZkZzI4In0.8Pmo8eeUh48QHBpzqHwNuQ';
+    var STYLE = 'mapbox://styles/lukerya/cmoime20s006m01r68jvia13j';
+    var started = false;
+    function start() {
+      if (started) return; started = true;
+      var css = document.createElement('link');
+      css.rel = 'stylesheet'; css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css';
+      document.head.appendChild(css);
+      var s = document.createElement('script');
+      s.src = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js';
+      s.onload = function () {
+        try {
+          mapboxgl.accessToken = TOKEN;
+          var map = new mapboxgl.Map({ container: 'pp-map', style: STYLE, center: [HOUSE.lon, HOUSE.lat], zoom: 8.6, attributionControl: true, cooperativeGestures: true });
+          map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+          var m = document.createElement('div'); m.className = 'pp-marker';
+          new mapboxgl.Marker({ element: m }).setLngLat([HOUSE.lon, HOUSE.lat]).addTo(map);
+        } catch (e) { console.error('map error', e); }
+      };
+      document.head.appendChild(s);
+    }
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { start(); io.disconnect(); }
+      }, { rootMargin: '400px' });
+      io.observe(el);
+    } else { start(); }
+  })();
+  </script>
 </body>
 </html>`;
 
@@ -1234,7 +830,7 @@ async function renderNearbyHouses(currentRecord) {
         ? '/' + isl + '/houses/' + slug
         : '/properties/' + slug;
       return '<a class="prop-other-card" href="' + escapeHtml(url) + '">' +
-            '<div class="card-img">' + (img ? '<img src="' + escapeHtml(responsiveImageUrl(img, 600)) + '" alt="' + escapeHtml(rf['Name']||'') + '" loading="lazy" ' + IMG_ONERROR + ' />' : '') + '</div>' +
+            '<div class="card-img">' + (img ? '<img src="' + escapeHtml(responsiveImageUrl(img, 900)) + '" alt="' + escapeHtml(rf['Name']||'') + '" loading="lazy" ' + IMG_ONERROR + ' />' : '') + '</div>' +
             '<p class="card-location">' + escapeHtml(rf['Location label']||'') + '</p>' +
             '<p class="card-name">' + escapeHtml(rf['Name']||'') + '</p>' +
             '</a>';
