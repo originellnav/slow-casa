@@ -673,11 +673,28 @@ module.exports = async function handler(req, res) {
       .pp-recs-grid, .prop-other-grid { grid-template-columns: 1fr; }
       .pp-prose p { text-indent: 2em; }
     }
+    /* Floating CTA */
+    .pp-cta {
+      position: fixed; right: 48px; bottom: calc(32px + env(safe-area-inset-bottom, 0px)); z-index: 800;
+      display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+      padding: 20px 32px; background: var(--black); color: #FDFCF8;
+      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif); font-size: 14px; font-weight: 400;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      box-shadow: 0 6px 24px rgba(15, 15, 15, 0.18);
+      opacity: 0; transform: translateY(16px); pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
+    }
+    .pp-cta.is-on { opacity: 1; transform: none; pointer-events: auto; }
+    .pp-cta:hover { background: #2a2a28; }
+    .pp-cta:focus-visible { outline: 1px solid var(--black); outline-offset: 4px; }
+    @media (prefers-reduced-motion: reduce) { .pp-cta { transition: none; } }
+
       /* Phone gutters: must stay last so they win over the base rules. */
     @media (max-width: 768px) {
       .pp-hero-wrap, .pp, .pp-facts { padding-left: 16px; padding-right: 16px; }
       .pp-features { padding: 20px 16px; }
       .prop-other { padding-left: 16px; padding-right: 16px; }
+      .pp-cta { left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); padding: 18px 20px; }
     }
   </style>
 </head>
@@ -697,7 +714,7 @@ module.exports = async function handler(req, res) {
         </div>
         <div class="pp-actions">
           <button class="pp-share" type="button" id="pp-share">Share</button>
-          ${bookingUrl ? `<a class="pp-btn" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener">Book</a>` : ''}
+          ${bookingUrl ? `<a class="pp-btn" id="pp-book" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener">Book</a>` : ''}
         </div>
       </div>
     </div>
@@ -721,7 +738,33 @@ module.exports = async function handler(req, res) {
 
 ${footer()}
 
+  ${bookingUrl ? `<a class="pp-cta" id="pp-cta" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">Check availability <span aria-hidden="true">&rarr;</span></a>` : ''}
+
   <script>
+  (function () {
+    // Floating CTA: shows once the Book button in the title bar has scrolled
+    // out of view, hides again while the footer is on screen.
+    var cta = document.getElementById('pp-cta');
+    var book = document.getElementById('pp-book');
+    var foot = document.querySelector('footer');
+    if (cta && book && 'IntersectionObserver' in window) {
+      var pastBook = false, footVisible = false;
+      var update = function () {
+        var on = pastBook && !footVisible;
+        cta.classList.toggle('is-on', on);
+        cta.setAttribute('aria-hidden', on ? 'false' : 'true');
+        cta.tabIndex = on ? 0 : -1;
+      };
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) { pastBook = !e.isIntersecting && e.boundingClientRect.top < 0; });
+        update();
+      }).observe(book);
+      if (foot) new IntersectionObserver(function (es) {
+        es.forEach(function (e) { footVisible = e.isIntersecting; });
+        update();
+      }).observe(foot);
+    }
+  })();
   (function () {
     // Share: native sheet on phones, copy link elsewhere
     var share = document.getElementById('pp-share');
