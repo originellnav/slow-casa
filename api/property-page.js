@@ -532,16 +532,16 @@ module.exports = async function handler(req, res) {
     @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-v17-latin-300italic.woff2') format('woff2'); font-weight: 300; font-style: italic; font-display: swap; }
 
     body { background: #FDFCF8; }
-    .pp { max-width: 1440px; margin: 0 auto; padding: 0 40px; }
-    .pp figure { margin: 0; overflow: hidden; background: var(--grey-4); }
-    .pp figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Every block uses the nav's side gutter (48px, 16px on phones) so all edges line up. */
+    .pp { padding: 0 48px; }
+    .pp figure, .pp-hero-wrap figure { margin: 0; overflow: hidden; background: var(--grey-4); }
+    .pp figure img, .pp-hero-wrap figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .img-fallback { background: var(--grey-4); }
 
     /* Hero */
     /* Hero runs edge to edge with the same side gutter as the nav,
        so its left edge lines up with the wordmark at every width. */
     .pp-hero-wrap { padding: 0 48px; }
-    @media (max-width: 768px) { .pp-hero-wrap { padding: 0 16px; } }
     .pp-hero { aspect-ratio: 16 / 8.5; max-height: 86vh; width: 100%; }
 
     /* Title row */
@@ -560,12 +560,12 @@ module.exports = async function handler(req, res) {
 
     /* Key facts + features, full-bleed rules */
     .pp-band { border-top: 1px solid var(--grey-3); }
-    .pp-facts { display: grid; grid-template-columns: repeat(var(--cols), 1fr); max-width: 1440px; margin: 0 auto; padding: 0 40px; }
+    .pp-facts { display: grid; grid-template-columns: repeat(var(--cols), 1fr); padding: 0 48px; }
     .pp-fact { text-align: center; padding: 30px 12px; }
     .pp-fact-k { font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 14px; }
     .pp-fact-v { font-size: 22px; margin: 0; }
     .pp-features-band { border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
-    .pp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; max-width: 1440px; margin: 0 auto; padding: 26px 40px; }
+    .pp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; padding: 26px 48px; }
     .pp-feature { border: 1px solid var(--grey-3); padding: 22px 12px; text-align: center; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
 
     /* Shared section rhythm */
@@ -635,7 +635,7 @@ module.exports = async function handler(req, res) {
     .pp-dot { margin: 0 8px; font-size: 10px; }
 
     /* Nearby houses */
-    .prop-other { max-width: 1440px; margin: 0 auto; padding: 150px 40px 0; }
+    .prop-other { padding: 150px 48px 0; }
     .prop-other-header { margin-bottom: 56px; }
     .prop-other-title { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 3vw, 40px); text-transform: uppercase; margin: 0; }
     .prop-other-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px 32px; }
@@ -644,10 +644,9 @@ module.exports = async function handler(req, res) {
     footer { margin-top: 140px; }
 
     @media (max-width: 900px) {
-      .pp { padding: 0 20px; }
       .pp-titlebar { flex-direction: column; padding: 40px 0 56px; }
-      .pp-facts { grid-template-columns: repeat(2, 1fr); padding: 0 20px; }
-      .pp-features { grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 20px; }
+      .pp-facts { grid-template-columns: repeat(2, 1fr); }
+      .pp-features { grid-template-columns: repeat(2, 1fr); gap: 14px; }
       .pp-section, .pp-intro { padding-top: 90px; }
       .pp-intro, .pp-split { grid-template-columns: 1fr; gap: 28px; }
       .pp-intro .pp-prose { grid-column: 1; }
@@ -661,7 +660,7 @@ module.exports = async function handler(req, res) {
       .pp-env-text { order: 2; }
       .pp-loc-text p { text-align: left; }
       .pp-recs-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
-      .prop-other { padding: 90px 20px 0; }
+      .prop-other { padding-top: 90px; }
       .prop-other-grid { grid-template-columns: 1fr 1fr; gap: 32px 20px; }
       .pp-overview .pp-h2, .pp-env .pp-h2, .pp-location .pp-h2, .pp-recs-head { margin-bottom: 36px; }
     }
@@ -673,6 +672,12 @@ module.exports = async function handler(req, res) {
       .pp-mosaic-3, .pp-mosaic-3.pp-mosaic-flip, .pp-mosaic-2, .pp-pair-2 { grid-template-columns: 1fr; }
       .pp-recs-grid, .prop-other-grid { grid-template-columns: 1fr; }
       .pp-prose p { text-indent: 2em; }
+    }
+      /* Phone gutters: must stay last so they win over the base rules. */
+    @media (max-width: 768px) {
+      .pp-hero-wrap, .pp, .pp-facts { padding-left: 16px; padding-right: 16px; }
+      .pp-features { padding: 20px 16px; }
+      .prop-other { padding-left: 16px; padding-right: 16px; }
     }
   </style>
 </head>
