@@ -206,19 +206,10 @@ module.exports = async function handler(req, res) {
       font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #f9f7f2; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
+    html, body { background: #FDFCF8; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
     a { color: inherit; text-decoration: none; }
     h1, h2, h3, h4 { font-weight: 400; }
 
-    nav {
-      display: grid; grid-template-columns: 1fr auto 1fr;
-      align-items: center; padding: 28px 48px;
-      background: #f9f7f2; z-index: 10;
-    }
-    .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: #0f0f0f; }
-    .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
-    .nav-links a { font-size: 13px; color: #0f0f0f; opacity: 0.7; letter-spacing: 0.03em; transition: opacity 0.2s; }
-    .nav-links a:hover { opacity: 1; }
 
     .dir-header {
       max-width: 800px;
@@ -342,9 +333,6 @@ module.exports = async function handler(req, res) {
       .arch-grid { grid-template-columns: repeat(2, 1fr); gap: 44px 24px; }
     }
     @media (max-width: 768px) {
-      nav { padding: 20px 24px; }
-      .nav-links { display: none; }
-      .wordmark { font-size: 22px; }
       .dir-header { padding: 48px 24px 40px; }
       .arch-grid { grid-template-columns: 1fr; gap: 40px; padding: 0 24px 72px; }
       .grid-section-label { padding: 0 24px 24px; }

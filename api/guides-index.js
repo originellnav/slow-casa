@@ -229,19 +229,10 @@ module.exports = async function handler(req, res) {
       font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #ffffff; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
+    html, body { background: #FDFCF8; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
     a { color: inherit; text-decoration: none; }
     h1, h2, h3 { font-weight: 400; }
 
-    nav {
-      display: grid; grid-template-columns: 1fr auto 1fr;
-      align-items: center; padding: 28px 48px;
-      background: #ffffff; z-index: 10; position: relative;
-    }
-    .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: #0f0f0f; }
-    .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
-    .nav-links a { font-size: 13px; color: #0f0f0f; opacity: 0.7; letter-spacing: 0.03em; transition: opacity 0.2s; }
-    .nav-links a:hover { opacity: 1; }
 
     .guides-header {
       max-width: 720px;
@@ -367,8 +358,6 @@ module.exports = async function handler(req, res) {
     .footer-links a:hover { color: #0f0f0f; }
 
     @media (max-width: 768px) {
-      nav { padding: 20px 24px; }
-      .nav-links { display: none; }
       .guides-header { padding: 56px 24px 32px; }
       .guides-grid {
         grid-template-columns: 1fr;

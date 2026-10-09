@@ -127,7 +127,17 @@ function responsiveImageUrl(url, width) {
       if (parts.length !== 2) return url;
       const rest = parts[1];
       const versionIdx = rest.search(/\/v\d+\//);
-      const trail = versionIdx >= 0 ? rest.substring(versionIdx) : '/' + rest;
+      let trail;
+      if (versionIdx >= 0) {
+        trail = rest.substring(versionIdx);
+      } else {
+        // No version number in the stored URL. Drop any size or crop settings
+        // already in it (e.g. w_1400/), or they override the width asked for here.
+        const segs = rest.split('/');
+        const isTransform = s => s.split(',').every(p => /^(c|w|h|g|q|f|ar|dpr|e|fl|x|y|z|r|o|b|t|a)_[^,]+$/.test(p));
+        while (segs.length > 1 && isTransform(segs[0])) segs.shift();
+        trail = '/' + segs.join('/');
+      }
       return parts[0] + '/upload/c_fill,w_' + width + ',g_auto,q_auto,f_auto' + trail;
     } catch (e) { return url; }
   }
@@ -521,13 +531,17 @@ module.exports = async function handler(req, res) {
     @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
     @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-v17-latin-300italic.woff2') format('woff2'); font-weight: 300; font-style: italic; font-display: swap; }
 
-    body { background: #ffffff; }
+    body { background: #FDFCF8; }
     .pp { max-width: 1440px; margin: 0 auto; padding: 0 40px; }
     .pp figure { margin: 0; overflow: hidden; background: var(--grey-4); }
     .pp figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .img-fallback { background: var(--grey-4); }
 
     /* Hero */
+    /* Hero runs edge to edge with the same side gutter as the nav,
+       so its left edge lines up with the wordmark at every width. */
+    .pp-hero-wrap { padding: 0 48px; }
+    @media (max-width: 768px) { .pp-hero-wrap { padding: 0 16px; } }
     .pp-hero { aspect-ratio: 16 / 8.5; max-height: 86vh; width: 100%; }
 
     /* Title row */
@@ -538,7 +552,7 @@ module.exports = async function handler(req, res) {
     .pp-actions { display: flex; align-items: center; gap: 28px; flex-shrink: 0; }
     .pp-share { background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--sans); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); }
     .pp-btn {
-      display: inline-block; border: 1px solid var(--black); background: #fff; color: var(--black);
+      display: inline-block; border: 1px solid var(--black); background: transparent; color: var(--black);
       padding: 17px 34px; font-family: var(--sans); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
       cursor: pointer; transition: background 0.2s, color 0.2s;
     }
@@ -592,12 +606,12 @@ module.exports = async function handler(req, res) {
 
     /* View all */
     .pp-viewall-wrap { text-align: center; padding-top: 110px; }
-    .pp-lightbox { position: fixed; inset: 0; background: #fff; z-index: 100; overflow-y: auto; }
+    .pp-lightbox { position: fixed; inset: 0; background: #FDFCF8; z-index: 100; overflow-y: auto; }
     .pp-lightbox[hidden] { display: none; }
     .pp-lightbox-inner { max-width: 1100px; margin: 0 auto; padding: 80px 24px; display: grid; gap: 20px; }
     .pp-lightbox-inner figure { margin: 0; }
     .pp-lightbox-inner img { width: 100%; height: auto; display: block; }
-    .pp-lightbox-close { position: fixed; top: 18px; right: 26px; background: #fff; border: 0; font-size: 40px; line-height: 1; cursor: pointer; z-index: 101; }
+    .pp-lightbox-close { position: fixed; top: 18px; right: 26px; background: #FDFCF8; border: 0; font-size: 40px; line-height: 1; cursor: pointer; z-index: 101; }
 
     /* Location */
     .pp-location .pp-h2 { margin-bottom: 72px; }
@@ -667,8 +681,8 @@ module.exports = async function handler(req, res) {
   ${nav()}
 
   <main>
+    ${heroImage ? `<div class="pp-hero-wrap"><figure class="pp-hero">${img(heroImage, 2400, '', true)}</figure></div>` : ''}
     <div class="pp">
-      ${heroImage ? `<figure class="pp-hero">${img(heroImage, 2400, '', true)}</figure>` : ''}
 
       <div class="pp-titlebar">
         <div>

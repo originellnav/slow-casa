@@ -1,3 +1,4 @@
+const { nav, footer } = require('../lib/nav');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const ARCHITECTS_TABLE = 'Architects';
@@ -281,19 +282,10 @@ module.exports = async function handler(req, res) {
       font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #f9f7f2; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
+    html, body { background: #FDFCF8; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
     a { color: inherit; text-decoration: none; }
     h1, h2, h3, h4 { font-weight: 400; }
 
-    nav {
-      display: grid; grid-template-columns: 1fr auto 1fr;
-      align-items: center; padding: 28px 48px;
-      background: #f9f7f2; z-index: 10;
-    }
-    .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: #0f0f0f; }
-    .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
-    .nav-links a { font-size: 13px; color: #0f0f0f; opacity: 0.7; letter-spacing: 0.03em; transition: opacity 0.2s; }
-    .nav-links a:hover { opacity: 1; }
 
     /* Architect hero */
     .arch-hero {
@@ -493,8 +485,6 @@ module.exports = async function handler(req, res) {
     }
 
     @media (max-width: 768px) {
-      nav { padding: 20px 24px; }
-      .nav-links { display: none; }
       .arch-hero { padding: 48px 24px 0; }
       .arch-name { font-size: clamp(36px, 9vw, 48px); }
       .arch-photo { padding: 0 24px; margin-top: 56px; }
@@ -510,17 +500,7 @@ module.exports = async function handler(req, res) {
 </head>
 <body>
 
-  <nav>
-    <div></div>
-    <a href="/" class="wordmark">Slow Casa</a>
-    <ul class="nav-links">
-      <li><a href="/directory">Directory</a></li>
-      <li><a href="/design-directory">Architects</a></li>
-      <li><a href="/guides">Guides</a></li>
-      <li><a href="https://newsletter.slowcasa.com" target="_blank" rel="noopener">Newsletter</a></li>
-      <li><a href="/criteria">About</a></li>
-    </ul>
-  </nav>
+  ${nav()}
 
   <section class="arch-hero">
     <p class="arch-eyebrow">Architect</p>
@@ -563,17 +543,7 @@ module.exports = async function handler(req, res) {
     `}
   </section>
 
-  <footer>
-    <div class="footer-left">
-      <span class="footer-copy">&copy; 2026 Slow Casa</span>
-      <a href="/privacy" class="footer-policy">Privacy Policy</a>
-    </div>
-    <div class="footer-links">
-      <a href="/guides">Guides</a>
-      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
-    </div>
-  </footer>
+  ${footer()}
 
 </body>
 </html>`;

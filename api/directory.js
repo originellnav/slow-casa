@@ -74,7 +74,17 @@ function responsiveImageUrl(url, width) {
       if (parts.length !== 2) return url;
       const rest = parts[1];
       const versionIdx = rest.search(/\/v\d+\//);
-      const trail = versionIdx >= 0 ? rest.substring(versionIdx) : '/' + rest;
+      let trail;
+      if (versionIdx >= 0) {
+        trail = rest.substring(versionIdx);
+      } else {
+        // No version number in the stored URL. Drop any size or crop settings
+        // already in it (e.g. w_1400/), or they override the width asked for here.
+        const segs = rest.split('/');
+        const isTransform = s => s.split(',').every(p => /^(c|w|h|g|q|f|ar|dpr|e|fl|x|y|z|r|o|b|t|a)_[^,]+$/.test(p));
+        while (segs.length > 1 && isTransform(segs[0])) segs.shift();
+        trail = '/' + segs.join('/');
+      }
       return parts[0] + '/upload/c_fill,w_' + width + ',g_auto,q_auto,f_auto' + trail;
     } catch (e) { return url; }
   }
@@ -283,14 +293,9 @@ module.exports = async function handler(req, res) {
       --sans: 'DM Sans', system-ui, sans-serif;
     }
     html { font-size: 16px; -webkit-font-smoothing: antialiased; }
-    body { font-family: var(--sans); background: #ffffff !important; color: var(--black); min-height: 100vh; }
+    body { font-family: var(--sans); background: #FDFCF8 !important; color: var(--black); min-height: 100vh; }
     a { color: inherit; text-decoration: none; }
 
-    nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 28px 48px; background: #ffffff; }
-    .wordmark { font-family: 'DM Serif Display', Georgia, serif; font-size: 28px; font-weight: 400; letter-spacing: 0.01em; text-align: center; color: #2a2a28; text-transform: none; }
-    .nav-links { display: flex; gap: 32px; list-style: none; justify-content: flex-end; }
-    .nav-links a { font-size: 13px; color: var(--grey-1); letter-spacing: 0.03em; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--black); }
 
     .page-header {
       max-width: 800px;
@@ -501,9 +506,6 @@ module.exports = async function handler(req, res) {
     }
 
     @media (max-width: 768px) {
-      nav { padding: 20px 24px; }
-      .nav-links { display: none; }
-      .wordmark { font-size: 22px; }
       .page-header { padding: 40px 24px 32px; }
       .page-subline { font-size: 30px; }
       .dir-body { grid-template-columns: 1fr; padding: 0 24px 56px; }

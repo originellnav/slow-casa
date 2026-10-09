@@ -60,7 +60,17 @@ function responsiveImageUrl(url, width) {
       if (parts.length !== 2) return url;
       const rest = parts[1];
       const versionIdx = rest.search(/\/v\d+\//);
-      const trail = versionIdx >= 0 ? rest.substring(versionIdx) : '/' + rest;
+      let trail;
+      if (versionIdx >= 0) {
+        trail = rest.substring(versionIdx);
+      } else {
+        // No version number in the stored URL. Drop any size or crop settings
+        // already in it (e.g. w_1400/), or they override the width asked for here.
+        const segs = rest.split('/');
+        const isTransform = s => s.split(',').every(p => /^(c|w|h|g|q|f|ar|dpr|e|fl|x|y|z|r|o|b|t|a)_[^,]+$/.test(p));
+        while (segs.length > 1 && isTransform(segs[0])) segs.shift();
+        trail = '/' + segs.join('/');
+      }
       return parts[0] + '/upload/c_fill,w_' + width + ',g_auto,q_auto,f_auto' + trail;
     } catch (e) { return url; }
   }

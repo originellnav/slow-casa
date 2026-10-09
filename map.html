@@ -122,14 +122,35 @@
 </head>
 <body>
 
-  <nav>
+  <!-- Site nav: generated from lib/nav.js. Keep in sync. -->
+  <header class="site-nav">
     <a href="/" class="wordmark">Slow Casa</a>
-    <ul class="nav-links">
-      <li><a href="/houses">The Collection</a></li>
-      <li><a href="/places">Places</a></li>
-      <li><a href="/map">Map</a></li>
-    </ul>
-  </nav>
+    <div class="site-nav-right">
+      <a class="site-nav-link" href="/houses">The Collection</a>
+      <a class="site-nav-link" href="/places">Places</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">Menu <i class="burger" aria-hidden="true"></i></button>
+    </div>
+  </header>
+  <div class="menu-scrim" data-menu-close></div>
+  <aside class="site-menu" id="site-menu" aria-label="Menu" aria-hidden="true" inert>
+    <div class="site-menu-top">
+      <button class="menu-close" type="button" data-menu-close>Close <i class="burger is-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="site-menu-links">
+      <a href="/houses">The Collection</a>
+      <a href="/places">Places</a>
+      <a href="/map">Map</a>
+      <a href="/about">About</a>
+      <a href="mailto:luke@slowcasa.com?subject=List%20my%20house%20on%20Slow%20Casa">List your house</a>
+    </div>
+    <a class="site-menu-contact" href="mailto:luke@slowcasa.com">Contact</a>
+    <div class="site-menu-foot">
+      <a href="mailto:luke@slowcasa.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg>luke@slowcasa.com</a>
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6"/></svg>@theslowcasa</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>The newsletter</a>
+    </div>
+  </aside>
+  <script src="/menu.js" defer></script>
 
   <header class="map-lede">
     <p class="map-eyebrow">Coming soon</p>
