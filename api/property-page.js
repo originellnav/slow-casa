@@ -352,64 +352,56 @@ module.exports = async function handler(req, res) {
     ${features.map(t => `<div class="pp-feature">${escapeHtml(t)}</div>`).join('')}
   </div>` : '';
 
-  // ---- Overview mosaic: rows of three, alternating wide/narrow ----
-  let overviewHtml = '';
-  if (overviewImgs.length) {
-    const rows = [];
-    for (let i = 0; i < overviewImgs.length; i += 3) rows.push(overviewImgs.slice(i, i + 3));
-    overviewHtml = `
-  <section class="pp-section pp-overview">
-    <h2 class="pp-h2">Overview</h2>
-    ${rows.map((row, r) => `<div class="pp-mosaic pp-mosaic-${row.length}${r % 2 ? ' pp-mosaic-flip' : ''}">${row.map(s => `<figure>${img(s, 1100)}</figure>`).join('')}</div>`).join('')}
-  </section>`;
-  }
-
-  // ---- Story sections: heading left, paragraph right, images below ----
-  const imagesBelow = (set) => {
-    if (!set.length) return '';
-    const first = `<figure class="pp-wide">${img(set[0], 1800)}</figure>`;
-    let pairs = '';
-    const rest = set.slice(1);
-    for (let i = 0; i < rest.length; i += 2) {
-      const pair = rest.slice(i, i + 2);
-      pairs += `<div class="pp-pair pp-pair-${pair.length}">${pair.map(s => `<figure>${img(s, 1400)}</figure>`).join('')}</div>`;
-    }
-    return first + pairs;
-  };
-  const pairsOnly = (set) => {
-    let out = '';
-    for (let i = 0; i < set.length; i += 2) {
-      const pair = set.slice(i, i + 2);
-      out += `<div class="pp-pair pp-pair-${pair.length}">${pair.map(s => `<figure>${img(s, 1400)}</figure>`).join('')}</div>`;
+  // ---- Image grids ----
+  // Every section uses the same grid. Images go in rows of three; the rule
+  // below picks the row sizes so there is never a lone image on the last row:
+  //   1 -> [1]   2 -> [2]   3 -> [3]   4 -> [2,2]   5 -> [3,2]   6 -> [3,3]
+  //   7 -> [3,2,2]   8 -> [3,3,2]   9 -> [3,3,3]   10 -> [3,3,2,2] ...
+  const rowSizes = (n) => {
+    if (n <= 0) return [];
+    if (n <= 3) return [n];
+    const out = [];
+    let left = n;
+    while (left > 0) {
+      if (left === 4) { out.push(2, 2); break; }
+      if (left <= 3) { out.push(left); break; }
+      out.push(3); left -= 3;
     }
     return out;
   };
-  const story = (heading, text, imagesHtml, cls) => (text || imagesHtml) ? `
+  const grid = (set) => {
+    if (!set.length) return '';
+    let i = 0;
+    const rows = rowSizes(set.length).map((size, r) => {
+      const row = set.slice(i, i + size); i += size;
+      // Wide and narrow images alternate row by row, as on the reference:
+      // row 1 wide-wide-narrow, row 2 narrow-wide-wide, and so on.
+      const flip = r % 2 ? ' pp-grid-flip' : '';
+      return `<div class="pp-grid-row pp-grid-${size}${flip}">${row.map(s => `<figure>${img(s, size === 3 ? 1200 : 1600)}</figure>`).join('')}</div>`;
+    });
+    return `<div class="pp-grid">${rows.join('')}</div>`;
+  };
+
+  // ---- Overview ----
+  const overviewHtml = overviewImgs.length ? `
+  <section class="pp-section pp-overview">
+    <h2 class="pp-h2">Overview</h2>
+    ${grid(overviewImgs)}
+  </section>` : '';
+
+  // ---- Story sections: heading left, paragraph right, grid below ----
+  const story = (heading, text, set, cls) => (text || set.length) ? `
   <section class="pp-section pp-story ${cls || ''}">
     <div class="pp-split">
       <h2 class="pp-h2">${heading}</h2>
       <div class="pp-prose">${paras(text)}</div>
     </div>
-    ${imagesHtml}
+    ${grid(set)}
   </section>` : '';
 
-  const livingHtml   = story('Living Spaces', livingText, imagesBelow(livingSet));
-  const bedroomsHtml = story('Bedrooms &amp; Bathrooms', bedroomsText, pairsOnly(bedroomsSet));
-
-  // The environment: big image right, paragraph tucked bottom left, as on the reference
-  let outdoorHtml = '';
-  if (outdoorText || outdoorSet.length) {
-    const lead = outdoorSet[0];
-    outdoorHtml = `
-  <section class="pp-section pp-env">
-    <h2 class="pp-h2">The Environment</h2>
-    <div class="pp-env-grid${lead ? '' : ' pp-env-noimg'}">
-      <div class="pp-prose pp-env-text">${paras(outdoorText)}</div>
-      ${lead ? `<figure class="pp-env-img">${img(lead, 1800)}</figure>` : ''}
-    </div>
-    ${pairsOnly(outdoorSet.slice(1))}
-  </section>`;
-  }
+  const livingHtml   = story('Living Spaces', livingText, livingSet);
+  const bedroomsHtml = story('Bedrooms &amp; Bathrooms', bedroomsText, bedroomsSet);
+  const outdoorHtml  = story('The Environment', outdoorText, outdoorSet, 'pp-env');
 
   const viewAllHtml = allImgs.length > 1 ? `
   <div class="pp-viewall-wrap"><button class="pp-btn" type="button" id="pp-viewall">View all images</button></div>
@@ -580,29 +572,11 @@ module.exports = async function handler(req, res) {
 
     /* Overview mosaic */
     .pp-overview .pp-h2 { margin-bottom: 72px; }
-    .pp-mosaic { display: grid; gap: 18px; margin-bottom: 18px; }
-    .pp-mosaic figure { height: clamp(220px, 26vw, 470px); }
-    .pp-mosaic-3 { grid-template-columns: 3fr 3fr 2fr; }
-    .pp-mosaic-3.pp-mosaic-flip { grid-template-columns: 2fr 3fr 3fr; }
-    .pp-mosaic-2 { grid-template-columns: 1fr 1fr; }
-    .pp-mosaic-1 { grid-template-columns: 1fr; }
 
     /* Story sections */
     .pp-split { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-bottom: 120px; }
-    .pp-wide { margin-left: 26% !important; aspect-ratio: 16 / 10; margin-bottom: 18px !important; }
-    .pp-pair { display: grid; gap: 70px; margin-bottom: 18px; }
-    .pp-pair-2 { grid-template-columns: 1fr 1fr; }
-    .pp-pair-1 { grid-template-columns: 1fr; }
-    .pp-pair figure { aspect-ratio: 4 / 4.6; }
-    .pp-pair-1 figure { aspect-ratio: 16 / 9; }
 
     /* The environment */
-    .pp-env .pp-h2 { margin-bottom: 64px; }
-    .pp-env-grid { display: grid; grid-template-columns: 1fr 2.65fr; gap: 56px; align-items: end; margin-bottom: 18px; }
-    .pp-env-grid.pp-env-noimg { grid-template-columns: 1fr 1fr; }
-    .pp-env-noimg .pp-env-text { grid-column: 2; }
-    .pp-env-img { aspect-ratio: 16 / 10; }
-    .pp-env-text p { font-size: 16px; }
 
     /* View all */
     .pp-viewall-wrap { text-align: center; padding-top: 110px; }
@@ -651,28 +625,43 @@ module.exports = async function handler(req, res) {
       .pp-intro, .pp-split { grid-template-columns: 1fr; gap: 28px; }
       .pp-intro .pp-prose { grid-column: 1; }
       .pp-split { margin-bottom: 48px; }
-      .pp-wide { margin-left: 0 !important; }
-      .pp-mosaic-3, .pp-mosaic-3.pp-mosaic-flip { grid-template-columns: 1fr 1fr; }
-      .pp-mosaic-3 figure:first-child { grid-column: 1 / -1; }
-      .pp-pair { gap: 18px; }
-      .pp-env-grid, .pp-loc-grid { grid-template-columns: 1fr; gap: 28px; }
-      .pp-env-noimg .pp-env-text, .pp-loc-nomap .pp-loc-text { grid-column: 1; }
-      .pp-env-text { order: 2; }
+      .pp-loc-grid { grid-template-columns: 1fr; gap: 28px; }
+      .pp-loc-nomap .pp-loc-text { grid-column: 1; }
       .pp-loc-text p { text-align: left; }
       .pp-recs-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
       .prop-other { padding-top: 90px; }
       .prop-other-grid { grid-template-columns: 1fr 1fr; gap: 32px 20px; }
-      .pp-overview .pp-h2, .pp-env .pp-h2, .pp-location .pp-h2, .pp-recs-head { margin-bottom: 36px; }
+      .pp-overview .pp-h2, .pp-location .pp-h2, .pp-recs-head { margin-bottom: 36px; }
     }
     @media (max-width: 560px) {
       .pp-hero { aspect-ratio: 4 / 5; max-height: none; }
       .pp-name { font-size: 23px; }
       .pp-fact-v { font-size: 19px; }
       .pp-features { grid-template-columns: 1fr; }
-      .pp-mosaic-3, .pp-mosaic-3.pp-mosaic-flip, .pp-mosaic-2, .pp-pair-2 { grid-template-columns: 1fr; }
       .pp-recs-grid, .prop-other-grid { grid-template-columns: 1fr; }
       .pp-prose p { text-indent: 2em; }
     }
+    /* Image grid (all sections). Only the hero is full width. */
+    .pp-grid { display: grid; gap: 18px; margin-top: 56px; }
+    .pp-overview .pp-grid { margin-top: 0; }
+    /* Every image in a row shares one height; wide images are 3:2, narrow ones close to square. */
+    .pp-grid-row { display: grid; gap: 18px; height: clamp(220px, 24vw, 520px); }
+    .pp-grid-row figure { height: 100%; }
+    .pp-grid-3 { grid-template-columns: 3fr 3fr 2fr; }
+    .pp-grid-3.pp-grid-flip { grid-template-columns: 2fr 3fr 3fr; }
+    .pp-grid-2 { grid-template-columns: 3fr 2fr; height: clamp(260px, 36vw, 760px); }
+    .pp-grid-2.pp-grid-flip { grid-template-columns: 2fr 3fr; }
+    .pp-grid-1 { grid-template-columns: 3fr 2fr; height: clamp(260px, 36vw, 760px); }
+    @media (max-width: 560px) {
+      .pp-grid, .pp-grid-row { gap: 10px; }
+      .pp-grid { margin-top: 32px; }
+      .pp-grid-row { height: auto; }
+      .pp-grid-row figure { height: auto; aspect-ratio: 4 / 3; }
+      .pp-grid-3, .pp-grid-3.pp-grid-flip, .pp-grid-2, .pp-grid-2.pp-grid-flip { grid-template-columns: repeat(2, 1fr); }
+      .pp-grid-3 figure:first-child { grid-column: 1 / -1; }
+      .pp-grid-1 { grid-template-columns: 1fr; }
+    }
+
     /* Floating CTA */
     .pp-cta {
       position: fixed; right: 48px; bottom: calc(32px + env(safe-area-inset-bottom, 0px)); z-index: 800;
