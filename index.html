@@ -817,9 +817,10 @@
     }
     .home-cta:hover { background: var(--black); color: #fff; }
 
-    .home-film { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+    /* Homepage sections share the nav's 48px gutter (16px on phones), no width cap, so every edge lines up. */
+    .home-film { padding: 0 48px; }
     .home-film-frame {
-      width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+      width: 100%; aspect-ratio: 16 / 9; max-height: 86vh; overflow: hidden;
       background: var(--grey-4); display: block;
     }
     .home-film-still {
@@ -835,13 +836,14 @@
       .home-film-still { animation: none; }
     }
 
-    .home-intro { max-width: 1200px; margin: 0 auto; padding: 96px 48px 0; }
+    .home-intro { padding: 120px 48px 0; }
     .home-intro p {
-      max-width: 58ch; text-indent: 2.2em;
-      font-size: 17px; line-height: 1.72; margin: 0;
+      max-width: 50ch; text-indent: 3em;
+      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif);
+      font-size: 20px; line-height: 1.6; letter-spacing: 0.01em; margin: 0;
     }
 
-    .home-collection { max-width: 1200px; margin: 0 auto; padding: 104px 48px 0; }
+    .home-collection { padding: 120px 48px 0; }
     .home-collection-head {
       display: flex; align-items: baseline; justify-content: space-between;
       gap: 24px; margin-bottom: 40px;
@@ -876,7 +878,7 @@
       .island-grid { grid-template-columns: 1fr; gap: 36px; }
     }
   
-    .home-map { max-width: 1200px; margin: 0 auto; padding: 104px 48px 0; }
+    .home-map { padding: 120px 48px 0; }
     .home-map .section-header { padding-top: 0; }
     .home-map .map-cta { font-size: 15px; line-height: 1.6; color: var(--grey-1); margin: 20px 0 0; max-width: 62ch; }
     .home-map .map-cta a { color: var(--black); border-bottom: 1px solid var(--grey-3); }
@@ -897,7 +899,7 @@
     .home-map-frame:hover .home-map-cta { background: var(--black); color: #fff; }
     .home-map-credit { font-size: 10px; color: var(--grey-2); margin: 10px 0 0; letter-spacing: 0.04em; }
 
-    .home-signup { max-width: 1200px; margin: 96px auto 0; padding: 0 48px; }
+    .home-signup { margin: 96px 0 0; padding: 0 48px; }
     .home-signup-inner {
       display: flex; align-items: center; justify-content: space-between; gap: 32px;
       border-top: 1px solid var(--grey-3); padding-top: 28px;
@@ -981,7 +983,7 @@
 
   <section class="home-film">
     <div class="home-film-frame">
-      <img class="home-film-still" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_16:9,g_auto,w_1600,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg" alt="Mallorca" loading="lazy" />
+      <img class="home-film-still" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_16:9,g_auto,w_2400,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg" alt="Mallorca" loading="lazy" />
     </div>
   </section>
 
