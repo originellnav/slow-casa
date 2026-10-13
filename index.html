@@ -881,25 +881,27 @@
     }
   
     .home-map { padding: 120px 48px 0; }
-    .home-map .section-header { padding-top: 0; }
-    .home-map .map-cta { font-size: 15px; line-height: 1.6; color: var(--grey-1); margin: 20px 0 0; max-width: 62ch; }
-    .home-map .map-cta a { color: var(--black); border-bottom: 1px solid var(--grey-3); }
-    .home-map .map-cta a:hover { border-color: var(--black); }
+    .home-map-lede {
+      font-family: var(--body); font-size: 20px; line-height: 1.6; letter-spacing: 0.01em;
+      max-width: 50ch; margin: -24px 0 48px;
+    }
+    .home-map-lede a { border-bottom: 1px solid var(--black); }
     .home-map-frame {
-      position: relative; display: block; width: 100%; overflow: hidden;
-      background: var(--grey-4); border: 1px solid var(--grey-3);
-      min-height: 260px;
+      position: relative; display: block; width: 100%; aspect-ratio: 16 / 7; max-height: 80vh;
+      overflow: hidden; background: var(--grey-4); cursor: pointer;
     }
-    .home-map-frame img { width: 100%; height: auto; display: block; transition: transform 0.6s ease; }
-    .home-map-frame:hover img { transform: scale(1.02); }
+    .home-map-frame img, .home-map-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .home-map-frame img { object-fit: cover; display: block; }
+    .home-map-canvas { opacity: 0; transition: opacity 0.8s ease; }
+    .home-map-canvas.is-ready { opacity: 1; }
+    .home-map-pin { width: 12px; height: 12px; border-radius: 50%; background: var(--black); border: 2px solid #FDFCF8; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
     .home-map-cta {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: transparent; color: var(--black); border: 1px solid var(--black);
-      padding: 16px 32px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-      transition: background 0.2s, color 0.2s; white-space: nowrap;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;
+      background: var(--black); color: #FDFCF8;
+      padding: 20px 36px; font-family: var(--display); font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase;
+      transition: background 0.2s; white-space: nowrap;
     }
-    .home-map-frame:hover .home-map-cta { background: var(--black); color: #fff; }
-    .home-map-credit { font-size: 10px; color: var(--grey-2); margin: 10px 0 0; letter-spacing: 0.04em; }
+    .home-map-frame:hover .home-map-cta { background: #2a2a28; }
 
     .home-signup { margin: 96px 0 0; padding: 0 48px; }
     .home-signup-inner {
@@ -914,7 +916,9 @@
 
     @media (max-width: 768px) {
       .home-map { padding: 64px 16px 0; }
-      .home-map-cta { padding: 13px 22px; font-size: 10px; }
+      .home-map-cta { padding: 16px 26px; font-size: 13px; }
+      .home-map-lede { font-size: 17px; margin: -16px 0 32px; }
+      .home-map-frame { aspect-ratio: 4 / 5; }
       .home-signup { margin-top: 56px; padding: 0 16px; }
       .home-signup-inner { flex-direction: column; align-items: stretch; gap: 16px; }
       .home-signup .try-form { flex: 1 1 auto; max-width: none; }
@@ -1019,16 +1023,16 @@
 
 
   <section class="home-map">
-    <div class="section-header">
-      <p class="section-label">The Map</p>
-      <a class="section-link" href="/map">Open the map</a>
+    <div class="home-collection-head">
+      <h2>The Map</h2>
+      <a class="home-collection-link" href="/map"><span>Open the map</span><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
     </div>
-    <a class="home-map-frame" href="/map">
+    <p class="home-map-lede">Every house, restaurant, beach and bar we rate across the Balearics, on one map. <a href="/map">Take a look.</a></p>
+    <div class="home-map-frame" id="home-map-frame">
       <img src="https://res.cloudinary.com/dw1wmo2go/image/upload/q_auto,f_auto,w_1600/v1791444652/map_graphic_c81oaq.jpg" alt="Map of Mallorca, Ibiza and Menorca showing every house in the collection" loading="lazy" />
-      <span class="home-map-cta">Take a look</span>
-    </a>
-    <p class="map-cta">Every house, restaurant, beach and bar we rate across the Balearics, on one map. <a href="/map">Take a look.</a></p>
-    <p class="home-map-credit">&copy; Mapbox &nbsp;&copy; OpenStreetMap</p>
+      <div class="home-map-canvas" id="home-map" aria-hidden="true"></div>
+      <a class="home-map-cta" href="/map">Take a look</a>
+    </div>
   </section>
 
   <section class="home-signup">
@@ -1290,6 +1294,64 @@
         });
       })
       .catch(function () { /* leave the numbers in the HTML */ });
+  })();
+  </script>
+  <script>
+  // Homepage map: a live Mapbox map framed on the three islands, with a pin per house.
+  // Loads only when the section scrolls near the screen. It cannot be dragged or zoomed;
+  // a click anywhere on it goes to /map. If Mapbox fails, the still image underneath stays.
+  (function () {
+    var frame = document.getElementById('home-map-frame');
+    var el = document.getElementById('home-map');
+    if (!frame || !el) return;
+    frame.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('a')) return;
+      window.location.href = '/map';
+    });
+    var TOKEN = 'pk.eyJ1IjoibHVrZXJ5YSIsImEiOiJjbG96cmZ3OTMwMHRyMmlzNHc1bTZkZzI4In0.8Pmo8eeUh48QHBpzqHwNuQ';
+    var STYLE = 'mapbox://styles/lukerya/cmoime20s006m01r68jvia13j';
+    var BOUNDS = [[1.15, 38.62], [4.45, 40.12]];
+    var started = false;
+    function load() {
+      if (started) return; started = true;
+      var css = document.createElement('link');
+      css.rel = 'stylesheet'; css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css';
+      document.head.appendChild(css);
+      var s = document.createElement('script');
+      s.src = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js';
+      s.onload = function () {
+        try {
+          mapboxgl.accessToken = TOKEN;
+          var map = new mapboxgl.Map({
+            container: el, style: STYLE, bounds: BOUNDS,
+            fitBoundsOptions: { padding: 40 }, interactive: false, attributionControl: true
+          });
+          map.on('load', function () {
+            el.classList.add('is-ready');
+            fetch('/api/properties?all=true')
+              .then(function (r) { return r.json(); })
+              .then(function (d) {
+                ((d && d.records) || []).forEach(function (r) {
+                  var f = r.fields || {};
+                  var lat = parseFloat(f['Latitude']), lon = parseFloat(f['Longitude']);
+                  if (!isFinite(lat) || !isFinite(lon)) return;
+                  var pin = document.createElement('div');
+                  pin.className = 'home-map-pin';
+                  new mapboxgl.Marker({ element: pin }).setLngLat([lon, lat]).addTo(map);
+                });
+              })
+              .catch(function () {});
+          });
+        } catch (e) { /* keep the still image */ }
+      };
+      document.head.appendChild(s);
+    }
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) {
+        if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); load(); }
+      }, { rootMargin: '400px 0px' });
+      io.observe(frame);
+    } else { load(); }
   })();
   </script>
 </body>
