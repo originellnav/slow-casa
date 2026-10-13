@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- v2026-06-11 -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design Houses to Rent in Mallorca, Ibiza &amp; Menorca | Slow Casa</title>
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Slow Casa" />
+<link rel="manifest" href="/site.webmanifest" />
+  <meta name="description" content="A curated directory of design-led houses to rent across the Balearic Islands, plus village guides to where to eat, swim and stay near each one." />
+  <link rel="canonical" href="https://slowcasa.com/" />
+<meta property="og:title" content="Design Houses to Rent in Mallorca, Ibiza &amp; Menorca | Slow Casa" />
+<meta property="og:description" content="A curated directory of design-led houses to rent across the Balearic Islands, plus village guides to where to eat, swim and stay near each one." />
+<meta property="og:url" content="https://slowcasa.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Slow Casa" />
+<meta property="og:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Design Houses to Rent in Mallorca, Ibiza &amp; Menorca | Slow Casa" />
+<meta name="twitter:description" content="A curated directory of design-led houses to rent across the Balearic Islands, plus village guides to where to eat, swim and stay near each one." />
+<meta name="twitter:image" content="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/v1779177901/olive_garden7_w5ybha.jpg" />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
+  <link rel="stylesheet" href="/slow-casa.css" />
+  <style>
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2');
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-300italic.woff2') format('woff2');
+      font-weight: 300;
+      font-style: italic;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/fonts/dm-sans-v17-latin-500.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Serif Display';
+      src: url('/fonts/dm-serif-display-v17-latin-regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Serif Display';
+      src: url('/fonts/dm-serif-display-v17-latin-italic.woff2') format('woff2');
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'TT Norms Pro';
+      src: url('/TT_Norms_Pro_Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    /* Homepage-specific styles */
+    .hero-wrapper { position: relative; }
+    .hero {
+      width: 100%;
+      height: 100vh;
+      min-height: 600px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero picture {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .hero-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 5;
+      width: 90%;
+      max-width: 800px;
+      padding: 0 24px;
+    }
+
+    .hero-headline {
+      font-family: var(--display);
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 400;
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      margin-bottom: 24px;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4); text-transform: uppercase; letter-spacing: 0.02em; }
+
+    .hero-subhead {
+      font-family: var(--body);
+      font-size: clamp(15px, 1.6vw, 19px);
+      font-weight: 400;
+      line-height: 1.5;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      opacity: 0.95;
+      text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .hero-top-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 180px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      .hero { min-height: 500px; }
+      .hero-headline { font-size: clamp(32px, 9vw, 48px); }
+      .hero-subhead { font-size: 15px; letter-spacing: 0.04em; }
+    }
+
+
+
+    .try-section {
+      background: #FDFCF8;
+      padding: 96px 48px;
+      text-align: center;
+    }
+
+    .try-headline {
+      font-family: var(--body);
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.55;
+      color: var(--black);
+      max-width: 900px;
+      margin: 0 auto 32px;
+    }
+
+    .try-headline strong {
+      font-weight: 600;
+    }
+
+    .try-form {
+      display: flex;
+      gap: 0;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .try-email {
+      flex: 1;
+      font-family: var(--body);
+      font-size: 14px;
+      padding: 14px 18px;
+      border: 0.5px solid var(--black);
+      border-right: none;
+      background: transparent;
+      color: var(--black);
+      outline: none;
+    }
+
+    .try-email::placeholder { color: var(--grey-1); }
+
+    .try-btn {
+      font-family: var(--body);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      border: 0.5px solid var(--black);
+      background: var(--black);
+      color: var(--white);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+
+    .try-btn:hover { background: var(--white); color: var(--black); }
+
+    .featured-property {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 600px;
+    }
+
+    .featured-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 80px 64px;
+      background: #FDFCF8;
+    }
+
+    .featured-eyebrow {
+      font-family: var(--body);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 28px;
+    }
+
+    .featured-region {
+      font-family: var(--body);
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 12px;
+    }
+
+    .featured-name {
+      font-family: var(--display);
+      font-size: 52px;
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--black);
+      margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.02em; }
+
+    .featured-desc {
+      font-family: var(--body);
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.65;
+      color: var(--black);
+      max-width: 340px;
+      margin-bottom: 36px;
+    }
+
+    .featured-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s;
+    }
+
+    .featured-arrow:hover { opacity: 0.6; }
+
+    .featured-right {
+      display: block;
+      overflow: hidden;
+    }
+
+    .featured-right img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .featured-right:hover img { transform: scale(1.03); }
+
+    /* MAP TEASER */
+    .map-teaser {
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .map-teaser-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 480px;
+    }
+
+    .map-teaser-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 64px;
+      background: #FDFCF8;
+    }
+
+    .map-teaser-eyebrow {
+      font-family: var(--body);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 20px;
+    }
+
+    .map-teaser-title {
+      font-family: var(--display);
+      font-size: 48px;
+      font-weight: 400;
+      line-height: 1.05;
+      color: var(--black);
+      margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.02em; }
+
+    .map-teaser-sub {
+      font-family: var(--body);
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.65;
+      color: var(--grey-1);
+      max-width: 320px;
+      margin-bottom: 36px;
+    }
+
+    .map-teaser-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: opacity 0.2s;
+    }
+
+    .map-teaser-btn:hover { opacity: 0.6; }
+
+    .map-teaser-right {
+      position: relative;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    /* MAP MODAL */
+    .map-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: #FDFCF8;
+      display: none;
+      flex-direction: column;
+    }
+
+    .map-modal.open { display: flex; }
+
+    .map-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px;
+      border-bottom: none;
+      background: #FDFCF8;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .map-modal-title {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--black); text-transform: uppercase; letter-spacing: 0.02em; }
+
+    .map-modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .map-modal-close:hover { opacity: 0.5; }
+
+    /* PROPERTY POPUP */
+    .map-popup {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      width: 280px;
+      background: #FDFCF8;
+      z-index: 20;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    }
+
+    .map-popup-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .map-popup-body {
+      padding: 16px 20px 20px;
+    }
+
+    .map-popup-location {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      margin-bottom: 4px;
+    }
+
+    .map-popup-name {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--black);
+      margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.02em; }
+
+    .map-popup-link {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+      border-bottom: 0.5px solid var(--black);
+      padding-bottom: 2px;
+    }
+
+    .map-popup-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(249,247,242,0.9);
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+    }
+
+    /* MAPBOX MARKER */
+    .sc-marker {
+      width: 10px;
+      height: 10px;
+      background: #0f0f0f;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      transition: transform 0.2s;
+    }
+
+    .sc-marker:hover { transform: scale(1.4); }
+    .sc-marker.active { background: #8B7355; transform: scale(1.4); }
+
+    @media (max-width: 768px) {
+      .map-teaser-inner { grid-template-columns: 1fr; }
+      .map-teaser-right { min-height: 240px; }
+      .map-teaser-left { padding: 48px 28px; }
+      .map-teaser-title { font-size: 36px; }
+      .map-popup { left: 16px; right: 16px; width: auto; bottom: 24px; }
+    }
+
+    @media (max-width: 768px) {
+      .featured-property { grid-template-columns: 1fr; }
+      .featured-left { padding: 56px 32px; }
+      .featured-name { font-size: 36px; }
+      .featured-right { min-height: 300px; }
+    }
+
+    .criteria-section {
+      background: #FDFCF8;
+      padding: 96px 48px;
+      text-align: center;
+    }
+
+    .criteria-body {
+      font-family: var(--body);
+      font-size: 24px;
+      font-weight: 300;
+      line-height: 1.45;
+      color: var(--black);
+      max-width: 680px;
+      margin: 0 auto 36px;
+    }
+
+    .criteria-btn {
+      display: inline-block;
+      font-family: var(--body);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      border: 0.5px solid var(--black);
+      background: transparent;
+      color: var(--black);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+
+    .criteria-btn:hover { background: var(--black); color: var(--white); }
+
+    .editorial { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .editorial-img { width: 100%; aspect-ratio: 4/3; background: var(--grey-4); overflow: hidden; }
+    .editorial-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .editorial-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 16px; }
+    .editorial-title { font-family: var(--body); font-size: 22px; font-weight: 300; line-height: 1.25; margin-bottom: 16px; }
+    .editorial-body { font-size: 14px; color: var(--grey-1); line-height: 1.8; margin-bottom: 24px; }
+    .editorial-link { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); border-bottom: 0.5px solid var(--black); padding-bottom: 2px; cursor: pointer; }
+
+    .newsletter-strip { border-top: none; border-bottom: none; padding: 72px 48px; }
+    .newsletter-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .newsletter-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 16px; }
+    .newsletter-title { font-family: var(--body); font-size: 26px; font-weight: 300; line-height: 1.2; margin-bottom: 12px; }
+    .newsletter-sub { font-size: 14px; color: var(--grey-1); line-height: 1.75; }
+    .newsletter-form { display: flex; flex-direction: column; gap: 12px; }
+    .newsletter-input { font-family: var(--body); font-size: 14px; padding: 14px 18px; border: 0.5px solid var(--grey-3); background: transparent; color: var(--black); outline: none; transition: border-color 0.2s; }
+    .newsletter-input:focus { border-color: var(--black); }
+    .newsletter-input::placeholder { color: var(--grey-2); }
+    .newsletter-submit { font-family: var(--body); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 28px; border: 0.5px solid var(--black); background: transparent; color: var(--black); cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .newsletter-submit:hover { background: var(--black); color: var(--white); }
+    .newsletter-small { font-size: 11px; color: var(--grey-2); }
+
+    /* MAP TEASER */
+    .map-teaser {
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .map-teaser-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 480px;
+    }
+
+    .map-teaser-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 64px;
+      background: #FDFCF8;
+    }
+
+    .map-teaser-eyebrow {
+      font-family: var(--body);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 20px;
+    }
+
+    .map-teaser-title {
+      font-family: var(--display);
+      font-size: 48px;
+      font-weight: 400;
+      line-height: 1.05;
+      color: var(--black);
+      margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.02em; }
+
+    .map-teaser-sub {
+      font-family: var(--body);
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.65;
+      color: var(--grey-1);
+      max-width: 320px;
+      margin-bottom: 36px;
+    }
+
+    .map-teaser-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: opacity 0.2s;
+    }
+
+    .map-teaser-btn:hover { opacity: 0.6; }
+
+    .map-teaser-right {
+      position: relative;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    /* MAP MODAL */
+    .map-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: #FDFCF8;
+      display: none;
+      flex-direction: column;
+    }
+
+    .map-modal.open { display: flex; }
+
+    .map-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px;
+      border-bottom: none;
+      background: #FDFCF8;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .map-modal-title {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--black); text-transform: uppercase; letter-spacing: 0.02em; }
+
+    .map-modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .map-modal-close:hover { opacity: 0.5; }
+
+    /* PROPERTY POPUP */
+    .map-popup {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      width: 280px;
+      background: #FDFCF8;
+      z-index: 20;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    }
+
+    .map-popup-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .map-popup-body {
+      padding: 16px 20px 20px;
+    }
+
+    .map-popup-location {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-1);
+      margin-bottom: 4px;
+    }
+
+    .map-popup-name {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--black);
+      margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.02em; }
+
+    .map-popup-link {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+      border-bottom: 0.5px solid var(--black);
+      padding-bottom: 2px;
+    }
+
+    .map-popup-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(249,247,242,0.9);
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+    }
+
+    /* MAPBOX MARKER */
+    .sc-marker {
+      width: 10px;
+      height: 10px;
+      background: #0f0f0f;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      transition: transform 0.2s;
+    }
+
+    .sc-marker:hover { transform: scale(1.4); }
+    .sc-marker.active { background: #8B7355; transform: scale(1.4); }
+
+    @media (max-width: 768px) {
+      .map-teaser-inner { grid-template-columns: 1fr; }
+      .map-teaser-right { min-height: 240px; }
+      .map-teaser-left { padding: 48px 28px; }
+      .map-teaser-title { font-size: 36px; }
+      .map-popup { left: 16px; right: 16px; width: auto; bottom: 24px; }
+    }
+
+    @media (max-width: 768px) {
+      .hero-nav .wordmark { font-size: 22px; }
+      .try-section { padding: 64px 24px; }
+      .try-headline { font-size: 22px; }
+      .editorial { grid-template-columns: 1fr; gap: 32px; }
+      .editorial-title { font-size: 22px; }
+      .newsletter-strip { padding: 48px 24px; }
+      .newsletter-inner { grid-template-columns: 1fr; gap: 36px; }
+      .newsletter-title { font-size: 24px; }
+    }
+
+    /* Homepage editorial sections — temporary, replaced in the October design pass */
+    .posts { padding-top: 72px; padding-bottom: 0; }
+    .posts:last-of-type { padding-bottom: 72px; }
+    .posts .section-header {
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    .posts .section-label {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+      font-family: var(--body);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #0f0f0f;
+    }
+    .posts .section-label::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: #e4ddcd;
+    }
+    .posts .section-link { white-space: nowrap; }
+
+    .posts .property-card { display: flex; flex-direction: column; }
+    .posts .card-img { order: 1; margin-bottom: 22px; }
+    .posts .card-name {
+      order: 2;
+      font-family: var(--display);
+      font-size: 26px;
+      font-weight: 400;
+      line-height: 1.18;
+      letter-spacing: -0.01em;
+      color: #0f0f0f;
+      margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.02em; }
+    .posts .card-location {
+      order: 3;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #a09a90;
+      margin: 0;
+    }
+    .posts .card-detail { display: none; }
+
+    @media (max-width: 768px) {
+      .posts .section-label { font-size: 13px; }
+      .posts .card-name { font-size: 22px; }
+    }
+
+    .map-cta {
+      font-family: var(--display);
+      font-size: clamp(22px, 3vw, 30px);
+      line-height: 1.3;
+      max-width: 760px;
+      color: #0f0f0f;
+    }
+    .map-cta a { border-bottom: 1px solid #0f0f0f; }
+  
+    /* ---------- HOMEPAGE 2026 ---------- */
+
+    .home-hero { text-align: center; padding: 104px 48px 92px; max-width: 1100px; margin: 0 auto; }
+    .home-eyebrow {
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--black); opacity: 0.6; margin: 0 0 34px;
+    }
+    .home-headline {
+      font-family: var(--display); font-weight: 400;
+      font-size: clamp(38px, 5.6vw, 76px); line-height: 1.06; letter-spacing: -0.005em;
+      margin: 0 auto 46px; max-width: 17ch; text-transform: uppercase; letter-spacing: 0.02em; }
+    .home-cta {
+      display: inline-block; border: 1px solid var(--black); padding: 17px 34px;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--black); transition: background 0.2s, color 0.2s;
+    }
+    .home-cta:hover { background: var(--black); color: #fff; }
+
+    /* Homepage sections share the nav's 48px gutter (16px on phones), no width cap, so every edge lines up. */
+    .home-film { padding: 0 48px; }
+    .home-film-frame {
+      width: 100%; aspect-ratio: 16 / 9; max-height: 86vh; overflow: hidden;
+      background: var(--grey-4); display: block;
+    }
+    .home-film-still {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transform-origin: center;
+      animation: film-drift 26s ease-in-out infinite alternate;
+    }
+    @keyframes film-drift {
+      from { transform: scale(1); }
+      to   { transform: scale(1.06); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .home-film-still { animation: none; }
+    }
+
+    .home-intro { padding: 120px 48px 0; }
+    .home-intro p {
+      max-width: 50ch; text-indent: 3em;
+      font-family: var(--body);
+      font-size: 20px; line-height: 1.6; letter-spacing: 0.01em; margin: 0;
+    }
+
+    .home-collection { padding: 120px 48px 0; }
+    .home-collection-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 24px; margin-bottom: 56px;
+    }
+    .home-collection-head h2 {
+      font-family: var(--body); font-weight: 400;
+      font-size: clamp(28px, 3.3vw, 48px); line-height: 1.1; letter-spacing: 0.02em;
+      text-transform: uppercase; margin: 0;
+    }
+    .home-collection-link {
+      display: inline-flex; align-items: center; gap: 14px;
+      font-family: var(--body);
+      font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--black); white-space: nowrap;
+    }
+    .home-collection-link svg { width: 9px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: transform 0.2s; }
+    .home-collection-link:hover svg { transform: translateX(4px); }
+
+    .island-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 3.6vw, 56px); }
+    .island-card { display: block; color: inherit; }
+    .island-img { width: 100%; aspect-ratio: 4 / 5; overflow: hidden; background: var(--grey-4); margin-bottom: 26px; }
+    .island-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
+    .island-card:hover .island-img img { transform: scale(1.03); }
+    .island-name {
+      font-family: var(--body);
+      font-size: clamp(19px, 1.8vw, 26px); font-weight: 400; letter-spacing: 0.04em;
+      text-transform: uppercase; margin: 0 0 8px;
+    }
+    .island-count {
+      font-family: var(--body);
+      font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--grey-1); margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .home-hero { padding: 56px 16px 52px; }
+      .home-headline { font-size: clamp(30px, 8.5vw, 44px); max-width: none; }
+      .home-eyebrow { margin-bottom: 22px; }
+      .home-film { padding: 0 16px; }
+      .home-intro { padding: 56px 16px 0; }
+      .home-intro p { font-size: 16px; }
+      .home-collection { padding: 64px 16px 0; }
+      .home-collection-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .island-grid { grid-template-columns: 1fr; gap: 36px; }
+    }
+  
+    .home-map { padding: 120px 48px 0; }
+    .home-map .section-header { padding-top: 0; }
+    .home-map .map-cta { font-size: 15px; line-height: 1.6; color: var(--grey-1); margin: 20px 0 0; max-width: 62ch; }
+    .home-map .map-cta a { color: var(--black); border-bottom: 1px solid var(--grey-3); }
+    .home-map .map-cta a:hover { border-color: var(--black); }
+    .home-map-frame {
+      position: relative; display: block; width: 100%; overflow: hidden;
+      background: var(--grey-4); border: 1px solid var(--grey-3);
+      min-height: 260px;
+    }
+    .home-map-frame img { width: 100%; height: auto; display: block; transition: transform 0.6s ease; }
+    .home-map-frame:hover img { transform: scale(1.02); }
+    .home-map-cta {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: transparent; color: var(--black); border: 1px solid var(--black);
+      padding: 16px 32px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      transition: background 0.2s, color 0.2s; white-space: nowrap;
+    }
+    .home-map-frame:hover .home-map-cta { background: var(--black); color: #fff; }
+    .home-map-credit { font-size: 10px; color: var(--grey-2); margin: 10px 0 0; letter-spacing: 0.04em; }
+
+    .home-signup { margin: 96px 0 0; padding: 0 48px; }
+    .home-signup-inner {
+      display: flex; align-items: center; justify-content: space-between; gap: 32px;
+      border-top: 1px solid var(--grey-3); padding-top: 28px;
+    }
+    .home-signup-text { font-size: 14px; color: var(--grey-1); margin: 0; }
+    .home-signup-text strong { color: var(--black); font-weight: 500; }
+    .home-signup .try-form { max-width: 380px; margin: 0; flex: 0 1 380px; }
+    .home-signup .try-email { font-size: 13px; padding: 11px 14px; }
+    .home-signup .try-btn { font-size: 10px; padding: 11px 20px; }
+
+    @media (max-width: 768px) {
+      .home-map { padding: 64px 16px 0; }
+      .home-map-cta { padding: 13px 22px; font-size: 10px; }
+      .home-signup { margin-top: 56px; padding: 0 16px; }
+      .home-signup-inner { flex-direction: column; align-items: stretch; gap: 16px; }
+      .home-signup .try-form { flex: 1 1 auto; max-width: none; }
+    }
+  </style>
+  <!-- Google Analytics -->
+  <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-B930Z6F96Z');
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Slow Casa",
+    "url": "https://slowcasa.com",
+    "description": "A curated directory of design-led houses to rent across the Balearic Islands, plus village guides to where to eat, swim and stay near each one.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Slow Casa",
+      "url": "https://slowcasa.com",
+      "logo": "https://slowcasa.com/web-app-manifest-512x512.png",
+      "sameAs": ["https://www.instagram.com/theslowcasa/"]
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Site nav: generated from lib/nav.js. Keep in sync. -->
+  <header class="site-nav">
+    <a href="/" class="wordmark">Slow Casa</a>
+    <div class="site-nav-right">
+      <a class="site-nav-link" href="/houses">The Collection</a>
+      <a class="site-nav-link" href="/places">Places</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">Menu <i class="burger" aria-hidden="true"></i></button>
+    </div>
+  </header>
+  <div class="menu-scrim" data-menu-close></div>
+  <aside class="site-menu" id="site-menu" aria-label="Menu" aria-hidden="true" inert>
+    <div class="site-menu-top">
+      <button class="menu-close" type="button" data-menu-close>Close <i class="burger is-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="site-menu-links">
+      <a href="/houses">The Collection</a>
+      <a href="/places">Places</a>
+      <a href="/map">Map</a>
+      <a href="/about">About</a>
+      <a href="mailto:luke@slowcasa.com?subject=List%20my%20house%20on%20Slow%20Casa">List your house</a>
+    </div>
+    <a class="site-menu-contact" href="mailto:luke@slowcasa.com">Contact</a>
+    <div class="site-menu-foot">
+      <a href="mailto:luke@slowcasa.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg>luke@slowcasa.com</a>
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6"/></svg>@theslowcasa</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>The newsletter</a>
+    </div>
+  </aside>
+  <script src="/menu.js" defer></script>
+
+  <header class="home-hero">
+    <p class="home-eyebrow">Design holiday homes</p>
+    <h1 class="home-headline">The best houses to rent in Mallorca, Ibiza and Menorca</h1>
+    <a class="home-cta" href="/houses">Explore collection (<span data-count="all">18</span>)</a>
+  </header>
+
+  <section class="home-film">
+    <div class="home-film-frame">
+      <img class="home-film-still" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_16:9,g_auto,w_2400,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg" alt="Mallorca" loading="lazy" />
+    </div>
+  </section>
+
+  <section class="home-intro">
+    <p>Slow Casa is a curated collection of exceptional homes throughout Mallorca, Menorca and Ibiza. Every home is personally selected for its design, location, and quality. You too can live the Balearic lifestyle. Our community of properties and owners shares our values, and each authentic place offers the opportunity for a slow living stay.</p>
+  </section>
+
+  <section class="home-collection">
+    <div class="home-collection-head">
+      <h2>The Collection</h2>
+      <a class="home-collection-link" href="/houses"><span>See full collection (<span data-count="all">18</span>)</span><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
+    </div>
+    <div class="island-grid">
+      <a class="island-card" href="/mallorca">
+        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,q_auto,f_auto,w_1000/v1791362039/mallorca_card_v6tx57.jpg" alt="Port de Soller on the north-west coast of Mallorca" loading="lazy" /></div>
+        <p class="island-name">Mallorca</p>
+        <p class="island-count"><span data-count="mallorca">14</span> houses</p>
+      </a>
+      <a class="island-card" href="/menorca">
+        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,q_auto,f_auto,w_1000/v1791362040/menorca_card_ywifq5.jpg" alt="Houses above the limestone cliffs on the coast of Menorca" loading="lazy" /></div>
+        <p class="island-name">Menorca</p>
+        <p class="island-count"><span data-count="menorca">2</span> houses</p>
+      </a>
+      <a class="island-card" href="/ibiza">
+        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,q_auto,f_auto,w_1000/v1791362038/ibiza_card_bbuc6x.jpg" alt="A street in Dalt Vila, the old town of Ibiza" loading="lazy" /></div>
+        <p class="island-name">Ibiza</p>
+        <p class="island-count"><span data-count="ibiza">2</span> houses</p>
+      </a>
+    </div>
+  </section>
+
+
+  <section class="home-map">
+    <div class="section-header">
+      <p class="section-label">The Map</p>
+      <a class="section-link" href="/map">Open the map</a>
+    </div>
+    <a class="home-map-frame" href="/map">
+      <img src="https://res.cloudinary.com/dw1wmo2go/image/upload/q_auto,f_auto,w_1600/v1791444652/map_graphic_c81oaq.jpg" alt="Map of Mallorca, Ibiza and Menorca showing every house in the collection" loading="lazy" />
+      <span class="home-map-cta">Take a look</span>
+    </a>
+    <p class="map-cta">Every house, restaurant, beach and bar we rate across the Balearics, on one map. <a href="/map">Take a look.</a></p>
+    <p class="home-map-credit">&copy; Mapbox &nbsp;&copy; OpenStreetMap</p>
+  </section>
+
+  <section class="home-signup">
+    <div class="home-signup-inner">
+      <p class="home-signup-text"><strong>The Slow Signal.</strong> Notes on the houses and the islands, now and then.</p>
+      <div class="try-form">
+        <input class="try-email" id="try-email-input" type="email" placeholder="Your email address" />
+        <button class="try-btn" type="button" onclick="handleTrySubscribe()">Sign up</button>
+      </div>
+    </div>
+  </section>
+
+    <footer>
+    <div class="footer-left">
+      <span class="footer-copy">&copy; 2026 Slow Casa</span>
+      <a href="/privacy" class="footer-policy">Privacy</a>
+    </div>
+    <div class="footer-links">
+      <a href="/about">About</a>
+      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">Newsletter</a>
+      <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </footer>
+
+  <script>
+  // All page logic deferred until after initial render to maximize FCP/LCP
+  window.addEventListener('DOMContentLoaded', function() {
+
+    // Mapbox lazy loader - loads Mapbox CSS+JS only when first needed
+    var mapboxLoadPromise = null;
+
+    // Cloudinary responsive transformer - keeps Cloudinary URLs but enforces sensible sizes
+    function responsiveCloudinaryUrl(url, width) {
+      if (!url || url.indexOf('res.cloudinary.com') === -1) return url;
+      // If the URL already has transformations, replace width; otherwise inject one
+      try {
+        var parts = url.split('/upload/');
+        if (parts.length !== 2) return url;
+        // Strip any existing transformation segment if present (between /upload/ and /v...)
+        var rest = parts[1];
+        var versionIdx = rest.search(/\/v\d+\//);
+        var trail = versionIdx >= 0 ? rest.substring(versionIdx) : '/' + rest;
+        return parts[0] + '/upload/c_fill,w_' + width + ',g_auto,q_auto,f_auto' + trail;
+      } catch (e) { return url; }
+    }
+
+    // Sanity responsive transformer - adds width + format hints to cdn.sanity.io URLs
+    function responsiveSanityUrl(url, width) {
+      if (!url || url.indexOf('cdn.sanity.io') === -1) return url;
+      try {
+        var separator = url.indexOf('?') >= 0 ? '&' : '?';
+        return url + separator + 'w=' + width + '&auto=format&fit=max&q=80';
+      } catch (e) { return url; }
+    }
+
+    // Smart responsive URL - applies the right transformer based on URL host
+    function responsiveImageUrl(url, width) {
+      if (!url) return url;
+      if (url.indexOf('res.cloudinary.com') >= 0) return responsiveCloudinaryUrl(url, width);
+      if (url.indexOf('cdn.sanity.io') >= 0) return responsiveSanityUrl(url, width);
+      return url;
+    }
+
+    async function fetchProperties() {
+      try {
+        var res = await fetch('/api/properties');
+        var data = await res.json();
+        return data.records || [];
+      } catch (err) { return []; }
+    }
+
+    function getImageUrl(record, index) {
+      index = index || 0;
+      var heroImg = record.fields && record.fields['Hero Image'];
+      if (index === 0 && heroImg) return heroImg;
+      var images = record.fields['Images'];
+      if (images && images.length > index) return images[index].url;
+      return null;
+    }
+
+    // Fetch featured property from API (single static hero image now)
+
+       function renderProperties(records) {
+      var grid = document.getElementById('latest-homes');
+      if (!grid || !records.length) return;
+
+      // Newest first, and only homes that actually have an image
+      var sorted = records.filter(function (r) {
+        var f = r.fields || {};
+        if (!f['Name'] || !f['Slug']) return false;
+        return !!f['Hero Image'] || !!f['Gallery Images'] || (f['Images'] && f['Images'].length > 0);
+      }).filter(function (r) {
+        // Balearics only. Matched on text for now; an Island field in Airtable would be cleaner.
+        var f = r.fields;
+        var hay = ((f['Location label'] || '') + ' ' + (f['Region'] || '') + ' ' + (f['Town'] || '')).toLowerCase();
+        return hay.indexOf('mallorca') > -1 || hay.indexOf('majorca') > -1 ||
+               hay.indexOf('ibiza') > -1 || hay.indexOf('eivissa') > -1 ||
+               hay.indexOf('menorca') > -1 || hay.indexOf('minorca') > -1 ||
+               hay.indexOf('balear') > -1 || hay.indexOf('formentera') > -1;
+      }).sort(function (a, b) {
+        var da = a.fields['Date added'] ? new Date(a.fields['Date added']) : new Date(0);
+        var db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
+        return db - da;
+      }).slice(0, 9);
+
+      if (!sorted.length) { var sec = grid.closest('section'); if (sec) sec.style.display = 'none'; return; }
+
+      function esc(str) {
+        return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      grid.innerHTML = sorted.map(function (r) {
+        var f = r.fields;
+        var img = f['Hero Image'] || getImageUrl(r, 0) || '';
+        var label = f['Location label'] || f['Region'] || f['Country'] || '';
+        var isl = String(f['Island'] || '').trim().toLowerCase();
+        var href = ['mallorca','ibiza','menorca','formentera'].indexOf(isl) !== -1
+          ? '/' + isl + '/houses/' + esc(f['Slug'])
+          : '/properties/' + esc(f['Slug']);
+        return '<a class="property-card" href="' + href + '">' +
+          '<div class="card-img">' + (img ? '<img src="' + esc(responsiveImageUrl(img, 800)) + '" alt="' + esc(f['Name']) + '" loading="lazy" />' : '') + '</div>' +
+          '<p class="card-location">' + esc(label) + '</p>' +
+          '<p class="card-name">' + esc(f['Name']) + '</p>' +
+          '<p class="card-detail"></p>' +
+          '</a>';
+      }).join('');
+    }
+
+    async function handleNewsletterSubscribe(e) {
+      e.preventDefault();
+      var input = document.querySelector('.newsletter-input');
+      var btn = e.target;
+      var email = input.value;
+      if (!email || !email.includes('@')) return;
+      btn.textContent = 'Subscribing...';
+      btn.disabled = true;
+      try {
+        var res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        if (res.ok) {
+          input.value = '';
+          btn.textContent = "You're in!";
+          setTimeout(function() { btn.textContent = 'Subscribe — it\'s free'; btn.disabled = false; }, 3000);
+        } else {
+          btn.textContent = 'Subscribe — it\'s free';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        btn.textContent = 'Subscribe — it\'s free';
+        btn.disabled = false;
+      }
+    }
+
+    async function handleTrySubscribe() {
+      var input = document.getElementById('try-email-input');
+      var btn = input.nextElementSibling;
+      var email = input.value;
+      if (!email || !email.includes('@')) { input.focus(); return; }
+      btn.textContent = 'Subscribing...';
+      btn.disabled = true;
+      try {
+        var res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        if (res.ok) {
+          input.parentElement.innerHTML = '<p style="font-size:14px;color:var(--grey-1);letter-spacing:0.02em;">You\'re in. See you Thursday.</p>';
+        } else {
+          btn.textContent = 'Sign up';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        btn.textContent = 'Sign up';
+        btn.disabled = false;
+      }
+    }
+
+    // Houses grid removed from the homepage; the island cards replace it.
+    // fetchProperties().then(renderProperties);
+
+    // Fetch latest journal post - DISABLED until journal section is re-added with proper content
+    async function fetchLatestPost() {
+      return;
+    }
+
+    fetchLatestPost();
+
+    window.handleTrySubscribe = handleTrySubscribe;
+  });
+  </script>
+<script>
+(function () {
+  var q = '*[_type == "guide" && defined(publishedAt) && defined(slug.current)]' +
+          ' | order(publishedAt desc){title, excerpt, category,' +
+          ' "slug": slug.current, "img": heroImage.asset->url}';
+  var url = 'https://hchp27po.apicdn.sanity.io/v2024-01-01/data/query/production?query=' + encodeURIComponent(q);
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function thumb(u) {
+    if (!u) return '';
+    return u + (u.indexOf('?') > -1 ? '&' : '?') + 'w=800&auto=format&fit=crop';
+  }
+  function card(g, label) {
+    return '<a class="property-card" href="/guides/' + esc(g.slug) + '">' +
+      '<div class="card-img">' + (g.img ? '<img src="' + esc(thumb(g.img)) + '" alt="' + esc(g.title) + '" loading="lazy" />' : '') + '</div>' +
+      '<p class="card-location">' + esc(label) + '</p>' +
+      '<p class="card-name">' + esc(g.title) + '</p>' +
+      '<p class="card-detail">' + esc(g.excerpt || '') + '</p>' +
+      '</a>';
+  }
+
+  fetch(url)
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var all = (d && d.result) || [];
+      var grids = document.querySelectorAll('.js-posts');
+      for (var i = 0; i < grids.length; i++) {
+        var grid = grids[i];
+        var cats = (grid.getAttribute('data-categories') || '').split(',');
+        var label = grid.getAttribute('data-label') || 'Guide';
+        var items = all.filter(function (g) { return cats.indexOf(g.category) > -1; }).slice(0, 3);
+        if (!items.length) { var s = grid.closest('section'); if (s) s.style.display = 'none'; continue; }
+        grid.innerHTML = items.map(function (g) { return card(g, label); }).join('');
+      }
+    })
+    .catch(function () { /* sections stay empty rather than breaking the page */ });
+})();
+</script>
+
+  <script>
+  // The island counts are written into the HTML so they are visible without JavaScript.
+  // This corrects them from Airtable after load, so they stay right as houses are added.
+  (function () {
+    var nodes = document.querySelectorAll('[data-count]');
+    if (!nodes.length) return;
+    fetch('/api/properties?all=true')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var recs = (d && d.records) || [];
+        if (!recs.length) return;
+        var tally = { all: recs.length, mallorca: 0, ibiza: 0, menorca: 0 };
+        recs.forEach(function (r) {
+          var isl = String((r.fields && r.fields['Island']) || '').trim().toLowerCase();
+          if (tally[isl] !== undefined) tally[isl]++;
+        });
+        nodes.forEach(function (n) {
+          var key = n.getAttribute('data-count');
+          if (tally[key] !== undefined) n.textContent = tally[key];
+        });
+      })
+      .catch(function () { /* leave the numbers in the HTML */ });
+  })();
+  </script>
+</body>
+</html>

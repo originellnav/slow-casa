@@ -1,0 +1,304 @@
+@font-face {
+  font-family: 'TT Norms Pro';
+  src: url('/TT_Norms_Pro_Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* ============================================
+   SLOW CASA — Global Stylesheet
+   Edit this file to update styles sitewide
+   ============================================ */
+
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --white: #ffffff;
+  --black: #0f0f0f;
+  --grey-1: #888888;
+  --grey-2: #bbbbbb;
+  --grey-3: #e8e8e8;
+  --grey-4: #f5f5f3;
+  --bg: #FDFCF8;
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --archivo: 'Archivo Black', sans-serif;
+  --playfair: 'Playfair Display', Georgia, serif;
+}
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, h5, h6 { font-weight: 400; }
+body { font-family: var(--body); background: var(--bg); color: var(--black); min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font-family: inherit; }
+
+
+/* FOOTER — sitewide */
+footer {
+  padding: 24px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 0.5px solid var(--grey-3);
+  margin-top: 40px;
+}
+
+.footer-left { display: flex; align-items: center; gap: 32px; }
+.footer-copy { font-family: var(--body); font-size: 12px; color: var(--grey-1); letter-spacing: 0.02em; }
+.footer-policy { font-family: var(--body); font-size: 12px; color: var(--grey-1); letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+.footer-policy:hover { color: var(--black); }
+
+.footer-links { display: flex; gap: 28px; }
+.footer-links a { font-family: var(--body); font-size: 12px; color: var(--grey-1); letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+.footer-links a:hover { color: var(--black); }
+
+@media (max-width: 768px) {
+  footer { flex-direction: column; gap: 16px; padding: 24px; text-align: center; }
+  .footer-left { flex-direction: column; gap: 12px; }
+  .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+}
+
+/* PROPERTY CARDS — shared */
+.property-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.property-card { cursor: pointer; }
+.property-card:hover .card-img img { transform: scale(1.03); }
+.card-img { width: 100%; aspect-ratio: 4/3; overflow: hidden; margin-bottom: 16px; background: var(--grey-4); }
+.card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
+.card-img-placeholder { width: 100%; height: 100%; background: var(--grey-4); }
+.card-location { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 6px; }
+.card-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
+.card-detail { font-size: 13px; color: var(--grey-1); line-height: 1.5; margin-bottom: 12px; }
+.card-tag { display: inline-block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey-1); border: 0.5px solid var(--grey-3); padding: 4px 10px; }
+
+/* SECTION HEADERS — shared */
+.section { max-width: 1200px; margin: 0 auto; padding: 0 48px 80px; }
+.section-header { display: flex; justify-content: space-between; align-items: baseline; padding-top: 20px; margin-bottom: 40px; }
+.section-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); }
+.section-link { font-size: 12px; color: var(--grey-1); cursor: pointer; transition: color 0.2s; }
+.section-link:hover { color: var(--black); }
+
+/* LOADING / SKELETON */
+.loading { grid-column: 1 / -1; text-align: center; padding: 48px; font-size: 13px; color: var(--grey-1); letter-spacing: 0.06em; }
+.skeleton { background: var(--grey-4); animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* ANIMATIONS */
+.fade-in { opacity: 0; transform: translateY(12px); animation: fadeIn 0.6s ease forwards; }
+@keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .section { padding: 0 24px 56px; }
+  .property-grid { grid-template-columns: 1fr; gap: 40px; }
+  footer { flex-direction: column; gap: 20px; padding: 32px 24px; text-align: center; }
+  .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+}
+/* ============================================
+   GLOBAL NAV + FOOTER
+   Selectors are deliberately specific so they beat the
+   inline <style> blocks inside the serverless page functions.
+   ============================================ */
+
+
+footer .footer-links { gap: 32px; }
+footer .footer-links a,
+footer .footer-left .footer-policy {
+  font-family: var(--body);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--grey-1);
+  transition: color 0.2s;
+}
+footer .footer-links a:hover,
+footer .footer-left .footer-policy:hover { color: var(--black); }
+footer .footer-copy {
+  font-family: var(--body);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--grey-1);
+}
+
+@media (max-width: 768px) {
+  footer .footer-links { gap: 20px; }
+  footer .footer-links a,
+  footer .footer-left .footer-policy { font-size: 11px; }
+}
+
+
+
+/* ============================================
+   SITE NAV + SLIDE-OUT MENU
+   Markup: lib/nav.js (and the copies in the static pages).
+   Behaviour: /menu.js
+   ============================================ */
+@font-face {
+  font-family: 'Jost';
+  src: url('/fonts/jost-latin-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Jost';
+  src: url('/fonts/jost-latin-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+:root {
+  /* SITE TYPE: two families only.
+     --brand   the Slow Casa wordmark, nothing else
+     --display headings, card names, labels (set in capitals by each rule)
+     --body    everything else
+     Page files must use these tokens, never a font name. */
+  --brand: 'DM Serif Display', Georgia, serif;
+  --display: 'Jost', 'DM Sans', system-ui, sans-serif;
+  --body: 'Jost', 'DM Sans', system-ui, sans-serif;
+  --nav-font: var(--display);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 26px 48px;
+  background: var(--bg);
+}
+.site-nav .wordmark {
+  font-family: var(--brand);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--black);
+  white-space: nowrap;
+}
+.site-nav-right { display: flex; align-items: center; gap: 40px; }
+.site-nav-link,
+.menu-btn,
+.menu-close {
+  font-family: var(--body);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--black);
+}
+.site-nav-link:hover,
+.site-menu-links a:hover {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
+}
+.menu-btn,
+.menu-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: 0;
+  padding: 6px 0;
+  cursor: pointer;
+}
+.burger { position: relative; display: inline-block; width: 20px; height: 9px; }
+.burger::before,
+.burger::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: var(--black);
+}
+.burger::before { top: 0; }
+.burger::after { top: 8px; }
+.burger.is-x::before { top: 4px; transform: rotate(45deg); }
+.burger.is-x::after { top: 4px; transform: rotate(-45deg); }
+
+.menu-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 15, 15, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  z-index: 900;
+}
+.site-menu {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(440px, 100%);
+  background: var(--bg);
+  z-index: 901;
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s linear 0.45s;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 48px 40px;
+  overflow-y: auto;
+}
+html.menu-open { overflow: hidden; }
+html.menu-open .menu-scrim { opacity: 1; pointer-events: auto; }
+html.menu-open .site-menu {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s;
+}
+.site-menu-top { display: flex; justify-content: flex-end; }
+.site-menu-links { margin-top: 64px; display: grid; gap: 28px; }
+.site-menu-links a {
+  width: fit-content;
+  font-family: var(--body);
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--black);
+}
+.site-menu-contact {
+  display: block;
+  margin-top: 44px;
+  padding: 18px;
+  border: 1px solid var(--black);
+  text-align: center;
+  font-family: var(--body);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--black);
+  transition: background 0.2s, color 0.2s;
+}
+.site-menu-contact:hover { background: var(--black); color: var(--bg); }
+.site-menu-foot { margin-top: auto; padding-top: 48px; display: grid; gap: 14px; }
+.site-menu-foot a {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  font-family: var(--body);
+  font-size: 14px;
+  color: var(--black);
+}
+.site-menu-foot svg { width: 17px; height: 17px; fill: none; stroke: var(--black); stroke-width: 1.3; flex: none; }
+.site-nav a:focus-visible,
+.site-menu a:focus-visible,
+.menu-btn:focus-visible,
+.menu-close:focus-visible { outline: 1px solid var(--black); outline-offset: 4px; }
+
+@media (max-width: 768px) {
+  .site-nav { padding: 20px 16px; }
+  .site-nav .wordmark { font-size: 22px; }
+  .site-nav-link { display: none; }
+  .site-menu { padding: 20px 24px 32px; }
+  .site-menu-links { margin-top: 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-scrim, .site-menu, html.menu-open .site-menu { transition: none; }
+}
