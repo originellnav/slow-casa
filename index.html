@@ -113,18 +113,17 @@
     }
 
     .hero-headline {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: clamp(40px, 6vw, 72px);
       font-weight: 400;
       line-height: 1.0;
       letter-spacing: -0.01em;
       color: #ffffff;
       margin-bottom: 24px;
-      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
-    }
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4); text-transform: uppercase; letter-spacing: 0.02em; }
 
     .hero-subhead {
-      font-family: 'DM Sans', system-ui, sans-serif;
+      font-family: var(--body);
       font-size: clamp(15px, 1.6vw, 19px);
       font-weight: 400;
       line-height: 1.5;
@@ -162,7 +161,7 @@
     }
 
     .try-headline {
-      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-family: var(--body);
       font-size: 28px;
       font-weight: 300;
       line-height: 1.55;
@@ -184,7 +183,7 @@
 
     .try-email {
       flex: 1;
-      font-family: var(--sans);
+      font-family: var(--body);
       font-size: 14px;
       padding: 14px 18px;
       border: 0.5px solid var(--black);
@@ -197,7 +196,7 @@
     .try-email::placeholder { color: var(--grey-1); }
 
     .try-btn {
-      font-family: var(--sans);
+      font-family: var(--body);
       font-size: 11px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -229,7 +228,7 @@
     }
 
     .featured-eyebrow {
-      font-family: var(--sans);
+      font-family: var(--body);
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.16em;
@@ -239,7 +238,7 @@
     }
 
     .featured-region {
-      font-family: var(--sans);
+      font-family: var(--body);
       font-size: 13px;
       font-weight: 300;
       letter-spacing: 0.22em;
@@ -249,17 +248,16 @@
     }
 
     .featured-name {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: 52px;
       font-weight: 400;
       line-height: 1.05;
       letter-spacing: -0.01em;
       color: var(--black);
-      margin-bottom: 24px;
-    }
+      margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.02em; }
 
     .featured-desc {
-      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-family: var(--body);
       font-size: 16px;
       font-weight: 300;
       line-height: 1.65;
@@ -313,7 +311,7 @@
     }
 
     .map-teaser-eyebrow {
-      font-family: var(--sans);
+      font-family: var(--body);
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.16em;
@@ -323,16 +321,15 @@
     }
 
     .map-teaser-title {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: 48px;
       font-weight: 400;
       line-height: 1.05;
       color: var(--black);
-      margin-bottom: 16px;
-    }
+      margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.02em; }
 
     .map-teaser-sub {
-      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-family: var(--body);
       font-size: 15px;
       font-weight: 300;
       line-height: 1.65;
@@ -381,11 +378,10 @@
     }
 
     .map-modal-title {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: 18px;
       font-weight: 400;
-      color: var(--black);
-    }
+      color: var(--black); text-transform: uppercase; letter-spacing: 0.02em; }
 
     .map-modal-close {
       background: none;
@@ -428,12 +424,11 @@
     }
 
     .map-popup-name {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: 18px;
       font-weight: 400;
       color: var(--black);
-      margin-bottom: 12px;
-    }
+      margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.02em; }
 
     .map-popup-link {
       font-size: 11px;
@@ -491,7 +486,7 @@
     }
 
     .criteria-body {
-      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-family: var(--body);
       font-size: 24px;
       font-weight: 300;
       line-height: 1.45;
@@ -502,7 +497,7 @@
 
     .criteria-btn {
       display: inline-block;
-      font-family: var(--sans);
+      font-family: var(--body);
       font-size: 11px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -521,20 +516,20 @@
     .editorial-img { width: 100%; aspect-ratio: 4/3; background: var(--grey-4); overflow: hidden; }
     .editorial-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .editorial-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 16px; }
-    .editorial-title { font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif; font-size: 22px; font-weight: 300; line-height: 1.25; margin-bottom: 16px; }
+    .editorial-title { font-family: var(--body); font-size: 22px; font-weight: 300; line-height: 1.25; margin-bottom: 16px; }
     .editorial-body { font-size: 14px; color: var(--grey-1); line-height: 1.8; margin-bottom: 24px; }
     .editorial-link { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); border-bottom: 0.5px solid var(--black); padding-bottom: 2px; cursor: pointer; }
 
     .newsletter-strip { border-top: none; border-bottom: none; padding: 72px 48px; }
     .newsletter-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
     .newsletter-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 16px; }
-    .newsletter-title { font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif; font-size: 26px; font-weight: 300; line-height: 1.2; margin-bottom: 12px; }
+    .newsletter-title { font-family: var(--body); font-size: 26px; font-weight: 300; line-height: 1.2; margin-bottom: 12px; }
     .newsletter-sub { font-size: 14px; color: var(--grey-1); line-height: 1.75; }
     .newsletter-form { display: flex; flex-direction: column; gap: 12px; }
-    .newsletter-input { font-family: var(--sans); font-size: 14px; padding: 14px 18px; border: 0.5px solid var(--grey-3); background: transparent; color: var(--black); outline: none; transition: border-color 0.2s; }
+    .newsletter-input { font-family: var(--body); font-size: 14px; padding: 14px 18px; border: 0.5px solid var(--grey-3); background: transparent; color: var(--black); outline: none; transition: border-color 0.2s; }
     .newsletter-input:focus { border-color: var(--black); }
     .newsletter-input::placeholder { color: var(--grey-2); }
-    .newsletter-submit { font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 28px; border: 0.5px solid var(--black); background: transparent; color: var(--black); cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .newsletter-submit { font-family: var(--body); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 28px; border: 0.5px solid var(--black); background: transparent; color: var(--black); cursor: pointer; transition: background 0.2s, color 0.2s; }
     .newsletter-submit:hover { background: var(--black); color: var(--white); }
     .newsletter-small { font-size: 11px; color: var(--grey-2); }
 
@@ -559,7 +554,7 @@
     }
 
     .map-teaser-eyebrow {
-      font-family: var(--sans);
+      font-family: var(--body);
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.16em;
@@ -569,16 +564,15 @@
     }
 
     .map-teaser-title {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: 48px;
       font-weight: 400;
       line-height: 1.05;
       color: var(--black);
-      margin-bottom: 16px;
-    }
+      margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.02em; }
 
     .map-teaser-sub {
-      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-family: var(--body);
       font-size: 15px;
       font-weight: 300;
       line-height: 1.65;
@@ -627,11 +621,10 @@
     }
 
     .map-modal-title {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: 18px;
       font-weight: 400;
-      color: var(--black);
-    }
+      color: var(--black); text-transform: uppercase; letter-spacing: 0.02em; }
 
     .map-modal-close {
       background: none;
@@ -674,12 +667,11 @@
     }
 
     .map-popup-name {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: 18px;
       font-weight: 400;
       color: var(--black);
-      margin-bottom: 12px;
-    }
+      margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.02em; }
 
     .map-popup-link {
       font-size: 11px;
@@ -747,7 +739,7 @@
       align-items: center;
       gap: 20px;
       flex: 1;
-      font-family: var(--sans);
+      font-family: var(--body);
       font-size: 15px;
       font-weight: 500;
       letter-spacing: 0.1em;
@@ -766,14 +758,13 @@
     .posts .card-img { order: 1; margin-bottom: 22px; }
     .posts .card-name {
       order: 2;
-      font-family: var(--serif);
+      font-family: var(--display);
       font-size: 26px;
       font-weight: 400;
       line-height: 1.18;
       letter-spacing: -0.01em;
       color: #0f0f0f;
-      margin-bottom: 12px;
-    }
+      margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.02em; }
     .posts .card-location {
       order: 3;
       font-size: 11px;
@@ -790,7 +781,7 @@
     }
 
     .map-cta {
-      font-family: var(--serif);
+      font-family: var(--display);
       font-size: clamp(22px, 3vw, 30px);
       line-height: 1.3;
       max-width: 760px;
@@ -806,10 +797,9 @@
       color: var(--black); opacity: 0.6; margin: 0 0 34px;
     }
     .home-headline {
-      font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
+      font-family: var(--display); font-weight: 400;
       font-size: clamp(38px, 5.6vw, 76px); line-height: 1.06; letter-spacing: -0.005em;
-      margin: 0 auto 46px; max-width: 17ch;
-    }
+      margin: 0 auto 46px; max-width: 17ch; text-transform: uppercase; letter-spacing: 0.02em; }
     .home-cta {
       display: inline-block; border: 1px solid var(--black); padding: 17px 34px;
       font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
@@ -839,7 +829,7 @@
     .home-intro { padding: 120px 48px 0; }
     .home-intro p {
       max-width: 50ch; text-indent: 3em;
-      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif);
+      font-family: var(--body);
       font-size: 20px; line-height: 1.6; letter-spacing: 0.01em; margin: 0;
     }
 
@@ -849,13 +839,13 @@
       gap: 24px; margin-bottom: 56px;
     }
     .home-collection-head h2 {
-      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif); font-weight: 400;
+      font-family: var(--body); font-weight: 400;
       font-size: clamp(28px, 3.3vw, 48px); line-height: 1.1; letter-spacing: 0.02em;
       text-transform: uppercase; margin: 0;
     }
     .home-collection-link {
       display: inline-flex; align-items: center; gap: 14px;
-      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif);
+      font-family: var(--body);
       font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
       color: var(--black); white-space: nowrap;
     }
@@ -868,12 +858,12 @@
     .island-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
     .island-card:hover .island-img img { transform: scale(1.03); }
     .island-name {
-      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif);
+      font-family: var(--body);
       font-size: clamp(19px, 1.8vw, 26px); font-weight: 400; letter-spacing: 0.04em;
       text-transform: uppercase; margin: 0 0 8px;
     }
     .island-count {
-      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif);
+      font-family: var(--body);
       font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
       color: var(--grey-1); margin: 0;
     }

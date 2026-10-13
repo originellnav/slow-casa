@@ -206,7 +206,7 @@ module.exports = async function handler(req, res) {
       font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #FDFCF8; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
+    html, body { background: #FDFCF8; font-family: var(--body); color: #0f0f0f; }
     a { color: inherit; text-decoration: none; }
     h1, h2, h3, h4 { font-weight: 400; }
 
@@ -218,7 +218,7 @@ module.exports = async function handler(req, res) {
       text-align: center;
     }
     .dir-eyebrow {
-      font-family: 'DM Sans', sans-serif;
+      font-family: var(--body);
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.18em;
@@ -227,15 +227,14 @@ module.exports = async function handler(req, res) {
       margin-bottom: 24px;
     }
     .dir-title {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: clamp(44px, 6vw, 64px);
       line-height: 1.0;
       letter-spacing: -0.02em;
       color: #0f0f0f;
-      margin-bottom: 20px;
-    }
+      margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.02em; }
     .dir-subline {
-      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-family: var(--body);
       font-size: 17px;
       font-weight: 300;
       line-height: 1.6;
@@ -248,7 +247,7 @@ module.exports = async function handler(req, res) {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 48px 32px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: var(--body);
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.18em;
@@ -281,13 +280,12 @@ module.exports = async function handler(req, res) {
     }
     .arch-card:hover .arch-card-img img { transform: scale(1.03); }
     .arch-card-name {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: 20px;
       font-weight: 400;
       line-height: 1.2;
       color: #0f0f0f;
-      margin-bottom: 6px;
-    }
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.02em; }
     .arch-card-location {
       font-size: 10px;
       letter-spacing: 0.14em;
@@ -296,7 +294,7 @@ module.exports = async function handler(req, res) {
       margin-bottom: 6px;
     }
     .arch-card-count {
-      font-family: 'TT Norms Pro', 'DM Sans', system-ui, sans-serif;
+      font-family: var(--body);
       font-size: 13px;
       font-weight: 300;
       color: #888;
@@ -312,22 +310,6 @@ module.exports = async function handler(req, res) {
       font-weight: 300;
     }
 
-    footer {
-      padding: 32px 48px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      border-top: 0.5px solid #e8e8e8;
-    }
-    .footer-left { display: flex; align-items: center; gap: 32px; }
-    .footer-copy { font-size: 12px; color: #888; }
-    .footer-policy { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-policy:hover { color: #0f0f0f; }
-    .footer-links { display: flex; gap: 28px; }
-    .footer-links a { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-links a:hover { color: #0f0f0f; }
 
     @media (max-width: 900px) {
       .arch-grid { grid-template-columns: repeat(2, 1fr); gap: 44px 24px; }
@@ -336,8 +318,6 @@ module.exports = async function handler(req, res) {
       .dir-header { padding: 48px 24px 40px; }
       .arch-grid { grid-template-columns: 1fr; gap: 40px; padding: 0 24px 72px; }
       .grid-section-label { padding: 0 24px 24px; }
-      footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
-      .footer-left { flex-direction: column; gap: 12px; }
     }
   </style>
 </head>

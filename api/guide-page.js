@@ -222,7 +222,7 @@ module.exports = async function handler(req, res) {
       // Proper 404 - not a soft 404 this time
       res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8').send(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8" /><title>Guide not found | Slow Casa</title><meta name="robots" content="noindex" /></head>
-<body style="font-family:sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;">
+<body style="font-family: system-ui, sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;">
 <h1>Guide not found</h1>
 <p>We couldn't find what you were looking for. <a href="/guides">Browse all guides</a> or <a href="/">return home</a>.</p>
 </body></html>`);
@@ -398,7 +398,7 @@ module.exports = async function handler(req, res) {
       font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #FDFCF8; font-family: 'DM Sans', system-ui, sans-serif; color: #0f0f0f; }
+    html, body { background: #FDFCF8; font-family: var(--body); color: #0f0f0f; }
     a { color: inherit; text-decoration: none; }
     h1, h2, h3, h4 { font-weight: 400; }
 
@@ -417,18 +417,17 @@ module.exports = async function handler(req, res) {
       margin-bottom: 24px;
     }
     .guide-title {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: clamp(32px, 4.5vw, 52px);
       line-height: 1.1;
       letter-spacing: -0.01em;
-      color: #0f0f0f;
-    }
+      color: #0f0f0f; text-transform: uppercase; letter-spacing: 0.02em; }
 
     .guide-body {
       max-width: 680px;
       margin: 0 auto;
       padding: 0 48px 80px;
-      font-family: 'TT Norms Pro', 'DM Sans', sans-serif;
+      font-family: var(--body);
       font-size: 18px;
       font-weight: 300;
       line-height: 1.7;
@@ -436,14 +435,13 @@ module.exports = async function handler(req, res) {
     }
     .guide-body p { margin-bottom: 1.4em; }
     .guide-body h2 {
-      font-family: 'DM Serif Display', Georgia, serif;
+      font-family: var(--display);
       font-size: clamp(24px, 2.8vw, 32px);
       margin: 2em 0 0.8em;
       line-height: 1.2;
-      color: #0f0f0f;
-    }
+      color: #0f0f0f; text-transform: uppercase; letter-spacing: 0.02em; }
     .guide-body h3 {
-      font-family: 'DM Sans', sans-serif;
+      font-family: var(--body);
       font-weight: 500;
       font-size: 20px;
       margin: 1.8em 0 0.6em;
@@ -489,30 +487,12 @@ module.exports = async function handler(req, res) {
       font-style: italic;
     }
 
-    footer {
-      padding: 80px 48px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      border-top: 0.5px solid #e8e8e8;
-    }
-    .footer-left { display: flex; align-items: center; gap: 32px; }
-    .footer-copy { font-size: 12px; color: #888; }
-    .footer-policy { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-policy:hover { color: #0f0f0f; }
-    .footer-links { display: flex; gap: 28px; }
-    .footer-links a { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-links a:hover { color: #0f0f0f; }
 
     @media (max-width: 768px) {
       .guide-header { padding: 48px 24px 24px; }
       .guide-body { padding: 0 24px 56px; font-size: 17px; }
       .guide-image { margin: 2em -24px; }
       .guide-image-lead { margin: 0 -24px 2em; }
-      footer { padding: 56px 24px 24px; flex-direction: column; gap: 16px; text-align: center; }
-      .footer-left { flex-direction: column; gap: 12px; }
     }
   </style>
 </head>

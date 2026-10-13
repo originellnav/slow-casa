@@ -1,4 +1,5 @@
 const { nav, footer } = require('../lib/nav');
+const { houseCard, placeOf } = require('../lib/card');
 
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
@@ -177,27 +178,18 @@ module.exports = async function handler(req, res) {
 
   const cardsHtml = houses.map(record => {
     const f = record.fields;
-    const name = escapeHtml(f['Name'] || '');
-    const slug = f['Slug'] || '';
-    const locationLabel = escapeHtml(f['Location label'] || '');
-    const descRaw = String(f['Description'] || '');
-    const desc = escapeHtml(descRaw.substring(0, 100) + (descRaw.length > 100 ? '...' : ''));
     const imgUrl = getImageUrl(record, 0) || '';
-    const url = `/${key}/houses/${slug}`;
-    return `<a href="${url}" class="card-link" style="text-decoration:none;color:inherit;">
-      <div class="property-card">
-        <div class="card-img">
-          ${imgUrl ? `<img src="${escapeHtml(responsiveImageUrl(imgUrl, 800))}" alt="${name}" loading="lazy" />` : '<div class="card-img-placeholder"></div>'}
-        </div>
-        <p class="card-location">${locationLabel}</p>
-        <p class="card-name">${name}</p>
-        <p class="card-detail">${desc}</p>
-      </div>
-    </a>`;
+    return houseCard({
+      url: `/${key}/houses/${f['Slug'] || ''}`,
+      img: imgUrl ? responsiveImageUrl(imgUrl, 1000) : '',
+      name: f['Name'] || '',
+      guests: f['Sleeps'],
+      place: placeOf(f)
+    });
   }).join('');
 
   const gridHtml = houses.length
-    ? `<div class="property-grid">${cardsHtml}</div>`
+    ? `<div class="house-grid">${cardsHtml}</div>`
     : `<p class="isl-empty">We are still adding houses on ${escapeHtml(config.name)}. <a href="/houses">See the whole directory</a>.</p>`;
 
   const guidesHtml = islandGuides.length
@@ -289,11 +281,11 @@ module.exports = async function handler(req, res) {
     .isl-crumb { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 24px; }
     .isl-crumb a { color: var(--grey-1); }
     .isl-crumb a:hover { color: var(--black); }
-    .isl-hero h1 { font-family: var(--serif); font-size: 46px; line-height: 1.12; margin: 0 0 24px; max-width: 16ch; }
+    .isl-hero h1 { font-family: var(--display); font-size: 46px; line-height: 1.12; margin: 0 0 24px; max-width: 16ch; text-transform: uppercase; letter-spacing: 0.02em; }
     .isl-intro { max-width: 62ch; }
     .isl-intro p { font-size: 16px; line-height: 1.65; color: var(--black); margin: 0 0 16px; }
-    .isl-count { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--grey-3); }
-    .isl-houses { padding-top: 40px; }
+    .isl-count { font-family: var(--body); font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-1); margin: 40px 0 0; }
+    .isl-houses { padding-top: 0; padding-bottom: 120px; }
     .isl-empty { font-size: 15px; color: var(--grey-1); }
     .isl-empty a { text-decoration: underline; }
     .isl-guide-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--grey-3); }
@@ -315,10 +307,10 @@ module.exports = async function handler(req, res) {
 <body>
 ${nav()}
 
-<header class="isl-hero">
-  <p class="isl-crumb"><a href="/">Slow Casa</a> / <a href="/houses">Houses</a> / ${escapeHtml(config.name)}</p>
-  <h1>${escapeHtml(config.title)}</h1>
-  <div class="isl-intro">${introHtml}</div>
+<header class="page-head">
+  <p class="page-crumb"><a href="/">Slow Casa</a> / <a href="/houses">Houses</a> / ${escapeHtml(config.name)}</p>
+  <h1 class="page-title">${escapeHtml(config.title)}</h1>
+  <div class="page-lede">${introHtml}</div>
   <p class="isl-count">${houseCount} ${houseCount === 1 ? 'house' : 'houses'} on ${escapeHtml(config.name)}</p>
 </header>
 
