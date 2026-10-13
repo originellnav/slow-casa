@@ -846,25 +846,37 @@
     .home-collection { padding: 120px 48px 0; }
     .home-collection-head {
       display: flex; align-items: baseline; justify-content: space-between;
-      gap: 24px; margin-bottom: 40px;
+      gap: 24px; margin-bottom: 56px;
     }
     .home-collection-head h2 {
-      font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
-      font-size: clamp(26px, 3.4vw, 40px); letter-spacing: 0.01em; margin: 0;
+      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif); font-weight: 400;
+      font-size: clamp(28px, 3.3vw, 48px); line-height: 1.1; letter-spacing: 0.02em;
+      text-transform: uppercase; margin: 0;
     }
     .home-collection-link {
-      font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
-      color: var(--grey-1); white-space: nowrap; transition: color 0.2s;
+      display: inline-flex; align-items: center; gap: 14px;
+      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif);
+      font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--black); white-space: nowrap;
     }
-    .home-collection-link:hover { color: var(--black); }
+    .home-collection-link svg { width: 9px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: transform 0.2s; }
+    .home-collection-link:hover svg { transform: translateX(4px); }
 
-    .island-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .island-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 3.6vw, 56px); }
     .island-card { display: block; color: inherit; }
-    .island-img { width: 100%; aspect-ratio: 4 / 3; overflow: hidden; background: var(--grey-4); margin-bottom: 16px; }
-    .island-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+    .island-img { width: 100%; aspect-ratio: 4 / 5; overflow: hidden; background: var(--grey-4); margin-bottom: 26px; }
+    .island-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
     .island-card:hover .island-img img { transform: scale(1.03); }
-    .island-name { font-size: 13px; letter-spacing: 0.13em; text-transform: uppercase; margin: 0 0 4px; }
-    .island-count { font-size: 13px; color: var(--grey-1); margin: 0; }
+    .island-name {
+      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif);
+      font-size: clamp(19px, 1.8vw, 26px); font-weight: 400; letter-spacing: 0.04em;
+      text-transform: uppercase; margin: 0 0 8px;
+    }
+    .island-count {
+      font-family: var(--nav-font, 'Jost', 'DM Sans', system-ui, sans-serif);
+      font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--grey-1); margin: 0;
+    }
 
     @media (max-width: 768px) {
       .home-hero { padding: 56px 16px 52px; }
@@ -994,21 +1006,21 @@
   <section class="home-collection">
     <div class="home-collection-head">
       <h2>The Collection</h2>
-      <a class="home-collection-link" href="/houses">See all houses (<span data-count="all">18</span>) &rsaquo;</a>
+      <a class="home-collection-link" href="/houses"><span>See full collection (<span data-count="all">18</span>)</span><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
     </div>
     <div class="island-grid">
       <a class="island-card" href="/mallorca">
-        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:3,g_auto,q_auto,f_auto,w_900/v1791362039/mallorca_card_v6tx57.jpg" alt="Port de Soller on the north-west coast of Mallorca" loading="lazy" /></div>
+        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,q_auto,f_auto,w_1000/v1791362039/mallorca_card_v6tx57.jpg" alt="Port de Soller on the north-west coast of Mallorca" loading="lazy" /></div>
         <p class="island-name">Mallorca</p>
         <p class="island-count"><span data-count="mallorca">14</span> houses</p>
       </a>
       <a class="island-card" href="/menorca">
-        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:3,g_auto,q_auto,f_auto,w_900/v1791362040/menorca_card_ywifq5.jpg" alt="Houses above the limestone cliffs on the coast of Menorca" loading="lazy" /></div>
+        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,q_auto,f_auto,w_1000/v1791362040/menorca_card_ywifq5.jpg" alt="Houses above the limestone cliffs on the coast of Menorca" loading="lazy" /></div>
         <p class="island-name">Menorca</p>
         <p class="island-count"><span data-count="menorca">2</span> houses</p>
       </a>
       <a class="island-card" href="/ibiza">
-        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:3,g_auto,q_auto,f_auto,w_900/v1791362038/ibiza_card_bbuc6x.jpg" alt="A street in Dalt Vila, the old town of Ibiza" loading="lazy" /></div>
+        <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,q_auto,f_auto,w_1000/v1791362038/ibiza_card_bbuc6x.jpg" alt="A street in Dalt Vila, the old town of Ibiza" loading="lazy" /></div>
         <p class="island-name">Ibiza</p>
         <p class="island-count"><span data-count="ibiza">2</span> houses</p>
       </a>
