@@ -1,4 +1,5 @@
 const { nav, footer } = require('../lib/nav');
+const { houseCard, placeOf } = require('../lib/card');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const PROPERTIES_TABLE = 'Properties';
@@ -877,11 +878,14 @@ async function renderNearbyHouses(currentRecord) {
       const url = ['mallorca','ibiza','menorca','formentera'].indexOf(isl) !== -1
         ? '/' + isl + '/houses/' + slug
         : '/properties/' + slug;
-      return '<a class="prop-other-card" href="' + escapeHtml(url) + '">' +
-            '<div class="card-img">' + (img ? '<img src="' + escapeHtml(responsiveImageUrl(img, 900)) + '" alt="' + escapeHtml(rf['Name']||'') + '" loading="lazy" ' + IMG_ONERROR + ' />' : '') + '</div>' +
-            '<p class="card-location">' + escapeHtml(rf['Location label']||'') + '</p>' +
-            '<p class="card-name">' + escapeHtml(rf['Name']||'') + '</p>' +
-            '</a>';
+      return houseCard({
+        url,
+        img: img ? responsiveImageUrl(img, 1000) : '',
+        name: rf['Name'] || '',
+        guests: rf['Sleeps'],
+        place: placeOf(rf),
+        imgAttrs: IMG_ONERROR
+      });
     }).join('');
 
     return `
@@ -889,7 +893,7 @@ async function renderNearbyHouses(currentRecord) {
       <div class="prop-other-header">
         <h2 class="prop-other-title">Nearby houses</h2>
       </div>
-      <div class="prop-other-grid">
+      <div class="house-grid">
         ${cardsHtml}
       </div>
     </section>`;

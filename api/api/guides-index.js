@@ -256,12 +256,10 @@ module.exports = async function handler(req, res) {
     }
 
     .guides-grid {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 48px 80px;
+      padding: 0 48px 120px;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 64px 48px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 64px clamp(24px, 3.6vw, 56px);
     }
 
     .guide-card {
@@ -277,10 +275,10 @@ module.exports = async function handler(req, res) {
     }
     .guide-card-image {
       width: 100%;
-      aspect-ratio: 4/3;
+      aspect-ratio: 4/5;
       overflow: hidden;
       background: #e8e8e8;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
     .guide-card-image img {
       width: 100%;
@@ -303,9 +301,8 @@ module.exports = async function handler(req, res) {
     }
     .guide-card-title {
       font-family: var(--display);
-      font-size: 26px;
+      font-size: clamp(18px, 1.6vw, 23px);
       line-height: 1.2;
-      letter-spacing: -0.005em;
       color: #0f0f0f;
       margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.02em; }
     .guide-card-excerpt {
@@ -338,33 +335,15 @@ module.exports = async function handler(req, res) {
       border-bottom: 0.5px solid #888;
     }
 
-    footer {
-      padding: 80px 48px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      border-top: 0.5px solid #e8e8e8;
-    }
-    .footer-left { display: flex; align-items: center; gap: 32px; }
-    .footer-copy { font-size: 12px; color: #888; }
-    .footer-policy { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-policy:hover { color: #0f0f0f; }
-    .footer-links { display: flex; gap: 28px; }
-    .footer-links a { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-links a:hover { color: #0f0f0f; }
 
+    @media (max-width: 900px) { .guides-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) {
       .guides-header { padding: 56px 24px 32px; }
       .guides-grid {
         grid-template-columns: 1fr;
-        padding: 0 24px 56px;
-        gap: 48px;
+        padding: 0 16px 56px;
+        gap: 44px;
       }
-      .guide-card-title { font-size: 22px; }
-      footer { padding: 56px 24px 24px; flex-direction: column; gap: 16px; text-align: center; }
-      .footer-left { flex-direction: column; gap: 12px; }
     }
   </style>
 </head>
@@ -372,9 +351,9 @@ module.exports = async function handler(req, res) {
 
   ${nav()}
 
-  <header class="guides-header">
-    <h1 class="guides-title">${escapeHtml(page.heading)}</h1>
-    <p class="guides-intro">${escapeHtml(page.intro)}</p>
+  <header class="page-head">
+    <h1 class="page-title">${escapeHtml(page.heading)}</h1>
+    <p class="page-lede">${escapeHtml(page.intro)}</p>
   </header>
 
   <main class="guides-grid">

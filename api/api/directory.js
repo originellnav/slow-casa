@@ -1,4 +1,5 @@
 const { nav, footer } = require('../lib/nav');
+const { houseCard, placeOf } = require('../lib/card');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 
@@ -188,21 +189,18 @@ module.exports = async function handler(req, res) {
     const imgUrl2 = getImageUrl(record, 1) || imgUrl;
 
     const url = houseUrl(record);
-    const featured = i < 2 ? '<span class="card-featured">&#9679; Featured</span>' : '';
     const pageNum = Math.floor(i / PAGE_SIZE);
     const hiddenClass = pageNum === 0 ? '' : ' card-hidden';
 
-    return `<a href="${url}" data-page="${pageNum}" data-country="${country}" data-region="${region}" data-island="${island}" data-setting="${setting}" class="card-link${hiddenClass}" style="text-decoration:none;color:inherit;">
-      <div class="property-card">
-        <div class="card-img">
-          ${imgUrl ? `<img src="${escapeHtml(responsiveImageUrl(imgUrl, 1200))}" alt="${name}" loading="lazy" class="img-primary" />` : ''}
-          ${featured}
-        </div>
-        <p class="card-location">${locationLabel}</p>
-        <p class="card-name">${name}</p>
-        <p class="card-detail">${desc}</p>
-      </div>
-    </a>`;
+    return houseCard({
+      url,
+      img: imgUrl ? responsiveImageUrl(imgUrl, 1000) : '',
+      name: f['Name'] || '',
+      guests: f['Sleeps'],
+      place: placeOf(f),
+      cls: 'card-link' + hiddenClass,
+      attrs: `data-page="${pageNum}" data-country="${country}" data-region="${region}" data-island="${island}" data-setting="${setting}"`
+    });
   }).join('');
 
   const gridContent = records.length === 0
@@ -343,7 +341,7 @@ module.exports = async function handler(req, res) {
       font-size: 11px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      background: #8B7355;
+      background: var(--black);
       color: var(--white);
       border: none;
       cursor: pointer;
@@ -410,15 +408,6 @@ module.exports = async function handler(req, res) {
 
     .dropdown-item:hover { background: var(--grey-4); }
 
-    .dir-body {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 48px 80px;
-      display: grid;
-      grid-template-columns: 180px 1fr;
-      gap: 0 48px;
-      align-items: start;
-    }
 
     .dir-sidebar {
       position: sticky;
@@ -468,11 +457,6 @@ module.exports = async function handler(req, res) {
     .no-results p { font-size: 15px; color: var(--grey-1); }
     .card-hidden { display: none; }
 
-    footer { padding: 32px 48px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; border-top: 0.5px solid var(--grey-3); }
-    .footer-word { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--grey-1); }
-    .footer-links { display: flex; gap: 28px; }
-    .footer-links a { font-size: 12px; color: var(--grey-1); transition: color 0.2s; }
-    .footer-links a:hover { color: var(--black); }
 
     .page-btn {
       width: 40px;
@@ -508,19 +492,14 @@ module.exports = async function handler(req, res) {
     @media (max-width: 768px) {
       .page-header { padding: 40px 24px 32px; }
       .page-subline { font-size: 30px; }
-      .dir-body { grid-template-columns: 1fr; padding: 0 24px 56px; }
       .dir-sidebar { position: static; flex-direction: row; flex-wrap: wrap; gap: 12px; padding-bottom: 32px; }
       .filter-btn { padding: 6px 0; font-size: 15px; }
       .property-grid { grid-template-columns: 1fr; gap: 40px; }
-      footer { padding: 24px; flex-direction: column; gap: 20px; text-align: center; }
-      .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
     }
 
     /* Directory map */
     .dir-map-wrap {
       position: relative;
-      max-width: 1400px;
-      margin: 0 auto;
       padding: 0 48px;
       display: none;
     }
@@ -537,7 +516,7 @@ module.exports = async function handler(req, res) {
       cursor: pointer; transition: transform 0.2s ease, background 0.2s ease;
     }
     .sc-marker:hover { transform: scale(1.4); }
-    .sc-marker.active { background: #8B7355; transform: scale(1.4); }
+    .sc-marker.active { background: #0f0f0f; transform: scale(1.4); }
 
     .map-popup {
       position: absolute; left: 68px; bottom: 28px; z-index: 5;
@@ -556,31 +535,13 @@ module.exports = async function handler(req, res) {
     }
 
     @media (max-width: 768px) {
-      .dir-map-wrap { padding: 0 24px; margin-bottom: 44px; }
+      .dir-map-wrap { padding: 0 16px; margin-bottom: 44px; }
       .dir-map { height: 300px; }
       .map-popup { left: 44px; right: 44px; width: auto; }
     }
 
     /* --- Balearics filter bar --- */
-    :root { --accent: #b5573a; }
-    .dir-h1 {
-      font-family: var(--display);
-      font-size: clamp(30px, 4.2vw, 46px);
-      line-height: 1.12;
-      letter-spacing: -0.01em;
-      color: var(--black);
-      margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.02em; }
-    .dir-sub {
-      font-family: var(--display);
-      font-style: italic;
-      font-size: clamp(19px, 2.4vw, 26px);
-      color: var(--accent);
-    }
-    .dir-filters {
-      max-width: 1400px;
-      margin: 0 auto 40px;
-      padding: 0 48px;
-    }
+    .dir-filters { margin: 0 0 56px; padding: 0 48px; }
     .filter-row {
       display: flex;
       flex-wrap: wrap;
@@ -594,7 +555,7 @@ module.exports = async function handler(req, res) {
       margin-right: 6px;
       white-space: nowrap;
     }
-    .filter-pin { color: var(--accent); display: flex; align-items: center; margin-right: 4px; }
+    .filter-pin { color: var(--black); display: flex; align-items: center; margin-right: 4px; }
     .chip {
       font-family: var(--body);
       font-size: 12px;
@@ -609,12 +570,11 @@ module.exports = async function handler(req, res) {
     }
     .chip:hover { background: var(--black); color: #ffffff; }
     .chip.active { background: var(--black); color: #ffffff; }
-    .chip-accent { border-color: var(--accent); color: var(--accent); }
-    .chip-accent:hover, .chip-accent.active { background: var(--accent); color: #ffffff; }
     .chip-map { margin-left: auto; }
-    .dir-body { display: block; }
+    .dir-body { display: block; padding: 0 48px 40px; }
+    @media (max-width: 768px) { .dir-body { padding: 0 16px 32px; } }
     @media (max-width: 768px) {
-      .dir-filters { padding: 0 24px; }
+      .dir-filters { padding: 0 16px; }
       .chip { font-size: 11px; padding: 8px 12px; }
       .chip-map { margin-left: 0; }
     }
@@ -631,10 +591,10 @@ module.exports = async function handler(req, res) {
 
     ${nav()}
 
-  <div class="page-header">
-    <h1 class="dir-h1">Handpicked homes in the Balearic Islands</h1>
-    <p class="dir-sub">Where do you want to go?</p>
-  </div>
+  <header class="page-head">
+    <h1 class="page-title">Handpicked homes in the Balearic Islands</h1>
+    <p class="page-lede">Where do you want to go?</p>
+  </header>
 
 
   <div class="dir-filters">
@@ -650,12 +610,12 @@ module.exports = async function handler(req, res) {
       <span class="filter-pin" aria-hidden="true">
         <svg width="13" height="17" viewBox="0 0 13 17" fill="none"><path d="M6.5 16S12 10.4 12 6.5A5.5 5.5 0 1 0 1 6.5C1 10.4 6.5 16 6.5 16z" stroke="currentColor" stroke-width="1.2"/><circle cx="6.5" cy="6.3" r="1.9" stroke="currentColor" stroke-width="1.2"/></svg>
       </span>
-      <button class="chip chip-accent active" data-type="island" data-value="all">All islands</button>
-      <button class="chip chip-accent" data-type="island" data-value="mallorca">Mallorca</button>
-      <button class="chip chip-accent" data-type="island" data-value="ibiza">Ibiza</button>
-      <button class="chip chip-accent" data-type="island" data-value="menorca">Menorca</button>
-      <button class="chip chip-accent" data-type="island" data-value="formentera">Formentera</button>
-      <button class="chip chip-accent chip-map" id="map-toggle" onclick="toggleMap()">Map view</button>
+      <button class="chip active" data-type="island" data-value="all">All islands</button>
+      <button class="chip" data-type="island" data-value="mallorca">Mallorca</button>
+      <button class="chip" data-type="island" data-value="ibiza">Ibiza</button>
+      <button class="chip" data-type="island" data-value="menorca">Menorca</button>
+      <button class="chip" data-type="island" data-value="formentera">Formentera</button>
+      <button class="chip chip-map" id="map-toggle" onclick="toggleMap()">Map view</button>
     </div>
   </div>
 
@@ -678,7 +638,7 @@ module.exports = async function handler(req, res) {
 
   <div class="dir-body">
     <div class="dir-main">
-      <div class="property-grid" id="property-grid">
+      <div class="house-grid" id="property-grid">
         ${gridContent}
       </div>
     </div>

@@ -487,30 +487,12 @@ module.exports = async function handler(req, res) {
       font-style: italic;
     }
 
-    footer {
-      padding: 80px 48px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      border-top: 0.5px solid #e8e8e8;
-    }
-    .footer-left { display: flex; align-items: center; gap: 32px; }
-    .footer-copy { font-size: 12px; color: #888; }
-    .footer-policy { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-policy:hover { color: #0f0f0f; }
-    .footer-links { display: flex; gap: 28px; }
-    .footer-links a { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-links a:hover { color: #0f0f0f; }
 
     @media (max-width: 768px) {
       .guide-header { padding: 48px 24px 24px; }
       .guide-body { padding: 0 24px 56px; font-size: 17px; }
       .guide-image { margin: 2em -24px; }
       .guide-image-lead { margin: 0 -24px 2em; }
-      footer { padding: 56px 24px 24px; flex-direction: column; gap: 16px; text-align: center; }
-      .footer-left { flex-direction: column; gap: 12px; }
     }
   </style>
 </head>

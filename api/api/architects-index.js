@@ -310,22 +310,6 @@ module.exports = async function handler(req, res) {
       font-weight: 300;
     }
 
-    footer {
-      padding: 32px 48px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      border-top: 0.5px solid #e8e8e8;
-    }
-    .footer-left { display: flex; align-items: center; gap: 32px; }
-    .footer-copy { font-size: 12px; color: #888; }
-    .footer-policy { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-policy:hover { color: #0f0f0f; }
-    .footer-links { display: flex; gap: 28px; }
-    .footer-links a { font-size: 12px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-    .footer-links a:hover { color: #0f0f0f; }
 
     @media (max-width: 900px) {
       .arch-grid { grid-template-columns: repeat(2, 1fr); gap: 44px 24px; }
@@ -334,8 +318,6 @@ module.exports = async function handler(req, res) {
       .dir-header { padding: 48px 24px 40px; }
       .arch-grid { grid-template-columns: 1fr; gap: 40px; padding: 0 24px 72px; }
       .grid-section-label { padding: 0 24px 24px; }
-      footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
-      .footer-left { flex-direction: column; gap: 12px; }
     }
   </style>
 </head>
