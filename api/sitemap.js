@@ -5,6 +5,7 @@ module.exports = async function handler(req, res) {
   const staticPages = [
     { url: '/', priority: '1.0', changefreq: 'weekly' },
         { url: '/houses', priority: '0.9', changefreq: 'weekly' },
+    { url: '/contact', priority: '0.4', changefreq: 'yearly' },
     { url: '/mallorca', priority: '0.9', changefreq: 'weekly' },
     { url: '/ibiza', priority: '0.9', changefreq: 'weekly' },
     { url: '/menorca', priority: '0.9', changefreq: 'weekly' },
@@ -12,7 +13,6 @@ module.exports = async function handler(req, res) {
     { url: '/places', priority: '0.9', changefreq: 'weekly' },
     { url: '/how-to', priority: '0.9', changefreq: 'weekly' },
     { url: '/design-directory', priority: '0.8', changefreq: 'weekly' },
-    { url: '/about', priority: '0.5', changefreq: 'monthly' },
   ];
   // Fetch properties from Airtable and guides from Sanity in parallel
   const [propertyUrls, guideUrls, architectUrls] = await Promise.all([
