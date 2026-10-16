@@ -18,17 +18,37 @@
     },
     {
       "source": "/journal",
-      "destination": "/places",
+      "destination": "/magazine",
       "permanent": true
     },
     {
       "source": "/journal/:path*",
-      "destination": "/places",
+      "destination": "/magazine",
       "permanent": true
     },
     {
       "source": "/criteria",
       "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/places",
+      "destination": "/magazine",
+      "permanent": true
+    },
+    {
+      "source": "/guides",
+      "destination": "/magazine",
+      "permanent": true
+    },
+    {
+      "source": "/house-tours",
+      "destination": "/magazine/house-tours",
+      "permanent": true
+    },
+    {
+      "source": "/how-to",
+      "destination": "/magazine/how-to",
       "permanent": true
     },
     {
@@ -38,9 +58,18 @@
     }
   ],
   "rewrites": [
-    { "source": "/mallorca", "destination": "/api/island?island=mallorca" },
-{ "source": "/ibiza", "destination": "/api/island?island=ibiza" },
-{ "source": "/menorca", "destination": "/api/island?island=menorca" },
+    {
+      "source": "/mallorca",
+      "destination": "/api/island?island=mallorca"
+    },
+    {
+      "source": "/ibiza",
+      "destination": "/api/island?island=ibiza"
+    },
+    {
+      "source": "/menorca",
+      "destination": "/api/island?island=menorca"
+    },
     {
       "source": "/houses",
       "destination": "/api/directory"
@@ -94,20 +123,12 @@
       "destination": "/api/property-page?slug=:slug&legacy=1"
     },
     {
-      "source": "/guides",
-      "destination": "/api/guides-index?section=places"
+      "source": "/magazine",
+      "destination": "/api/guides-index?section=magazine"
     },
     {
-      "source": "/places",
-      "destination": "/api/guides-index?section=places"
-    },
-    {
-      "source": "/house-tours",
-      "destination": "/api/guides-index?section=house-tours"
-    },
-    {
-      "source": "/how-to",
-      "destination": "/api/guides-index?section=how-to"
+      "source": "/magazine/:section",
+      "destination": "/api/guides-index?section=:section"
     },
     {
       "source": "/guides/:slug",

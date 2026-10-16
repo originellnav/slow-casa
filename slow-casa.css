@@ -335,3 +335,53 @@ html.menu-open .site-menu {
   .footer-signup input { flex: 1; width: auto; }
   .site-footer .footer-links { flex-wrap: wrap; gap: 24px; }
 }
+
+/* ============================================
+   MAGAZINE ROWS (markup: lib/magazine.js)
+   Used on /magazine, the island pages and under each guide.
+   A row = uppercase heading + "See all" link + a house-grid of cards.
+   ============================================ */
+.mag-row { padding: 120px 48px 0; }
+.mag-row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 56px; }
+.mag-row-head h2 {
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(28px, 3.3vw, 48px); line-height: 1.1; letter-spacing: 0.02em;
+  text-transform: uppercase; margin: 0;
+}
+.mag-row-link {
+  display: inline-flex; align-items: center; gap: 14px; white-space: nowrap;
+  font-family: var(--body); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--black);
+}
+.mag-row-link svg { width: 9px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: transform 0.2s; }
+.mag-row-link:hover svg { transform: translateX(4px); }
+.mag-card-text {
+  font-family: var(--body); font-size: 15px; line-height: 1.55; color: var(--black); margin: 12px 0 0; max-width: 46ch;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+/* Island filter chips */
+.mag-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 32px 0 0; padding: 0; list-style: none; }
+.mag-chips a {
+  display: inline-block; padding: 9px 18px; border: 1px solid var(--grey-2);
+  font-family: var(--body); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--black);
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+.mag-chips a:hover { border-color: var(--black); }
+.mag-chips a[aria-current="page"] { background: var(--black); border-color: var(--black); color: var(--bg); }
+.mag-empty { padding: 0 48px; font-size: 16px; line-height: 1.6; color: var(--grey-1); }
+.mag-empty a { color: var(--black); text-decoration: underline; text-underline-offset: 4px; }
+.mag-grid { padding: 0 48px; }
+.mag-sublinks { display: flex; flex-wrap: wrap; gap: 28px; padding: 120px 48px 0; }
+.mag-sublinks a { font-family: var(--body); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--grey-2); padding-bottom: 3px; }
+.mag-sublinks a:hover { border-color: var(--black); }
+
+/* Slide-out menu: the islands, set smaller under the main links */
+.site-menu-sub { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--grey-3); display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.site-menu-sub a { font-family: var(--body); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--black); }
+.site-menu-sub a:hover { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+@media (max-width: 768px) {
+  .mag-row { padding: 72px 16px 0; }
+  .mag-row-head { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 32px; }
+  .mag-empty, .mag-grid { padding-left: 16px; padding-right: 16px; }
+  .mag-sublinks { padding: 72px 16px 0; gap: 20px; }
+}

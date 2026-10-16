@@ -1,183 +1,136 @@
+// The Magazine. One function serves every Magazine page:
+//   /magazine                   -> ?section=magazine   (every section, a row each)
+//   /magazine/where-to-stay     -> ?section=where-to-stay
+//   /magazine/where-to-eat      -> ?section=where-to-eat
+//   /magazine/what-to-do        -> ?section=what-to-do
+//   /magazine/house-tours       -> ?section=house-tours
+//   /magazine/how-to            -> ?section=how-to
+// Add ?island=mallorca (or ibiza, menorca) to filter by island. Filtered views
+// are noindex and point their canonical at the unfiltered page, because the
+// island pages (/mallorca) are the ones meant to rank for each island.
+// Sections and data sources are defined in lib/magazine.js.
 const { nav, footer } = require('../lib/nav');
-const SANITY_PROJECT_ID = 'hchp27po';
-const SANITY_DATASET = 'production';
-const SANITY_API_VERSION = '2024-01-01';
+const M = require('../lib/magazine');
+const { esc } = M;
 
-const INDEX_CACHE = { data: null, expiresAt: 0 };
-const CACHE_TTL_MS = 5 * 60 * 1000;
-
-function escapeHtml(str) {
-  return String(str || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function sanityImageUrl(url, width) {
-  if (!url) return '';
-  const separator = url.indexOf('?') >= 0 ? '&' : '?';
-  return url + separator + 'w=' + width + '&auto=format&fit=max&q=80';
-}
-
-function formatDate(isoString) {
-  if (!isoString) return '';
-  try {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
-  } catch (e) { return ''; }
-}
-
-function formatCategory(category) {
-  const labels = {
-  'architect-roundup': 'Architects',
-  'typology-guide': 'House Types',
-  'region-discovery': 'Places',
-  'architectural-pilgrimage': 'Journeys',
-  'terminology': 'Terminology',
-  'architect-stories': 'Architect Stories',
-  'home-stories': 'Home Stories'
+const LANDING = {
+  title: 'Magazine: Where to Stay, Eat and Swim in Mallorca, Ibiza & Menorca | Slow Casa',
+  description: 'Village guides, restaurants, beaches and things to do in Mallorca, Ibiza and Menorca, chosen around the houses in the Slow Casa collection.',
+  heading: 'Magazine',
+  intro: 'Where to stay, eat and swim in Mallorca, Ibiza and Menorca. Village guides, places we rate and the stories behind the houses.'
 };
-  return labels[category] || 'Guide';
-}
+const LANDING_ROW_SIZE = 6;
 
-// This one function serves three routes. `categories: null` means show everything.
-//   /house-tours  -> ?section=house-tours
-//   /guides       -> (no param) Village Guides
-//   /how-to       -> ?section=how-to
-const PAGES = {
-  'village-guides': {
-    categories: ['region-discovery'],
-    title: 'Village Guides | Slow Casa',
-    description: 'Where to eat, swim and stay in the villages and small towns our houses sit in. Practical guides to the rural and coastal corners of Europe.',
-    canonical: 'https://slowcasa.com/guides',
-    heading: 'Village Guides',
-    intro: 'Where to eat, swim and stay in the places these houses sit.'
-  },
-  'house-tours': {
-    categories: ['home-stories', 'architect-stories', 'architect-roundup'],
-    title: 'House Tours | Slow Casa',
-    description: 'Inside the houses, with the people who made them. Conversations with the architects, designers and owners building in the European landscape.',
-    canonical: 'https://slowcasa.com/house-tours',
-    heading: 'House Tours',
-    intro: 'Inside the houses, with the people who made them.'
-  },
-  'how-to': {
-    categories: ['typology-guide', 'terminology'],
-    title: 'How To | Slow Casa',
-    description: 'How these houses get made. Materials, methods, house types and the practical business of building well in the European landscape.',
-    canonical: 'https://slowcasa.com/how-to',
-    heading: 'How To',
-    intro: 'How these houses get made. Materials, methods, and the people who know.'
-  }
-};
-
-async function fetchAllGuides() {
-  const query = `*[_type == "guide" && defined(publishedAt) && defined(slug.current)] | order(publishedAt desc) {
-    title,
-    "slug": slug.current,
-    category,
-    excerpt,
-    publishedAt,
-    "heroImage": {
-      "url": heroImage.asset->url,
-      "alt": heroImage.alt
-    }
-  }`;
-
-  const url = `https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v${SANITY_API_VERSION}/data/query/${SANITY_DATASET}?query=${encodeURIComponent(query)}`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Sanity fetch failed: ' + response.status);
-  const data = await response.json();
-  return data.result || [];
+function chips(basePath, island) {
+  const items = [{ key: '', label: 'All islands' }].concat(M.ISLAND_KEYS.map(k => ({ key: k, label: M.ISLANDS[k] })));
+  return `<ul class="mag-chips" aria-label="Filter by island">
+    ${items.map(i => `<li><a href="${basePath}${i.key ? '?island=' + i.key : ''}"${i.key === island ? ' aria-current="page"' : ''}>${esc(i.label)}</a></li>`).join('')}
+  </ul>`;
 }
 
 module.exports = async function handler(req, res) {
-  let guides;
+  const q = req.query || {};
+  let section = String(q.section || 'magazine').toLowerCase();
+  if (section === 'places' || section === 'village-guides') section = 'magazine';
+  const isLanding = section === 'magazine';
+  if (!isLanding && !M.SECTIONS[section]) {
+    res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><title>Not found | Slow Casa</title><meta name="robots" content="noindex" /></head><body style="font-family:system-ui,sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;"><h1>Not found</h1><p><a href="/magazine">Go to the Magazine</a></p></body></html>');
+  }
+  const island = M.ISLAND_KEYS.indexOf(String(q.island || '').toLowerCase()) !== -1 ? String(q.island).toLowerCase() : '';
+  const islandName = island ? M.ISLANDS[island] : '';
 
-  if (INDEX_CACHE.data && Date.now() < INDEX_CACHE.expiresAt) {
-    guides = INDEX_CACHE.data;
+  const [guides, props] = await Promise.all([M.getGuides(), M.getProperties()]);
+  const places = await M.getPlaces(props);
+
+  const basePath = isLanding ? '/magazine' : '/magazine/' + section;
+  const canonical = 'https://slowcasa.com' + basePath;
+  const sec = isLanding ? null : M.SECTIONS[section];
+
+  let heading, intro, title, description;
+  if (isLanding) {
+    heading = island ? 'Magazine: ' + islandName : LANDING.heading;
+    intro = LANDING.intro;
+    title = island ? `Magazine: ${islandName} | Slow Casa` : LANDING.title;
+    description = LANDING.description;
   } else {
-    try {
-      guides = await fetchAllGuides();
-      INDEX_CACHE.data = guides;
-      INDEX_CACHE.expiresAt = Date.now() + CACHE_TTL_MS;
-    } catch (e) {
-      res.status(500).send('Error fetching guides');
-      return;
-    }
+    heading = island ? `${sec.label} in ${islandName}` : sec.label;
+    intro = sec.intro;
+    title = island ? `${sec.label} in ${islandName} | Slow Casa` : sec.title;
+    description = sec.description;
   }
 
-  // Which route are we serving? Unknown values fall back to Village Guides.
-  const section = (req.query && req.query.section) || 'village-guides';
-  const page = PAGES[section] || PAGES['village-guides'];
-  if (page.categories) {
-    guides = guides.filter(g => page.categories.indexOf(g.category) !== -1);
+  let bodyHtml = '';
+  if (isLanding) {
+    bodyHtml = M.SECTION_KEYS.map(k => {
+      const items = M.sectionItems(k, guides, places, island);
+      return M.row({
+        id: k,
+        title: M.SECTIONS[k].label,
+        href: '/magazine/' + k + (island ? '?island=' + island : ''),
+        linkLabel: 'See all (' + items.cards.length + ')',
+        cards: items.cards.slice(0, LANDING_ROW_SIZE)
+      });
+    }).join('');
+    if (!bodyHtml) {
+      bodyHtml = `<p class="mag-empty">${island ? `Nothing here yet for ${esc(islandName)}. <a href="/magazine">See all islands</a>.` : 'The first guides are on the way.'}</p>`;
+    }
+  } else {
+    const items = M.sectionItems(section, guides, places, island);
+    bodyHtml = items.cards.length
+      ? `<div class="mag-grid"><div class="house-grid">${items.cards.join('')}</div></div>`
+      : `<p class="mag-empty">${island ? `Nothing here yet for ${esc(islandName)}. <a href="${basePath}">See all islands</a>.` : 'The first pieces are on the way.'}</p>`;
+    // Links to the other sections, and back to the island page when filtered.
+    const others = M.SECTION_KEYS.filter(k => k !== section && M.sectionItems(k, guides, places, island).cards.length);
+    const links = others.map(k => `<a href="/magazine/${k}${island ? '?island=' + island : ''}">${esc(M.SECTIONS[k].label)}</a>`);
+    if (island) links.push(`<a href="/${island}">All of ${esc(islandName)}</a>`);
+    if (links.length) bodyHtml += `<nav class="mag-sublinks" aria-label="More from the Magazine">${links.join('')}</nav>`;
   }
+
+  const crumbs = [{ name: 'Slow Casa', url: 'https://slowcasa.com' }, { name: 'Magazine', url: 'https://slowcasa.com/magazine' }];
+  if (!isLanding) crumbs.push({ name: sec.label, url: canonical });
+  const crumbHtml = crumbs.map((c, i) => i === crumbs.length - 1
+    ? esc(c.name)
+    : `<a href="${c.url.replace('https://slowcasa.com', '') || '/'}">${esc(c.name)}</a>`).join(' / ');
+
+  const schema = [
+    {
+      '@context': 'https://schema.org', '@type': 'CollectionPage',
+      name: title, description, url: canonical,
+      isPartOf: { '@type': 'WebSite', name: 'Slow Casa', url: 'https://slowcasa.com' }
+    },
+    {
+      '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+      itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: c.url }))
+    }
+  ];
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
-
-  const guidesHtml = guides.length === 0
-    ? `<div class="guides-empty">
-        <p>New guides are on the way. Subscribe to <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener">The Slow Signal</a> to be notified.</p>
-      </div>`
-    : guides.map((guide, index) => {
-        const heroUrl = (guide.heroImage && guide.heroImage.url) || '';
-        const heroAlt = (guide.heroImage && guide.heroImage.alt) || guide.title || '';
-        const isAboveFold = index < 3;
-        return `<article class="guide-card">
-          <a href="/guides/${escapeHtml(guide.slug)}" class="guide-card-link">
-            ${heroUrl ? `<div class="guide-card-image">
-              <img src="${escapeHtml(sanityImageUrl(heroUrl, 800))}" alt="${escapeHtml(heroAlt)}" loading="${isAboveFold ? 'eager' : 'lazy'}" />
-            </div>` : '<div class="guide-card-image guide-card-image-placeholder"></div>'}
-            <div class="guide-card-body">
-              <p class="guide-card-category">${escapeHtml(formatCategory(guide.category))}</p>
-              <h2 class="guide-card-title">${escapeHtml(guide.title || '')}</h2>
-              ${guide.excerpt ? `<p class="guide-card-excerpt">${escapeHtml(guide.excerpt)}</p>` : ''}
-              ${guide.publishedAt ? `<p class="guide-card-date">${escapeHtml(formatDate(guide.publishedAt))}</p>` : ''}
-            </div>
-          </a>
-        </article>`;
-      }).join('');
-
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": "Guides | Slow Casa",
-    "description": "Editorial guides on architect-designed vacation homes, regional architectural traditions, and slow-living destinations across Europe.",
-    "url": "https://slowcasa.com/guides",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Slow Casa",
-      "url": "https://slowcasa.com"
-    }
-  };
 
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${escapeHtml(page.title)}</title>
+  <title>${esc(title)}</title>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Slow Casa" />
-<link rel="manifest" href="/site.webmanifest" />
-  <meta name="description" content="${escapeHtml(page.description)}" />
-  <link rel="canonical" href="${escapeHtml(page.canonical)}" />
-  <script type="application/ld+json">${JSON.stringify(structuredData)}</script>
-  <meta property="og:title" content="${escapeHtml(page.title)}" />
-  <meta property="og:description" content="${escapeHtml(page.description)}" />
-  <meta property="og:url" content="${escapeHtml(page.canonical)}" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Slow Casa" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="description" content="${esc(description)}" />
+  ${island ? '<meta name="robots" content="noindex,follow" />' : ''}
+  <link rel="canonical" href="${canonical}" />
+  ${schema.map(s => `<script type="application/ld+json">${JSON.stringify(s)}</script>`).join('\n  ')}
+  <meta property="og:title" content="${esc(title)}" />
+  <meta property="og:description" content="${esc(description)}" />
+  <meta property="og:url" content="${canonical}" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Slow Casa" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/jost-latin-400.woff2" crossorigin />
   <link rel="stylesheet" href="/slow-casa.css" />
   <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
   <script>
@@ -188,163 +141,16 @@ module.exports = async function handler(req, res) {
   </script>
   <style>
     @font-face {
-      font-family: 'DM Sans';
-      src: url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2');
-      font-weight: 300;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'DM Sans';
-      src: url('/fonts/dm-sans-v17-latin-regular.woff2') format('woff2');
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'DM Sans';
-      src: url('/fonts/dm-sans-v17-latin-500.woff2') format('woff2');
-      font-weight: 500;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
       font-family: 'DM Serif Display';
       src: url('/fonts/dm-serif-display-v17-latin-regular.woff2') format('woff2');
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'DM Serif Display';
-      src: url('/fonts/dm-serif-display-v17-latin-italic.woff2') format('woff2');
-      font-weight: 400;
-      font-style: italic;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'TT Norms Pro';
-      src: url('/TT_Norms_Pro_Regular.woff2') format('woff2');
-      font-weight: 400;
-      font-display: swap;
+      font-weight: 400; font-style: normal; font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #FDFCF8; font-family: var(--body); color: #0f0f0f; }
+    html, body { background: var(--bg); font-family: var(--body); color: var(--black); }
     a { color: inherit; text-decoration: none; }
-    h1, h2, h3 { font-weight: 400; }
-
-
-    .guides-header {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 80px 48px 48px;
-      text-align: center;
-    }
-    .guides-title {
-      font-family: var(--display);
-      font-size: clamp(36px, 5vw, 56px);
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-      color: #0f0f0f;
-      margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.02em; }
-    .guides-intro {
-      font-family: var(--body);
-      font-size: 18px;
-      font-weight: 300;
-      line-height: 1.6;
-      color: #555;
-    }
-
-    .guides-grid {
-      padding: 0 48px 120px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 64px clamp(24px, 3.6vw, 56px);
-    }
-
-    .guide-card {
-      display: block;
-    }
-    .guide-card-link {
-      display: block;
-      color: inherit;
-      transition: opacity 0.2s;
-    }
-    .guide-card-link:hover {
-      opacity: 0.8;
-    }
-    .guide-card-image {
-      width: 100%;
-      aspect-ratio: 4/5;
-      overflow: hidden;
-      background: #e8e8e8;
-      margin-bottom: 22px;
-    }
-    .guide-card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .guide-card-image-placeholder {
-      background: linear-gradient(135deg, #e8e8e8, #f0ebe2);
-    }
-    .guide-card-body {
-      padding: 0;
-    }
-    .guide-card-category {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #888;
-      margin-bottom: 14px;
-    }
-    .guide-card-title {
-      font-family: var(--display);
-      font-size: clamp(18px, 1.6vw, 23px);
-      line-height: 1.2;
-      color: #0f0f0f;
-      margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.02em; }
-    .guide-card-excerpt {
-      font-family: var(--body);
-      font-size: 15px;
-      font-weight: 300;
-      line-height: 1.6;
-      color: #555;
-      margin-bottom: 14px;
-    }
-    .guide-card-date {
-      font-size: 11px;
-      color: #888;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .guides-empty {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 0 48px 100px;
-      text-align: center;
-      font-family: var(--body);
-      font-size: 18px;
-      font-weight: 300;
-      color: #555;
-      line-height: 1.6;
-    }
-    .guides-empty a {
-      border-bottom: 0.5px solid #888;
-    }
-
-
-    @media (max-width: 900px) { .guides-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 768px) {
-      .guides-header { padding: 56px 24px 32px; }
-      .guides-grid {
-        grid-template-columns: 1fr;
-        padding: 0 16px 56px;
-        gap: 44px;
-      }
-    }
+    /* On a section page the grid sits straight under the header. */
+    .mag-grid { padding-top: 24px; }
+    main > .mag-row:first-child { padding-top: 40px; }
   </style>
 </head>
 <body>
@@ -352,12 +158,14 @@ module.exports = async function handler(req, res) {
   ${nav()}
 
   <header class="page-head">
-    <h1 class="page-title">${escapeHtml(page.heading)}</h1>
-    <p class="page-lede">${escapeHtml(page.intro)}</p>
+    <p class="page-crumb">${crumbHtml}</p>
+    <h1 class="page-title">${esc(heading)}</h1>
+    <p class="page-lede">${esc(intro)}</p>
+    ${chips(basePath, island)}
   </header>
 
-  <main class="guides-grid">
-    ${guidesHtml}
+  <main>
+    ${bodyHtml}
   </main>
 
   ${footer()}

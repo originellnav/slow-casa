@@ -1,16 +1,6 @@
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
-
-const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
-const BASE_ID = 'appndrnWrdlgxRJAG';
-
-const SANITY_PROJECT_ID = 'hchp27po';
-const SANITY_DATASET = 'production';
-const SANITY_API_VERSION = '2024-01-01';
-
-const CACHE_TTL_MS = 5 * 60 * 1000;
-let PROP_CACHE = { data: null, expiresAt: 0 };
-let GUIDE_CACHE = { data: null, expiresAt: 0 };
+const M = require('../lib/magazine');
 
 // The three islands. `intro` is placeholder copy, meant to be replaced with
 // 400-700 words of real writing per island. Everything else is derived.
@@ -95,68 +85,14 @@ function getImageUrl(record, index) {
   return null;
 }
 
-// Paginated. Airtable returns at most 100 records per request.
-async function fetchAllProperties() {
-  let allRecords = [];
-  let offset = null;
-  let attempts = 0;
-  do {
-    let url = `https://api.airtable.com/v0/${BASE_ID}/Properties?pageSize=100`;
-    if (offset) url += `&offset=${encodeURIComponent(offset)}`;
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-    });
-    if (!response.ok) throw new Error('Airtable fetch failed: ' + response.status);
-    const data = await response.json();
-    allRecords = allRecords.concat(data.records || []);
-    offset = data.offset;
-    attempts++;
-  } while (offset && attempts < 10);
-  return allRecords;
-}
-
-async function getProperties() {
-  if (PROP_CACHE.data && Date.now() < PROP_CACHE.expiresAt) return PROP_CACHE.data;
-  const records = await fetchAllProperties();
-  PROP_CACHE = { data: records, expiresAt: Date.now() + CACHE_TTL_MS };
-  return records;
-}
-
-async function fetchGuides() {
-  if (GUIDE_CACHE.data && Date.now() < GUIDE_CACHE.expiresAt) return GUIDE_CACHE.data;
-  const query = `*[_type == "guide" && defined(publishedAt) && defined(slug.current)] | order(publishedAt desc) {
-    title,
-    "slug": slug.current,
-    excerpt,
-    island,
-    publishedAt
-  }`;
-  const url = `https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v${SANITY_API_VERSION}/data/query/${SANITY_DATASET}?query=${encodeURIComponent(query)}`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Sanity fetch failed: ' + response.status);
-  const data = await response.json();
-  const result = data.result || [];
-  GUIDE_CACHE = { data: result, expiresAt: Date.now() + CACHE_TTL_MS };
-  return result;
-}
-
 module.exports = async function handler(req, res) {
   const key = String((req.query && req.query.island) || '').trim().toLowerCase();
   const config = ISLANDS[key];
   if (!config) return res.status(404).send('Island not found');
 
-  let records = [];
-  let guides = [];
-  try {
-    const [props, allGuides] = await Promise.all([
-      getProperties(),
-      fetchGuides().catch(() => [])
-    ]);
-    records = props || [];
-    guides = allGuides || [];
-  } catch (e) {
-    return res.status(500).send('Error loading island');
-  }
+  // Houses, guides and Places load in parallel. Each fails soft to an empty list.
+  const [records, guides] = await Promise.all([M.getProperties(), M.getGuides()]);
+  const places = await M.getPlaces(records);
 
   const houses = records
     .filter(r => {
@@ -168,10 +104,6 @@ module.exports = async function handler(req, res) {
       const db = b.fields['Date added'] ? new Date(b.fields['Date added']) : new Date(0);
       return db - da;
     });
-
-  const islandGuides = guides.filter(g =>
-    String(g.island || '').trim().toLowerCase() === key && g.slug
-  );
 
   const canonicalUrl = `https://slowcasa.com/${key}`;
   const houseCount = houses.length;
@@ -192,28 +124,27 @@ module.exports = async function handler(req, res) {
     ? `<div class="house-grid">${cardsHtml}</div>`
     : `<p class="isl-empty">We are still adding houses on ${escapeHtml(config.name)}. <a href="/houses">See the whole directory</a>.</p>`;
 
-  const guidesHtml = islandGuides.length
-    ? `<section class="section isl-guides">
-        <div class="section-header"><span class="section-label">Guides to ${escapeHtml(config.name)}</span></div>
-        <ul class="isl-guide-list">
-          ${islandGuides.map(g => `<li>
-            <a href="/${key}/${escapeHtml(g.slug)}">
-              <span class="isl-guide-title">${escapeHtml(g.title || '')}</span>
-              ${g.excerpt ? `<span class="isl-guide-excerpt">${escapeHtml(g.excerpt)}</span>` : ''}
-            </a>
-          </li>`).join('')}
-        </ul>
-      </section>`
-    : '';
+  // Magazine rows: where to stay, where to eat, what to do (then any house tours).
+  // Each row shows up to 3 and links to the full Magazine section for this island.
+  // A row with nothing in it is left out.
+  const ROW_SIZE = 3;
+  const magazineHtml = ['where-to-stay', 'where-to-eat', 'what-to-do', 'house-tours'].map(k => {
+    const items = M.sectionItems(k, guides, places, key);
+    return M.row({
+      id: k,
+      title: `${M.SECTIONS[k].label} in ${config.name}`,
+      href: `/magazine/${k}?island=${key}`,
+      linkLabel: items.cards.length > ROW_SIZE ? `See all (${items.cards.length})` : 'More in the Magazine',
+      cards: items.cards.slice(0, ROW_SIZE)
+    });
+  }).join('');
 
   const otherIslands = Object.keys(ISLANDS).filter(k => k !== key);
-  const otherHtml = `<section class="section isl-other">
-    <div class="section-header"><span class="section-label">The other islands</span></div>
-    <div class="isl-other-links">
-      ${otherIslands.map(k => `<a href="/${k}">${escapeHtml(ISLANDS[k].name)}</a>`).join('')}
-      <a href="/houses">All houses</a>
-    </div>
-  </section>`;
+  const otherHtml = `<nav class="mag-sublinks" aria-label="More">
+    ${otherIslands.map(k => `<a href="/${k}">${escapeHtml(ISLANDS[k].name)}</a>`).join('')}
+    <a href="/houses">All houses</a>
+    <a href="/magazine">The Magazine</a>
+  </nav>`;
 
   const introHtml = config.intro.map(p => `<p>${escapeHtml(p)}</p>`).join('');
 
@@ -231,8 +162,7 @@ module.exports = async function handler(req, res) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Slow Casa', item: 'https://slowcasa.com' },
-      { '@type': 'ListItem', position: 2, name: 'Houses', item: 'https://slowcasa.com/houses' },
-      { '@type': 'ListItem', position: 3, name: config.name, item: canonicalUrl }
+      { '@type': 'ListItem', position: 2, name: config.name, item: canonicalUrl }
     ]
   };
 
@@ -285,18 +215,9 @@ module.exports = async function handler(req, res) {
     .isl-intro { max-width: 62ch; }
     .isl-intro p { font-size: 16px; line-height: 1.65; color: var(--black); margin: 0 0 16px; }
     .isl-count { font-family: var(--body); font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-1); margin: 40px 0 0; }
-    .isl-houses { padding-top: 0; padding-bottom: 120px; }
+    .isl-houses { padding-top: 0; padding-bottom: 0; }
     .isl-empty { font-size: 15px; color: var(--grey-1); }
     .isl-empty a { text-decoration: underline; }
-    .isl-guide-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--grey-3); }
-    .isl-guide-list li { border-bottom: 1px solid var(--grey-3); }
-    .isl-guide-list a { display: block; padding: 20px 0; }
-    .isl-guide-title { display: block; font-size: 17px; margin-bottom: 4px; }
-    .isl-guide-excerpt { display: block; font-size: 13px; color: var(--grey-1); line-height: 1.5; max-width: 70ch; }
-    .isl-guide-list a:hover .isl-guide-title { text-decoration: underline; }
-    .isl-other-links { display: flex; gap: 28px; flex-wrap: wrap; }
-    .isl-other-links a { font-size: 14px; border-bottom: 1px solid var(--grey-3); padding-bottom: 2px; }
-    .isl-other-links a:hover { border-color: var(--black); }
     @media (max-width: 768px) {
       .isl-hero { padding: 32px 16px 0; }
       .isl-hero h1 { font-size: 32px; max-width: none; }
@@ -308,17 +229,17 @@ module.exports = async function handler(req, res) {
 ${nav()}
 
 <header class="page-head">
-  <p class="page-crumb"><a href="/">Slow Casa</a> / <a href="/houses">Houses</a> / ${escapeHtml(config.name)}</p>
+  <p class="page-crumb"><a href="/">Slow Casa</a> / ${escapeHtml(config.name)}</p>
   <h1 class="page-title">${escapeHtml(config.title)}</h1>
   <div class="page-lede">${introHtml}</div>
   <p class="isl-count">${houseCount} ${houseCount === 1 ? 'house' : 'houses'} on ${escapeHtml(config.name)}</p>
 </header>
 
-<section class="section isl-houses">
+<section class="section isl-houses" id="houses">
   ${gridHtml}
 </section>
 
-${guidesHtml}
+${magazineHtml}
 
 ${otherHtml}
 

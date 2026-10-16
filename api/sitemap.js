@@ -4,14 +4,17 @@ module.exports = async function handler(req, res) {
   const base = 'https://slowcasa.com';
   const staticPages = [
     { url: '/', priority: '1.0', changefreq: 'weekly' },
-        { url: '/houses', priority: '0.9', changefreq: 'weekly' },
+    { url: '/houses', priority: '0.9', changefreq: 'weekly' },
     { url: '/contact', priority: '0.4', changefreq: 'yearly' },
     { url: '/mallorca', priority: '0.9', changefreq: 'weekly' },
     { url: '/ibiza', priority: '0.9', changefreq: 'weekly' },
     { url: '/menorca', priority: '0.9', changefreq: 'weekly' },
-    { url: '/house-tours', priority: '0.9', changefreq: 'weekly' },
-    { url: '/places', priority: '0.9', changefreq: 'weekly' },
-    { url: '/how-to', priority: '0.9', changefreq: 'weekly' },
+    { url: '/magazine', priority: '0.9', changefreq: 'weekly' },
+    { url: '/magazine/where-to-stay', priority: '0.8', changefreq: 'weekly' },
+    { url: '/magazine/where-to-eat', priority: '0.8', changefreq: 'weekly' },
+    { url: '/magazine/what-to-do', priority: '0.8', changefreq: 'weekly' },
+    { url: '/magazine/house-tours', priority: '0.6', changefreq: 'monthly' },
+    { url: '/magazine/how-to', priority: '0.6', changefreq: 'monthly' },
     { url: '/design-directory', priority: '0.8', changefreq: 'weekly' },
   ];
   // Fetch properties from Airtable and guides from Sanity in parallel

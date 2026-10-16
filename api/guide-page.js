@@ -1,4 +1,6 @@
 const { nav, footer } = require('../lib/nav');
+const { houseCard, placeOf } = require('../lib/card');
+const M = require('../lib/magazine');
 const SANITY_PROJECT_ID = 'hchp27po';
 const SANITY_DATASET = 'production';
 const SANITY_API_VERSION = '2024-01-01';
@@ -44,18 +46,6 @@ function formatDate(isoString) {
     const date = new Date(isoString);
     return date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
   } catch (e) { return ''; }
-}
-
-// Format category as readable label
-function formatCategory(category) {
-  const labels = {
-  'architect-roundup': 'Architects',
-  'typology-guide': 'House Types',
-  'region-discovery': 'Places',
-  'architectural-pilgrimage': 'Journeys',
-    'terminology': 'Terminology'
-};
-  return labels[category] || 'Guide';
 }
 
 // Fetch guide from Sanity by slug
@@ -224,7 +214,7 @@ module.exports = async function handler(req, res) {
 <html lang="en"><head><meta charset="UTF-8" /><title>Guide not found | Slow Casa</title><meta name="robots" content="noindex" /></head>
 <body style="font-family: system-ui, sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;">
 <h1>Guide not found</h1>
-<p>We couldn't find what you were looking for. <a href="/guides">Browse all guides</a> or <a href="/">return home</a>.</p>
+<p>We couldn't find what you were looking for. <a href="/magazine">Browse the Magazine</a> or <a href="/">return home</a>.</p>
 </body></html>`);
       return;
     }
@@ -234,7 +224,6 @@ module.exports = async function handler(req, res) {
 
   const title = guide.title || '';
   const category = guide.category || '';
-  const categoryLabel = formatCategory(category);
   const metaTitle = guide.metaTitle || (title + ' | Slow Casa');
   const metaDesc = guide.metaDescription || guide.excerpt || `A guide on Slow Casa, the curated directory of architect-designed vacation homes in rural Europe.`;
   const publishedAt = guide.publishedAt || '';
@@ -286,21 +275,56 @@ module.exports = async function handler(req, res) {
   if (publishedAt) structuredData.datePublished = publishedAt;
   if (heroUrl) structuredData.image = heroUrl;
 
-  const gCrumbs = [
-    { "@type": "ListItem", "position": 1, "name": "Slow Casa", "item": "https://slowcasa.com" },
-    { "@type": "ListItem", "position": 2, "name": "Places", "item": "https://slowcasa.com/places" }
-  ];
-  if (guideIsland) {
-    gCrumbs.push({
-      "@type": "ListItem", "position": 3,
-      "name": guideIsland.charAt(0).toUpperCase() + guideIsland.slice(1),
-      "item": "https://slowcasa.com/" + guideIsland
+  // Breadcrumbs: Slow Casa / Mallorca / Where to stay / Santanyí
+  // (no island: Slow Casa / Magazine / Where to stay / Title)
+  const sectionKey = M.sectionOf(category);
+  const sectionLabel = sectionKey ? M.SECTIONS[sectionKey].label : 'Magazine';
+  const islandLabel = guideIsland ? guideIsland.charAt(0).toUpperCase() + guideIsland.slice(1) : '';
+  const crumbList = [{ name: 'Slow Casa', url: 'https://slowcasa.com' }];
+  if (M.ISLANDS[guideIsland]) crumbList.push({ name: islandLabel, url: 'https://slowcasa.com/' + guideIsland });
+  else crumbList.push({ name: 'Magazine', url: 'https://slowcasa.com/magazine' });
+  if (sectionKey) crumbList.push({ name: sectionLabel, url: 'https://slowcasa.com/magazine/' + sectionKey });
+  crumbList.push({ name: title, url: canonicalUrl });
+  const gCrumbs = crumbList.map((c, i) => ({ "@type": "ListItem", "position": i + 1, "name": c.name, "item": c.url }));
+  // Visible trail: everything but Slow Casa and the page itself.
+  const crumbHtml = crumbList.slice(1, -1).map(c => {
+    // The section link filters the Magazine to this guide's island.
+    const href = c.url.replace('https://slowcasa.com', '') +
+      (c.url.indexOf('/magazine/') !== -1 && M.ISLANDS[guideIsland] ? '?island=' + guideIsland : '');
+    return `<a href="${escapeHtml(href)}">${escapeHtml(c.name)}</a>`;
+  }).join(' <span aria-hidden="true">/</span> ');
+
+  // Cross-links under the guide: houses in this town (or on this island),
+  // then more from the same island. Both fail soft to nothing.
+  let relatedHtml = '';
+  try {
+    const [props, guides] = await Promise.all([M.getProperties(), M.getGuides()]);
+    const islandHouses = (props || []).filter(r => {
+      const f = r.fields || {};
+      return f['Slug'] && f['Name'] && M.islandOf(f['Island']) === guideIsland && guideIsland;
+    }).sort((a, b) => new Date(b.fields['Date added'] || 0) - new Date(a.fields['Date added'] || 0));
+    // A house is "in town" when its town appears in the guide's title or slug.
+    const hay = '-' + M.slugify(title) + '-' + slug + '-';
+    const inTown = islandHouses.filter(r => {
+      const t = M.slugify(placeOf(r.fields));
+      return t && hay.indexOf('-' + t + '-') !== -1;
     });
-  }
-  gCrumbs.push({
-    "@type": "ListItem", "position": gCrumbs.length + 1,
-    "name": guide.title || '', "item": canonicalUrl
-  });
+    const houseList = (inTown.length ? inTown : islandHouses).slice(0, 3);
+    const houseTitle = inTown.length ? 'Houses in ' + placeOf(inTown[0].fields) : 'Houses on ' + islandLabel;
+    const houseCards = houseList.map(r => {
+      const f = r.fields;
+      const hero = f['Hero Image'] || String(f['Gallery Images'] || '').split('\n')[0].trim();
+      return houseCard({
+        url: '/' + guideIsland + '/houses/' + f['Slug'],
+        img: hero ? M.imgUrl(hero, 1000) : '',
+        name: f['Name'], guests: f['Sleeps'], place: placeOf(f)
+      });
+    });
+    relatedHtml += M.row({ title: houseTitle, href: guideIsland ? '/' + guideIsland : '/houses', linkLabel: 'All of ' + (islandLabel || 'the collection'), cards: houseCards });
+    const more = (guides || []).filter(g => g.slug !== slug && g.islandKey && g.islandKey === guideIsland).slice(0, 3);
+    relatedHtml += M.row({ title: 'More from ' + islandLabel, href: '/magazine?island=' + guideIsland, linkLabel: 'The Magazine', cards: more.map(g => M.storyCard(g)) });
+  } catch (e) { relatedHtml = ''; }
+
   const breadcrumb = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -409,9 +433,10 @@ module.exports = async function handler(req, res) {
       padding: 64px 48px 32px;
       text-align: center;
     }
+    .guide-category a:hover { color: #0f0f0f; }
     .guide-category {
-      font-size: 10px;
-      letter-spacing: 0.2em;
+      font-size: 12px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: #888;
       margin-bottom: 24px;
@@ -501,7 +526,7 @@ module.exports = async function handler(req, res) {
   ${nav()}
 
   <header class="guide-header">
-    <p class="guide-category">${escapeHtml(categoryLabel)}</p>
+    <p class="guide-category">${crumbHtml || escapeHtml(sectionLabel)}</p>
     <h1 class="guide-title">${escapeHtml(title)}</h1>
   </header>
 
@@ -509,6 +534,8 @@ module.exports = async function handler(req, res) {
     ${leadImageHtml}
     ${bodyHtml}
   </article>
+
+  ${relatedHtml}
 
   ${footer()}
 
