@@ -44,14 +44,37 @@ async function getBookingMap() {
   return map;
 }
 
-function sendPlausibleEvent(req, slug) {
+// ---- Car hire (partner link) ----
+// /go/car-hire-{guide slug} -> the car hire URL saved once in Sanity (Partners page).
+// One link for every guide; the guide slug is kept so Plausible shows clicks per guide.
+const CAR_HIRE_PREFIX = 'car-hire-';
+const SANITY_PARTNERS_URL = 'https://hchp27po.apicdn.sanity.io/v2024-01-01/data/query/production?query=' +
+  encodeURIComponent('*[_type == "partners"][0].carHireUrl');
+let CAR_HIRE_URL_CACHE = null;
+let CAR_HIRE_CACHED_AT = 0;
+
+async function getCarHireUrl() {
+  if (CAR_HIRE_URL_CACHE && (Date.now() - CAR_HIRE_CACHED_AT) < CACHE_TTL_MS) {
+    return CAR_HIRE_URL_CACHE;
+  }
+  const resp = await fetch(SANITY_PARTNERS_URL);
+  if (!resp.ok) throw new Error(`Sanity ${resp.status}`);
+  const data = await resp.json();
+  const url = String(data.result || '').trim();
+  CAR_HIRE_URL_CACHE = /^https?:\/\//i.test(url) ? url : null;
+  CAR_HIRE_CACHED_AT = Date.now();
+  return CAR_HIRE_URL_CACHE;
+}
+
+function sendPlausibleEvent(req, slug, kind) {
   // Fire-and-forget; a logging failure must never block the visitor's redirect.
+  const isCarHire = kind === 'car-hire';
   const payload = JSON.stringify({
-    name: 'Booking Click',
+    name: isCarHire ? 'Car Hire Click' : 'Booking Click',
     url: `https://${PLAUSIBLE_DOMAIN}/go/${slug}`,
     domain: PLAUSIBLE_DOMAIN,
     referrer: req.headers['referer'] || '',
-    props: { property: slug }
+    props: isCarHire ? { guide: slug.slice(CAR_HIRE_PREFIX.length) } : { property: slug }
   });
   return fetch('https://plausible.io/api/event', {
     method: 'POST',
@@ -72,6 +95,21 @@ module.exports = async function handler(req, res) {
       res.statusCode = 404;
       res.setHeader('Content-Type', 'text/plain');
       return res.end('Not found');
+    }
+
+    if (slug.startsWith(CAR_HIRE_PREFIX)) {
+      const carHire = await getCarHireUrl();
+      if (!carHire) {
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'text/plain');
+        return res.end('Not found');
+      }
+      sendPlausibleEvent(req, slug, 'car-hire');
+      res.statusCode = 302;
+      res.setHeader('Location', carHire);
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+      return res.end();
     }
 
     const map = await getBookingMap();

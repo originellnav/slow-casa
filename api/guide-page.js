@@ -48,10 +48,13 @@ function formatDate(isoString) {
   } catch (e) { return ''; }
 }
 
-// Fetch guide from Sanity by slug
+// Fetch guide from Sanity by slug, plus the site-wide Partners settings
+// (used by the car hire block). Partners rides along on guide.partners.
 async function fetchGuideBySlug(slug) {
   const escapedSlug = slug.replace(/"/g, '\\"');
-  const query = `*[_type == "guide" && slug.current == "${escapedSlug}"][0]{
+  const query = `{
+  "partners": *[_type == "partners"][0]{ carHireUrl, carHireHeading, carHireText, carHireButton },
+  "guide": *[_type == "guide" && slug.current == "${escapedSlug}"][0]{
     title,
     category,
     island,
@@ -72,13 +75,56 @@ async function fetchGuideBySlug(slug) {
         "url": asset->url
       }
     }
-  }`;
+  }
+}`;
 
   const url = `https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v${SANITY_API_VERSION}/data/query/${SANITY_DATASET}?query=${encodeURIComponent(query)}`;
   const response = await fetch(url);
   if (!response.ok) throw new Error('Sanity fetch failed: ' + response.status);
   const data = await response.json();
-  return data.result || null;
+  const result = data.result || {};
+  if (!result.guide) return null;
+  result.guide.partners = result.partners || {};
+  return result.guide;
+}
+
+// ---- Custom body blocks ----
+
+// "Stay nearby": hand-picked Slow Casa houses, by Airtable slug.
+// houseMap = { slug: airtable record } built by the handler before rendering.
+function renderStayNearby(block, ctx) {
+  const slugs = (block.houses || []).map(s => String(s || '').trim().toLowerCase()).filter(Boolean);
+  const cards = slugs.map(s => ctx.houseMap[s]).filter(Boolean).map(r => {
+    const f = r.fields;
+    const island = M.islandOf(f['Island']) || ctx.island || 'mallorca';
+    const hero = f['Hero Image'] || String(f['Gallery Images'] || '').split('\n')[0].trim();
+    return houseCard({
+      url: '/' + island + '/houses/' + f['Slug'],
+      img: hero ? M.imgUrl(hero, 800) : '',
+      name: f['Name'], guests: f['Sleeps'], place: placeOf(f)
+    });
+  });
+  if (!cards.length) return ''; // no matching houses: render nothing rather than an empty box
+  const title = block.title || 'Stay nearby';
+  return '<section class="guide-houses">' +
+    '<h2>' + escapeHtml(title) + '</h2>' +
+    '<div class="guide-houses-grid">' + cards.join('') + '</div>' +
+  '</section>';
+}
+
+// "Car hire": the link lives once in Sanity (Partners), so every guide updates together.
+// Clicks go through /go/car-hire-{guide slug} so Plausible counts them per guide.
+function renderCarHire(block, ctx) {
+  const p = ctx.partners || {};
+  if (!p.carHireUrl) return ''; // Partners page not filled in yet: hide the block
+  const heading = block.heading || p.carHireHeading || 'Hire a car';
+  const text = block.text || p.carHireText || '';
+  const button = p.carHireButton || 'Compare cars';
+  return '<aside class="guide-cta">' +
+    '<p class="guide-cta-title">' + escapeHtml(heading) + '</p>' +
+    (text ? '<p class="guide-cta-text">' + escapeHtml(text) + '</p>' : '') +
+    '<a class="guide-cta-btn" href="/go/car-hire-' + escapeHtml(ctx.slug) + '" rel="sponsored nofollow">' + escapeHtml(button) + '</a>' +
+  '</aside>';
 }
 
 // Render a single text span with marks (bold, italic, links)
@@ -145,8 +191,9 @@ function renderImageBlock(block) {
 }
 
 // Render the full portable text body to HTML
-function renderBody(body) {
+function renderBody(body, ctx) {
   if (!Array.isArray(body) || body.length === 0) return '';
+  ctx = ctx || { houseMap: {}, partners: {}, slug: '', island: '' };
 
   let html = '';
   let listType = null; // 'bullet' or 'number' or null
@@ -165,6 +212,12 @@ function renderBody(body) {
     if (block._type === 'image') {
       flushList();
       html += renderImageBlock(block);
+    } else if (block._type === 'stayNearby') {
+      flushList();
+      html += renderStayNearby(block, ctx);
+    } else if (block._type === 'carHire') {
+      flushList();
+      html += renderCarHire(block, ctx);
     } else if (block._type === 'block') {
       if (block.listItem) {
         // Start a new list or continue an existing one
@@ -230,7 +283,25 @@ module.exports = async function handler(req, res) {
   const heroImage = guide.heroImage || {};
   const heroUrl = heroImage.url || '';
   const heroAlt = heroImage.alt || title;
-  const bodyHtml = renderBody(guide.body || []);
+  // Houses for any "Stay nearby" blocks come from Airtable (same cached list the
+  // related-houses row uses). Fails soft: no houses means the block renders nothing.
+  const bodyBlocks = guide.body || [];
+  const hasStayNearby = bodyBlocks.some(b => b && b._type === 'stayNearby');
+  const houseMap = {};
+  if (hasStayNearby) {
+    try {
+      for (const r of (await M.getProperties()) || []) {
+        const s = r.fields && r.fields['Slug'];
+        if (s && r.fields['Name']) houseMap[String(s).trim().toLowerCase()] = r;
+      }
+    } catch (e) { /* render the guide without house cards */ }
+  }
+  const bodyHtml = renderBody(bodyBlocks, {
+    houseMap,
+    partners: guide.partners || {},
+    slug,
+    island: String(guide.island || '').trim().toLowerCase()
+  });
 
   // Build leading image (replaces full-width hero). Sits at top of body content.
   const leadImageHtml = heroUrl ? `<figure class="guide-image guide-image-lead">
@@ -320,7 +391,11 @@ module.exports = async function handler(req, res) {
         name: f['Name'], guests: f['Sleeps'], place: placeOf(f)
       });
     });
-    relatedHtml += M.row({ title: houseTitle, href: guideIsland ? '/' + guideIsland : '/houses', linkLabel: 'All of ' + (islandLabel || 'the collection'), cards: houseCards });
+    // A guide with its own hand-picked "Stay nearby" block skips this automatic row,
+    // so the same houses never show twice on one page.
+    if (!hasStayNearby) {
+      relatedHtml += M.row({ title: houseTitle, href: guideIsland ? '/' + guideIsland : '/houses', linkLabel: 'All of ' + (islandLabel || 'the collection'), cards: houseCards });
+    }
     const more = (guides || []).filter(g => g.slug !== slug && g.islandKey && g.islandKey === guideIsland).slice(0, 3);
     relatedHtml += M.row({ title: 'More from ' + islandLabel, href: '/magazine?island=' + guideIsland, linkLabel: 'The Magazine', cards: more.map(g => M.storyCard(g)) });
   } catch (e) { relatedHtml = ''; }
@@ -493,6 +568,29 @@ module.exports = async function handler(req, res) {
     }
     .guide-body strong { font-weight: 600; }
 
+    /* "Stay nearby" block: two house cards per row inside the text column */
+    .guide-houses { margin: 2.8em 0; }
+    .guide-houses h2 { margin-top: 0; }
+    .guide-houses-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 24px; }
+    .guide-body .guide-houses a { border-bottom: 0; }
+    .guide-houses .house-card-img { margin-bottom: 16px; }
+
+    /* "Car hire" block */
+    .guide-cta {
+      margin: 2.8em 0; padding: 32px; border: 1px solid #d9d6cf; text-align: center;
+    }
+    .guide-cta-title {
+      font-family: var(--display); font-size: 22px; text-transform: uppercase;
+      letter-spacing: 0.04em; color: #0f0f0f; margin: 0 0 0.4em;
+    }
+    .guide-cta-text { margin: 0 0 1.2em; }
+    .guide-body .guide-cta-btn {
+      display: inline-block; padding: 12px 28px; border: 1px solid #0f0f0f;
+      font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 400;
+      transition: background 0.2s, color 0.2s;
+    }
+    .guide-body .guide-cta-btn:hover { background: #0f0f0f; color: #FDFCF8; }
+
     .guide-image {
       margin: 2.4em -48px;
     }
@@ -518,6 +616,10 @@ module.exports = async function handler(req, res) {
       .guide-body { padding: 0 24px 56px; font-size: 17px; }
       .guide-image { margin: 2em -24px; }
       .guide-image-lead { margin: 0 -24px 2em; }
+      .guide-cta { padding: 24px 20px; }
+    }
+    @media (max-width: 480px) {
+      .guide-houses-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
