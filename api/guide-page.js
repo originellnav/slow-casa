@@ -105,9 +105,12 @@ function renderStayNearby(block, ctx) {
     });
   });
   if (!cards.length) return ''; // no matching houses: render nothing rather than an empty box
-  const title = block.title || 'Stay nearby';
+  // A sub-heading (h3) under the guide's "Where to stay" h2. The old default
+  // "Stay nearby" reads as "Homes to rent", to sit next to a "Hotels to book" h3.
+  const raw = String(block.title || '').trim();
+  const title = !raw || raw.toLowerCase() === 'stay nearby' ? 'Homes to rent' : raw;
   return '<section class="guide-houses">' +
-    '<h2>' + escapeHtml(title) + '</h2>' +
+    '<h3>' + escapeHtml(title) + '</h3>' +
     '<div class="guide-houses-grid">' + cards.join('') + '</div>' +
   '</section>';
 }
@@ -121,9 +124,13 @@ function renderCarHire(block, ctx) {
   const text = block.text || p.carHireText || '';
   const button = p.carHireButton || 'Compare cars';
   return '<aside class="guide-cta">' +
+    '<p class="guide-cta-eyebrow">Getting around</p>' +
     '<p class="guide-cta-title">' + escapeHtml(heading) + '</p>' +
     (text ? '<p class="guide-cta-text">' + escapeHtml(text) + '</p>' : '') +
-    '<a class="guide-cta-btn" href="/go/car-hire-' + escapeHtml(ctx.slug) + '" rel="sponsored nofollow">' + escapeHtml(button) + '</a>' +
+    '<a class="guide-cta-btn" href="/go/car-hire-' + escapeHtml(ctx.slug) + '" rel="sponsored nofollow">' +
+      '<span>' + escapeHtml(button) + '</span>' +
+      '<svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg>' +
+    '</a>' +
   '</aside>';
 }
 
@@ -178,6 +185,14 @@ function renderBlock(block, listContext) {
   return '<p>' + content + '</p>';
 }
 
+// Responsive image: the browser picks the smallest file that looks sharp at the
+// column width (584px on desktop, full width on phones), up to 2x for retina.
+const IMG_SIZES = '(max-width: 768px) calc(100vw - 48px), 584px';
+function imgAttrs(url) {
+  const srcset = [600, 900, 1200, 1600].map(w => sanityImageUrl(url, w) + ' ' + w + 'w').join(', ');
+  return 'src="' + escapeHtml(sanityImageUrl(url, 1200)) + '" srcset="' + escapeHtml(srcset) + '" sizes="' + IMG_SIZES + '"';
+}
+
 // Render an image block within portable text
 function renderImageBlock(block) {
   const url = block.url;
@@ -185,7 +200,7 @@ function renderImageBlock(block) {
   const alt = escapeHtml(block.alt || '');
   const caption = block.caption ? '<figcaption>' + escapeHtml(block.caption) + '</figcaption>' : '';
   return '<figure class="guide-image">' +
-    '<img src="' + escapeHtml(sanityImageUrl(url, 1200)) + '" alt="' + alt + '" loading="lazy" />' +
+    '<img ' + imgAttrs(url) + ' alt="' + alt + '" loading="lazy" />' +
     caption +
   '</figure>';
 }
@@ -305,7 +320,7 @@ module.exports = async function handler(req, res) {
 
   // Build leading image (replaces full-width hero). Sits at top of body content.
   const leadImageHtml = heroUrl ? `<figure class="guide-image guide-image-lead">
-    <img src="${escapeHtml(sanityImageUrl(heroUrl, 1200))}" alt="${escapeHtml(heroAlt)}" fetchpriority="high" loading="eager" />
+    <img ${imgAttrs(heroUrl)} alt="${escapeHtml(heroAlt)}" fetchpriority="high" loading="eager" />
   </figure>` : '';
 
   // One guide, one URL. If the guide carries an island, any other island path
@@ -539,13 +554,18 @@ module.exports = async function handler(req, res) {
       margin: 2em 0 0.8em;
       line-height: 1.2;
       color: #0f0f0f; text-transform: uppercase; letter-spacing: 0.02em; }
+    /* Sub-headings (h3): same type as h2, one step down, e.g. "Homes to rent", "Hotels to book" */
     .guide-body h3 {
-      font-family: var(--body);
-      font-weight: 500;
-      font-size: 20px;
-      margin: 1.8em 0 0.6em;
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: 19px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.3;
+      margin: 2em 0 0.9em;
       color: #0f0f0f;
     }
+    .guide-body h2 + h3, .guide-body h2 + .guide-houses h3 { margin-top: 0.4em; }
     .guide-body ul, .guide-body ol {
       margin: 0 0 1.4em 1.4em;
     }
@@ -567,38 +587,50 @@ module.exports = async function handler(req, res) {
     }
     .guide-body strong { font-weight: 600; }
 
-    /* "Stay nearby" block: two house cards per row inside the text column */
-    .guide-houses { margin: 2.8em 0; }
-    .guide-houses h2 { margin-top: 0; }
+    /* "Homes to rent" (Stay nearby block): two house cards per row inside the text column */
+    .guide-houses { margin: 1.6em 0 2.8em; }
+    .guide-houses h3 { margin-top: 0; }
     .guide-houses-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 24px; }
     .guide-body .guide-houses a { border-bottom: 0; }
     .guide-houses .house-card-img { margin-bottom: 16px; }
 
-    /* "Car hire" block */
+    /* "Car hire" block: a warm sand panel with a solid button, so it reads as an action */
     .guide-cta {
-      margin: 2.8em 0; padding: 32px; border: 1px solid #d9d6cf; text-align: center;
+      margin: 2.8em 0; padding: 40px 36px; background: #F1ECE2; text-align: center;
+    }
+    .guide-cta-eyebrow {
+      font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #7a7466; margin: 0 0 0.9em;
     }
     .guide-cta-title {
-      font-family: var(--display); font-size: 22px; text-transform: uppercase;
-      letter-spacing: 0.04em; color: #0f0f0f; margin: 0 0 0.4em;
+      font-family: var(--display); font-size: 24px; text-transform: uppercase;
+      letter-spacing: 0.04em; line-height: 1.2; color: #0f0f0f; margin: 0 0 0.5em;
     }
-    .guide-cta-text { margin: 0 0 1.2em; }
+    .guide-cta-text { margin: 0 auto 1.4em; max-width: 34em; }
     .guide-body .guide-cta-btn {
-      display: inline-block; padding: 12px 28px; border: 1px solid #0f0f0f;
-      font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 400;
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 15px 30px; background: #0f0f0f; color: #FDFCF8; border: 1px solid #0f0f0f;
+      font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 400;
       transition: background 0.2s, color 0.2s;
     }
-    .guide-body .guide-cta-btn:hover { background: #0f0f0f; color: #FDFCF8; }
+    .guide-cta-btn svg { width: 8px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.5; transition: transform 0.2s; }
+    .guide-body .guide-cta-btn:hover { background: #FDFCF8; color: #0f0f0f; }
+    .guide-cta-btn:hover svg { transform: translateX(4px); }
+    .guide-cta-btn:focus-visible { outline: 1px solid #0f0f0f; outline-offset: 4px; }
 
+    /* Images sit in the same column as the text. Tall (portrait) photos are
+       capped so one picture never fills more than most of the screen. */
     .guide-image {
-      margin: 2.4em -48px;
+      margin: 2.4em 0;
     }
     .guide-image-lead {
-      margin: 0 -48px 2.4em;
+      margin: 0 0 2.4em;
     }
     .guide-image img {
       width: 100%;
       height: auto;
+      max-height: min(80vh, 760px);
+      object-fit: cover;
       display: block;
     }
     .guide-image figcaption {
@@ -613,9 +645,9 @@ module.exports = async function handler(req, res) {
     @media (max-width: 768px) {
       .guide-header { padding: 48px 24px 24px; }
       .guide-body { padding: 0 24px 56px; font-size: 17px; }
-      .guide-image { margin: 2em -24px; }
-      .guide-image-lead { margin: 0 -24px 2em; }
-      .guide-cta { padding: 24px 20px; }
+      .guide-image { margin: 2em 0; }
+      .guide-image-lead { margin: 0 0 2em; }
+      .guide-cta { padding: 32px 20px; }
     }
     @media (max-width: 480px) {
       .guide-houses-grid { grid-template-columns: 1fr; }
