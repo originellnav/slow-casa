@@ -127,7 +127,7 @@ function renderCarHire(block, ctx) {
     '<p class="guide-cta-eyebrow">Getting around</p>' +
     '<p class="guide-cta-title">' + escapeHtml(heading) + '</p>' +
     (text ? '<p class="guide-cta-text">' + escapeHtml(text) + '</p>' : '') +
-    '<a class="guide-cta-btn" href="/go/car-hire-' + escapeHtml(ctx.slug) + '" rel="sponsored nofollow">' +
+    '<a class="guide-cta-btn" href="/go/car-hire-' + escapeHtml(ctx.slug) + '" target="_blank" rel="sponsored nofollow noopener">' +
       '<span>' + escapeHtml(button) + '</span>' +
       '<svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg>' +
     '</a>' +
