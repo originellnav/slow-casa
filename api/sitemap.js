@@ -17,6 +17,20 @@ module.exports = async function handler(req, res) {
     { url: '/magazine/how-to', priority: '0.6', changefreq: 'monthly' },
     { url: '/design-directory', priority: '0.8', changefreq: 'weekly' },
   ];
+  // Island hubs (/mallorca/where-to-stay etc.) go in only when they have something
+  // on them. Empty hubs are noindex, and a sitemap should never list noindex pages.
+  try {
+    const M = require('../lib/magazine');
+    const [guides, props] = await Promise.all([M.getGuides(), M.getProperties()]);
+    const places = await M.getPlaces(props);
+    for (const isl of M.ISLAND_KEYS) {
+      for (const sec of M.ISLAND_HUB_SECTIONS) {
+        if (M.sectionItems(sec, guides, places, isl).cards.length) {
+          staticPages.push({ url: M.sectionUrl(sec, isl), priority: '0.8', changefreq: 'weekly' });
+        }
+      }
+    }
+  } catch (e) { /* sitemap still renders without the hubs */ }
   // Fetch properties from Airtable and guides from Sanity in parallel
   const [propertyUrls, guideUrls, architectUrls] = await Promise.all([
     (async () => {

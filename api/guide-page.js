@@ -354,14 +354,13 @@ module.exports = async function handler(req, res) {
   const crumbList = [{ name: 'Slow Casa', url: 'https://slowcasa.com' }];
   if (M.ISLANDS[guideIsland]) crumbList.push({ name: islandLabel, url: 'https://slowcasa.com/' + guideIsland });
   else crumbList.push({ name: 'Magazine', url: 'https://slowcasa.com/magazine' });
-  if (sectionKey) crumbList.push({ name: sectionLabel, url: 'https://slowcasa.com/magazine/' + sectionKey });
+  // Section crumb points at the island hub (/mallorca/where-to-stay) when there is one.
+  if (sectionKey) crumbList.push({ name: sectionLabel, url: 'https://slowcasa.com' + M.sectionUrl(sectionKey, M.ISLANDS[guideIsland] ? guideIsland : '') });
   crumbList.push({ name: title, url: canonicalUrl });
   const gCrumbs = crumbList.map((c, i) => ({ "@type": "ListItem", "position": i + 1, "name": c.name, "item": c.url }));
   // Visible trail: everything but Slow Casa and the page itself.
   const crumbHtml = crumbList.slice(1, -1).map(c => {
-    // The section link filters the Magazine to this guide's island.
-    const href = c.url.replace('https://slowcasa.com', '') +
-      (c.url.indexOf('/magazine/') !== -1 && M.ISLANDS[guideIsland] ? '?island=' + guideIsland : '');
+    const href = c.url.replace('https://slowcasa.com', '');
     return `<a href="${escapeHtml(href)}">${escapeHtml(c.name)}</a>`;
   }).join(' <span aria-hidden="true">/</span> ');
 

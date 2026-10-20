@@ -133,7 +133,7 @@ module.exports = async function handler(req, res) {
     return M.row({
       id: k,
       title: `${M.SECTIONS[k].label} in ${config.name}`,
-      href: `/magazine/${k}?island=${key}`,
+      href: M.sectionUrl(k, key),
       linkLabel: items.cards.length > ROW_SIZE ? `See all (${items.cards.length})` : 'More in the Magazine',
       cards: items.cards.slice(0, ROW_SIZE)
     });
