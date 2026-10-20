@@ -1,5 +1,6 @@
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
+const { placeCategories, placeIslandName, placeLink, placeImages } = require('../lib/magazine');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const PROPERTIES_TABLE = 'Properties';
@@ -98,16 +99,7 @@ async function getAllPlaces() {
 // (stable, like the property Hero Image). Also tolerates an Airtable
 // attachment, but note those URLs expire, so a text URL is recommended.
 function getPlaceImageUrl(place) {
-  const f = (place && place.fields) || {};
-  const img = f['Image'];
-  if (!img) return '';
-  if (typeof img === 'string') return img.trim();
-  if (Array.isArray(img) && img.length) {
-    const a = img[0] || {};
-    if (a.thumbnails && a.thumbnails.large) return a.thumbnails.large.url;
-    return a.url || '';
-  }
-  return '';
+  return placeImages((place && place.fields) || {})[0] || '';
 }
 
 function escapeHtml(str) {
@@ -307,7 +299,7 @@ module.exports = async function handler(req, res) {
 
   const catOrder = ['Eat', 'Drink', 'Stay', 'Swim', 'Play', 'See', 'Do'];
   places.sort((a, b) => {
-    const ra = catOrder.indexOf(a.fields.Category || ''); const rb = catOrder.indexOf(b.fields.Category || '');
+    const ra = catOrder.indexOf(placeCategories(a.fields)[0] || ''); const rb = catOrder.indexOf(placeCategories(b.fields)[0] || '');
     return (ra === -1 ? 99 : ra) - (rb === -1 ? 99 : rb);
   });
 
@@ -321,9 +313,8 @@ module.exports = async function handler(req, res) {
       ${places.map(p => {
         const pf = p.fields || {};
         const pName = pf['Name'] || '';
-        const sub = [pf['Category'], pf['Area']].filter(Boolean).map(escapeHtml).join(' <span class="pp-dot">&bull;</span> ');
-        const raw = String(pf['Link'] || '').trim();
-        const link = /^https?:\/\//i.test(raw) ? raw : '';
+        const sub = [placeCategories(pf)[0], String(pf['Town'] || '').trim() || placeIslandName(pf)].filter(Boolean).map(escapeHtml).join(' <span class="pp-dot">&bull;</span> ');
+        const link = placeLink(pf);
         const pimg = getPlaceImageUrl(p);
         const inner = `
           <div class="pp-rec-img">${pimg ? `<img src="${escapeHtml(responsiveImageUrl(pimg, 900))}" alt="${escapeHtml(pName)}" loading="lazy" ${IMG_ONERROR} />` : ''}</div>
