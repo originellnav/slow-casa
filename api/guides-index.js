@@ -21,7 +21,6 @@ const LANDING = {
   heading: 'Magazine',
   intro: 'Where to stay, eat and swim in Mallorca, Ibiza and Menorca. Village guides, places we rate and the stories behind the houses.'
 };
-const LANDING_ROW_SIZE = 6;
 
 // Copy for the island hubs. {island} is swapped for the island name.
 const HUB_COPY = {
@@ -43,12 +42,23 @@ const HUB_COPY = {
 };
 function fill(str, islandName) { return String(str).split('{island}').join(islandName); }
 
-function chips(section, island, isLanding) {
+// Two rows of filter buttons above the grid: sections, then islands.
+// Each button is a real link to an indexable page (/magazine/where-to-eat,
+// /mallorca/where-to-eat), so the filters also help search engines.
+function sectionChips(current, island, counts) {
+  const items = [{ key: '', label: 'All' }].concat(
+    M.SECTION_KEYS.filter(k => counts[k] || k === current).map(k => ({ key: k, label: M.SECTIONS[k].label })));
+  const href = key => key ? M.sectionUrl(key, island) : '/magazine' + (island ? '?island=' + island : '');
+  return `<ul class="mag-chips" aria-label="Filter by section">
+    ${items.map(i => `<li><a href="${href(i.key)}"${i.key === current ? ' aria-current="page"' : ''}>${esc(i.label)}</a></li>`).join('')}
+  </ul>`;
+}
+function islandChips(section, island) {
   const items = [{ key: '', label: 'All islands' }].concat(M.ISLAND_KEYS.map(k => ({ key: k, label: M.ISLANDS[k] })));
-  const href = key => isLanding
-    ? '/magazine' + (key ? '?island=' + key : '')
-    : (key ? M.sectionUrl(section, key) : '/magazine/' + section);
-  return `<ul class="mag-chips" aria-label="Filter by island">
+  const href = key => section
+    ? (key ? M.sectionUrl(section, key) : '/magazine/' + section)
+    : '/magazine' + (key ? '?island=' + key : '');
+  return `<ul class="mag-chips mag-chips-islands" aria-label="Filter by island">
     ${items.map(i => `<li><a href="${href(i.key)}"${i.key === island ? ' aria-current="page"' : ''}>${esc(i.label)}</a></li>`).join('')}
   </ul>`;
 }
@@ -105,34 +115,26 @@ module.exports = async function handler(req, res) {
     description = sec.description;
   }
 
+  // How many items each section has for the current island (hides empty filters).
+  const counts = {};
+  M.SECTION_KEYS.forEach(k => { counts[k] = M.magItems(k, guides, places, island).length; });
+
   let bodyHtml = '';
   let isEmpty = false;
+  let cards;
   if (isLanding) {
-    bodyHtml = M.SECTION_KEYS.map(k => {
-      const items = M.sectionItems(k, guides, places, island);
-      return M.row({
-        id: k,
-        title: M.SECTIONS[k].label,
-        href: M.sectionUrl(k, island),
-        linkLabel: 'See all (' + items.cards.length + ')',
-        cards: items.cards.slice(0, LANDING_ROW_SIZE)
-      });
-    }).join('');
-    if (!bodyHtml) {
-      bodyHtml = `<p class="mag-empty">${island ? `Nothing here yet for ${esc(islandName)}. <a href="/magazine">See all islands</a>.` : 'The first guides are on the way.'}</p>`;
-    }
+    // Everything in one grid: guides newest first, then places. A place listed
+    // under two sections (e.g. Eat + Experience) appears once.
+    const g = guides.filter(x => x.section && x.islandKey && (!island || x.islandKey === island));
+    const p = places.filter(x => x.islandKey && (!island || x.islandKey === island));
+    cards = g.map(M.magGuideCard).concat(p.map(M.magPlaceCard));
   } else {
-    const items = M.sectionItems(section, guides, places, island);
-    isEmpty = !items.cards.length;
-    bodyHtml = items.cards.length
-      ? `<div class="mag-grid"><div class="house-grid">${items.cards.join('')}</div></div>`
-      : `<p class="mag-empty">${island ? `Nothing here yet for ${esc(islandName)}. <a href="/magazine/${section}">See all islands</a>.` : 'The first pieces are on the way.'}</p>`;
-    // Links to the other sections, and back to the island page when filtered.
-    const others = M.SECTION_KEYS.filter(k => k !== section && M.sectionItems(k, guides, places, island).cards.length);
-    const links = others.map(k => `<a href="${M.sectionUrl(k, island)}">${esc(M.SECTIONS[k].label)}</a>`);
-    if (island) links.push(`<a href="/${island}">All of ${esc(islandName)}</a>`);
-    if (links.length) bodyHtml += `<nav class="mag-sublinks" aria-label="More from the Magazine">${links.join('')}</nav>`;
+    cards = M.magItems(section, guides, places, island);
   }
+  isEmpty = !cards.length;
+  bodyHtml = cards.length
+    ? `<div class="mag-grid">${M.magGrid(cards)}</div>`
+    : `<p class="mag-empty">${island ? `Nothing here yet for ${esc(islandName)}. <a href="${isLanding ? '/magazine' : '/magazine/' + section}">See all islands</a>.` : 'The first pieces are on the way.'}</p>`;
 
   // Island hubs sit under the island (Slow Casa / Mallorca / Where to eat);
   // everything else sits under the Magazine.
@@ -212,7 +214,8 @@ module.exports = async function handler(req, res) {
     <p class="page-crumb">${crumbHtml}</p>
     <h1 class="page-title">${esc(heading)}</h1>
     <p class="page-lede">${esc(intro)}</p>
-    ${chips(section, island, isLanding)}
+    ${sectionChips(isLanding ? '' : section, island, counts)}
+    ${islandChips(isLanding ? '' : section, island)}
   </header>
 
   <main>
