@@ -30,6 +30,14 @@ module.exports = async function handler(req, res) {
         }
       }
     }
+    // Place pages, but only the ones with a photo and a full description.
+    // The rest are live but noindex until they are filled in.
+    const allPlaces = await M.getPlaces(props, { all: true });
+    for (const pl of allPlaces) {
+      if (M.placeUrl(pl) && M.placeIndexable(pl)) {
+        staticPages.push({ url: M.placeUrl(pl), priority: '0.5', changefreq: 'monthly' });
+      }
+    }
   } catch (e) { /* sitemap still renders without the hubs */ }
   // Fetch properties from Airtable and guides from Sanity in parallel
   const [propertyUrls, guideUrls, architectUrls] = await Promise.all([
