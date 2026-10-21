@@ -1,4 +1,5 @@
 const { nav, footer } = require('../lib/nav');
+const { architectInScope } = require('../lib/scope');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const ARCHITECTS_TABLE = 'Architects';
@@ -102,9 +103,11 @@ module.exports = async function handler(req, res) {
     if (p && p.id) propById.set(p.id, p);
   }
 
-  // Published architects only, alphabetical
+  // Published Balearic architects only (based on the islands, or with a
+  // Balearic house in the collection), alphabetical.
   const published = architects
-    .filter(a => (a.fields && a.fields['Status']) === 'Published' && a.fields['Name'] && a.fields['Slug'])
+    .filter(a => (a.fields && a.fields['Status']) === 'Published' && a.fields['Name'] && String(a.fields['Slug'] || '').trim())
+    .filter(a => architectInScope(a.fields, propById))
     .sort((a, b) => String(a.fields['Name']).localeCompare(String(b.fields['Name'])));
 
   // Build card data
@@ -127,7 +130,7 @@ module.exports = async function handler(req, res) {
 
     return {
       name: f['Name'],
-      slug: f['Slug'],
+      slug: String(f['Slug']).trim(),
       location: f['Location'] || '',
       img,
       countLabel
@@ -135,14 +138,17 @@ module.exports = async function handler(req, res) {
   });
 
   const canonicalUrl = 'https://slowcasa.com/design-directory';
-  const title = 'Design Directory | Slow Casa';
-  const metaDesc = 'The people behind the houses on Slow Casa. Starting with the architects: studios and practices working across rural Europe, from new builds to the careful rebuilding of old farms.';
+  const title = 'Architects in Mallorca, Ibiza & Menorca | Slow Casa';
+  const metaDesc = 'The architects and studios behind the houses on Slow Casa, from new builds to old fincas brought back to life in Mallorca, Ibiza and Menorca.';
+  // Kept out of Google until the list is long enough to be useful on its own.
+  const MIN_INDEXABLE = 12;
+  const indexable = cards.length >= MIN_INDEXABLE;
 
   // JSON-LD ItemList
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Design Directory",
+    "name": "Architects in Mallorca, Ibiza & Menorca",
     "url": canonicalUrl,
     "mainEntity": {
       "@type": "ItemList",
@@ -179,6 +185,7 @@ module.exports = async function handler(req, res) {
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeHtml(metaDesc)}" />
   <link rel="canonical" href="${canonicalUrl}" />
+  ${indexable ? '' : '<meta name="robots" content="noindex, follow" />'}
   ${jsonLdScript}
   <meta property="og:title" content="${escapeHtml(title)}" />
   <meta property="og:description" content="${escapeHtml(metaDesc)}" />
@@ -326,8 +333,8 @@ module.exports = async function handler(req, res) {
   ${nav()}
 
   <header class="dir-header">
-    <h1 class="dir-title">Design Directory</h1>
-    <p class="dir-subline">The people behind the houses on Slow Casa. Starting with the architects.</p>
+    <h1 class="dir-title">Architects in the Balearics</h1>
+    <p class="dir-subline">The architects and studios behind the houses on Slow Casa.</p>
   </header>
 
   ${cards.length > 0 ? `

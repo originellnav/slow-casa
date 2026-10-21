@@ -1,4 +1,5 @@
 const { nav, footer } = require('../lib/nav');
+const { architectInScope, balearicIsland, gone } = require('../lib/scope');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const ARCHITECTS_TABLE = 'Architects';
@@ -52,7 +53,8 @@ async function getAllProperties() {
 }
 
 async function fetchArchitectBySlug(slug) {
-  const formula = encodeURIComponent(`{Slug} = "${slug}"`);
+  // TRIM: a stray space in the Slug field must not break the page.
+  const formula = encodeURIComponent(`TRIM({Slug}) = "${slug}"`);
   const url = `https://api.airtable.com/v0/${BASE_ID}/${ARCHITECTS_TABLE}?filterByFormula=${formula}&maxRecords=1`;
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}`, 'Cache-Control': 'no-cache' }
@@ -145,6 +147,16 @@ module.exports = async function handler(req, res) {
     return res.status(404).send('Architect not found');
   }
 
+  // Balearic architects only. The rest are from before the Balearic focus: 410.
+  {
+    let propById = null;
+    try {
+      const all = await getAllProperties();
+      propById = new Map(all.map(p => [p.id, p]));
+    } catch (e) { /* fall back to the Location check alone */ }
+    if (!architectInScope(f, propById) && !isPreview) return gone(res, 'architect profile');
+  }
+
   const name = f['Name'] || '';
   const location = f['Location'] || '';
   const country = f['Country'] || '';
@@ -164,6 +176,7 @@ module.exports = async function handler(req, res) {
       linkedProperties = linkedProperties.filter(p => {
         const pf = p.fields || {};
         if (!pf['Name']) return false;
+        if (!balearicIsland(pf['Island'])) return false; // only houses that still have a page
         return !!pf['Hero Image'] || !!pf['Gallery Images'] || (pf['Images'] && pf['Images'].length > 0);
       });
       // Sort by Date added descending

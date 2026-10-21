@@ -88,19 +88,19 @@
     },
     {
       "source": "/mallorca/houses/:slug",
-      "destination": "/api/property-page?slug=:slug"
+      "destination": "/api/property-page?slug=:slug&island=mallorca"
     },
     {
       "source": "/ibiza/houses/:slug",
-      "destination": "/api/property-page?slug=:slug"
+      "destination": "/api/property-page?slug=:slug&island=ibiza"
     },
     {
       "source": "/menorca/houses/:slug",
-      "destination": "/api/property-page?slug=:slug"
+      "destination": "/api/property-page?slug=:slug&island=menorca"
     },
     {
       "source": "/formentera/houses/:slug",
-      "destination": "/api/property-page?slug=:slug"
+      "destination": "/api/property-page?slug=:slug&island=formentera"
     },
     {
       "source": "/:island(mallorca|ibiza|menorca|formentera)/places/:slug",

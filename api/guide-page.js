@@ -1,6 +1,7 @@
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
 const M = require('../lib/magazine');
+const { balearicIsland, gone } = require('../lib/scope');
 const SANITY_PROJECT_ID = 'hchp27po';
 const SANITY_DATASET = 'production';
 const SANITY_API_VERSION = '2024-01-01';
@@ -328,6 +329,9 @@ module.exports = async function handler(req, res) {
   // is never served from four different URLs.
   const guideIsland = String(guide.island || '').trim().toLowerCase();
   const ISLANDS = ['mallorca', 'ibiza', 'menorca', 'formentera'];
+  // Balearic guides only: a guide with no island set is from before the
+  // Balearic focus and is gone (410). Setting an island in Sanity brings it back.
+  if (!balearicIsland(guideIsland)) return gone(res, 'guide');
   if (ISLANDS.indexOf(guideIsland) !== -1) {
     const requested = String((req.query && req.query.island) || '').trim().toLowerCase();
     if (requested !== guideIsland) {
