@@ -10,19 +10,34 @@ module.exports = async function handler(req, res) {
     { url: '/ibiza', priority: '0.9', changefreq: 'weekly' },
     { url: '/menorca', priority: '0.9', changefreq: 'weekly' },
     { url: '/magazine', priority: '0.9', changefreq: 'weekly' },
-    { url: '/magazine/where-to-stay', priority: '0.8', changefreq: 'weekly' },
-    { url: '/magazine/where-to-eat', priority: '0.8', changefreq: 'weekly' },
-    { url: '/magazine/what-to-do', priority: '0.8', changefreq: 'weekly' },
-    { url: '/magazine/house-tours', priority: '0.6', changefreq: 'monthly' },
-    { url: '/magazine/how-to', priority: '0.6', changefreq: 'monthly' },
-    { url: '/design-directory', priority: '0.8', changefreq: 'weekly' },
   ];
+  // Magazine sections and the architects directory go in only when they have
+  // enough on them. Empty or thin pages are noindex, and a sitemap should
+  // never list noindex pages.
+  let architectUrls = [];
   // Island hubs (/mallorca/where-to-stay etc.) go in only when they have something
   // on them. Empty hubs are noindex, and a sitemap should never list noindex pages.
   try {
     const M = require('../lib/magazine');
     const [guides, props] = await Promise.all([M.getGuides(), M.getProperties()]);
     const places = await M.getPlaces(props);
+    for (const sec of M.SECTION_KEYS) {
+      if (M.sectionItems(sec, guides, places, '').cards.length) {
+        staticPages.push({ url: '/magazine/' + sec, priority: '0.8', changefreq: 'weekly' });
+      }
+    }
+    // Architects: Published and Balearic only (see lib/scope.js).
+    const { architectInScope } = require('../lib/scope');
+    const propById = new Map((props || []).map(p => [p.id, p]));
+    const ar = await fetch('https://api.airtable.com/v0/appndrnWrdlgxRJAG/Architects?pageSize=100',
+      { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } });
+    const arData = ar.ok ? await ar.json() : { records: [] };
+    const inScope = (arData.records || []).filter(rec => {
+      const f = rec.fields || {};
+      return String(f['Slug'] || '').trim() && f['Status'] === 'Published' && architectInScope(f, propById);
+    });
+    architectUrls = inScope.map(rec => ({ url: '/architects/' + String(rec.fields['Slug']).trim(), priority: '0.6', changefreq: 'monthly', lastmod: '' }));
+    if (inScope.length >= 12) staticPages.push({ url: '/design-directory', priority: '0.7', changefreq: 'weekly' });
     for (const isl of M.ISLAND_KEYS) {
       for (const sec of M.ISLAND_HUB_SECTIONS) {
         if (M.sectionItems(sec, guides, places, isl).cards.length) {
@@ -40,7 +55,7 @@ module.exports = async function handler(req, res) {
     }
   } catch (e) { /* sitemap still renders without the hubs */ }
   // Fetch properties from Airtable and guides from Sanity in parallel
-  const [propertyUrls, guideUrls, architectUrls] = await Promise.all([
+  const [propertyUrls, guideUrls] = await Promise.all([
     (async () => {
       try {
                 let recs = [];
@@ -56,7 +71,7 @@ module.exports = async function handler(req, res) {
           attempts++;
         } while (offset && attempts < 10);
         return recs
-                    .filter(rec => rec.fields['Slug'] && rec.fields['Island'])
+                    .filter(rec => rec.fields['Slug'] && ['mallorca','ibiza','menorca','formentera'].indexOf(String(rec.fields['Island'] || '').trim().toLowerCase()) !== -1)
           .map(rec => ({
             url: (function () {
               const isl = String(rec.fields['Island'] || '').trim().toLowerCase();
@@ -77,7 +92,7 @@ module.exports = async function handler(req, res) {
         const r = await fetch(sanityUrl);
         const data = await r.json();
         return (data.result || [])
-          .filter(g => g.slug)
+          .filter(g => g.slug && ['mallorca','ibiza','menorca','formentera'].indexOf(String(g.island || '').trim().toLowerCase()) !== -1)
           .map(g => ({
             url: (function () {
               const isl = String(g.island || '').trim().toLowerCase();
@@ -88,23 +103,6 @@ module.exports = async function handler(req, res) {
             priority: '0.7',
             changefreq: 'monthly',
             lastmod: g.publishedAt ? g.publishedAt.split('T')[0] : ''
-          }));
-      } catch (e) { return []; }
-    })(),
-    (async () => {
-      try {
-        const r = await fetch(
-          'https://api.airtable.com/v0/appndrnWrdlgxRJAG/Architects?fields[]=Slug&fields[]=Status&maxRecords=200',
-          { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } }
-        );
-        const data = await r.json();
-        return (data.records || [])
-          .filter(rec => rec.fields['Slug'] && rec.fields['Status'] === 'Published')
-          .map(rec => ({
-            url: '/architects/' + rec.fields['Slug'],
-            priority: '0.7',
-            changefreq: 'monthly',
-            lastmod: ''
           }));
       } catch (e) { return []; }
     })()

@@ -1,4 +1,5 @@
 const { nav, footer } = require('../lib/nav');
+const { balearicIsland, gone } = require('../lib/scope');
 const { houseCard, placeOf } = require('../lib/card');
 const { placeCategories, placeIslandName, placeLink, placeImages, placeSlug, islandOf } = require('../lib/magazine');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
@@ -217,14 +218,17 @@ module.exports = async function handler(req, res) {
     setCached(slug, record);
   }
 
-  // Old /properties/:slug URLs 301 to the island path for Balearic houses.
-  // Driven by the Island field, so it stays correct as houses are added.
-  if (req.query && req.query.legacy && record.fields && record.fields['Island']) {
-    const island = String(record.fields['Island']).trim().toLowerCase();
-    const slugVal2 = record.fields['Slug'];
-    if (['mallorca','ibiza','menorca','formentera'].indexOf(island) !== -1 && slugVal2) {
+  // Balearic houses only. A house outside the islands is gone (410), whichever
+  // URL it is asked for on. A Balearic house has one URL, /{island}/houses/{slug}:
+  // the old /properties/ path and the wrong island both 301 there.
+  const houseIsland = balearicIsland(record.fields && record.fields['Island']);
+  if (!houseIsland) return gone(res, 'house');
+  {
+    const slugVal2 = String(record.fields['Slug'] || slug).trim();
+    const asked = String((req.query && req.query.island) || '').trim().toLowerCase();
+    if ((req.query && req.query.legacy) || asked !== houseIsland) {
       res.statusCode = 301;
-      res.setHeader('Location', '/' + island + '/houses/' + slugVal2);
+      res.setHeader('Location', '/' + houseIsland + '/houses/' + slugVal2);
       return res.end();
     }
   }

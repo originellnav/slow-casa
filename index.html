@@ -980,7 +980,7 @@
     <div class="site-menu-foot">
       <a href="mailto:luke@slowcasa.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg>luke@slowcasa.com</a>
       <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6"/></svg>@theslowcasa</a>
-      <a href="https://newsletter.slowcasa.com/subscribe" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>The newsletter</a>
+      <a href="https://newsletter.slowcasa.com/?modal=signup" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>The newsletter</a>
     </div>
   </aside>
   <script src="/menu.js" defer></script>
@@ -1232,8 +1232,10 @@
   </script>
 <script>
 (function () {
-  var q = '*[_type == "guide" && defined(publishedAt) && defined(slug.current)]' +
-          ' | order(publishedAt desc){title, excerpt, category,' +
+  // Balearic guides only (guides without an island are gone, see lib/scope.js).
+  var q = '*[_type == "guide" && defined(publishedAt) && defined(slug.current)' +
+          ' && lower(island) in ["mallorca","ibiza","menorca","formentera"]]' +
+          ' | order(publishedAt desc){title, excerpt, category, island,' +
           ' "slug": slug.current, "img": heroImage.asset->url}';
   var url = 'https://hchp27po.apicdn.sanity.io/v2024-01-01/data/query/production?query=' + encodeURIComponent(q);
 
@@ -1247,7 +1249,7 @@
     return u + (u.indexOf('?') > -1 ? '&' : '?') + 'w=800&auto=format&fit=crop';
   }
   function card(g, label) {
-    return '<a class="property-card" href="/guides/' + esc(g.slug) + '">' +
+    return '<a class="property-card" href="/' + esc(String(g.island).toLowerCase()) + '/' + esc(g.slug) + '">' +
       '<div class="card-img">' + (g.img ? '<img src="' + esc(thumb(g.img)) + '" alt="' + esc(g.title) + '" loading="lazy" />' : '') + '</div>' +
       '<p class="card-location">' + esc(label) + '</p>' +
       '<p class="card-name">' + esc(g.title) + '</p>' +

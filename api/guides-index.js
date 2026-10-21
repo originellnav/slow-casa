@@ -16,7 +16,7 @@ const M = require('../lib/magazine');
 const { esc } = M;
 
 const LANDING = {
-  title: 'Magazine: Where to Stay, Eat and Swim in Mallorca, Ibiza & Menorca | Slow Casa',
+  title: 'Where to Stay, Eat and Swim in Mallorca, Ibiza & Menorca | Slow Casa',
   description: 'Village guides, restaurants, beaches and things to do in Mallorca, Ibiza and Menorca, chosen around the houses in the Slow Casa collection.',
   heading: 'Magazine',
   intro: 'Where to stay, eat and swim in Mallorca, Ibiza and Menorca. Village guides, places we rate and the stories behind the houses.'
@@ -174,7 +174,7 @@ module.exports = async function handler(req, res) {
   <meta name="apple-mobile-web-app-title" content="Slow Casa" />
   <link rel="manifest" href="/site.webmanifest" />
   <meta name="description" content="${esc(description)}" />
-  ${(island && !isHub) || (isHub && isEmpty) ? '<meta name="robots" content="noindex,follow" />' : ''}
+  ${(island && !isHub) || isEmpty ? '<meta name="robots" content="noindex,follow" />' : ''}
   <link rel="canonical" href="${canonical}" />
   ${schema.map(s => `<script type="application/ld+json">${JSON.stringify(s)}</script>`).join('\n  ')}
   <meta property="og:title" content="${esc(title)}" />
