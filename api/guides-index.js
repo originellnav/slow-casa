@@ -210,10 +210,8 @@ module.exports = async function handler(req, res) {
 
   ${nav()}
 
-  <header class="page-head">
-    <p class="page-crumb">${crumbHtml}</p>
-    <h1 class="page-title">${esc(heading)}</h1>
-    <p class="page-lede">${esc(intro)}</p>
+  <header class="mag-head">
+    <h1 class="sr-only">${esc(heading)}</h1>
     ${sectionChips(isLanding ? '' : section, island, counts)}
     ${islandChips(isLanding ? '' : section, island)}
   </header>
