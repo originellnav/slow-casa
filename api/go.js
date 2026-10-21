@@ -66,15 +66,30 @@ async function getCarHireUrl() {
   return CAR_HIRE_URL_CACHE;
 }
 
+// ---- Places (recommended restaurants, bars, beaches...) ----
+// /go/place-{place slug} -> the place's own website, from Airtable Places.
+// Counted as "Place Click", so each place's page can show how many visitors we send it.
+const PLACE_PREFIX = 'place-';
+
+async function getPlaceWebsite(placeSlug) {
+  const M = require('../lib/magazine');
+  const places = await M.getPlaces(null, { all: true });
+  const p = places.find(x => x.slug === placeSlug);
+  return p ? M.placeLink(p.fields) : '';
+}
+
 function sendPlausibleEvent(req, slug, kind) {
   // Fire-and-forget; a logging failure must never block the visitor's redirect.
   const isCarHire = kind === 'car-hire';
+  const isPlace = kind === 'place';
   const payload = JSON.stringify({
-    name: isCarHire ? 'Car Hire Click' : 'Booking Click',
+    name: isCarHire ? 'Car Hire Click' : isPlace ? 'Place Click' : 'Booking Click',
     url: `https://${PLAUSIBLE_DOMAIN}/go/${slug}`,
     domain: PLAUSIBLE_DOMAIN,
     referrer: req.headers['referer'] || '',
-    props: isCarHire ? { guide: slug.slice(CAR_HIRE_PREFIX.length) } : { property: slug }
+    props: isCarHire ? { guide: slug.slice(CAR_HIRE_PREFIX.length) }
+      : isPlace ? { place: slug.slice(PLACE_PREFIX.length) }
+      : { property: slug }
   });
   return fetch('https://plausible.io/api/event', {
     method: 'POST',
@@ -107,6 +122,21 @@ module.exports = async function handler(req, res) {
       sendPlausibleEvent(req, slug, 'car-hire');
       res.statusCode = 302;
       res.setHeader('Location', carHire);
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+      return res.end();
+    }
+
+    if (slug.startsWith(PLACE_PREFIX)) {
+      const site = await getPlaceWebsite(slug.slice(PLACE_PREFIX.length));
+      if (!site) {
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'text/plain');
+        return res.end('Not found');
+      }
+      sendPlausibleEvent(req, slug, 'place');
+      res.statusCode = 302;
+      res.setHeader('Location', site);
       res.setHeader('Cache-Control', 'no-store');
       res.setHeader('X-Robots-Tag', 'noindex, nofollow');
       return res.end();

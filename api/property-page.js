@@ -1,6 +1,6 @@
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
-const { placeCategories, placeIslandName, placeLink, placeImages } = require('../lib/magazine');
+const { placeCategories, placeIslandName, placeLink, placeImages, placeSlug, islandOf } = require('../lib/magazine');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const PROPERTIES_TABLE = 'Properties';
@@ -314,14 +314,16 @@ module.exports = async function handler(req, res) {
         const pf = p.fields || {};
         const pName = pf['Name'] || '';
         const sub = [placeCategories(pf)[0], String(pf['Town'] || '').trim() || placeIslandName(pf)].filter(Boolean).map(escapeHtml).join(' <span class="pp-dot">&bull;</span> ');
-        const link = placeLink(pf);
+        // Each rec opens its place page on Slow Casa (island from the place, else this house).
+        const pIsland = islandOf(placeIslandName(pf)) || islandOf(region);
+        const link = pIsland && placeSlug(pf) ? '/' + pIsland + '/places/' + placeSlug(pf) : '';
         const pimg = getPlaceImageUrl(p);
         const inner = `
           <div class="pp-rec-img">${pimg ? `<img src="${escapeHtml(responsiveImageUrl(pimg, 900))}" alt="${escapeHtml(pName)}" loading="lazy" ${IMG_ONERROR} />` : ''}</div>
           <h3 class="pp-rec-name">${escapeHtml(pName)}</h3>
           ${sub ? `<p class="pp-rec-sub">${sub}</p>` : ''}`;
         return link
-          ? `<a class="pp-rec" href="${escapeHtml(link)}" target="_blank" rel="noopener">${inner}</a>`
+          ? `<a class="pp-rec" href="${escapeHtml(link)}">${inner}</a>`
           : `<div class="pp-rec">${inner}</div>`;
       }).join('')}
     </div>

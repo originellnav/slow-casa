@@ -103,6 +103,10 @@
       "destination": "/api/property-page?slug=:slug"
     },
     {
+      "source": "/:island(mallorca|ibiza|menorca|formentera)/places/:slug",
+      "destination": "/api/place-page?island=:island&slug=:slug"
+    },
+    {
       "source": "/:island(mallorca|ibiza|menorca)/:section(where-to-stay|where-to-eat|what-to-do)",
       "destination": "/api/guides-index?section=:section&island=:island&hub=1"
     },
