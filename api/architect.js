@@ -122,9 +122,13 @@ function getPropertyImageUrl(record, index) {
   return null;
 }
 
+// /design-directory is served from here too (lib/architects-index.js), so the
+// site stays within the Vercel plan's limit of 12 serverless functions.
+const architectsIndex = require('../lib/architects-index');
+
 module.exports = async function handler(req, res) {
   const { slug } = req.query;
-  if (!slug) return res.status(400).send('Missing slug');
+  if (!slug || (req.query && req.query.index)) return architectsIndex(req, res);
 
   let architect = getArchitectCached(slug);
 

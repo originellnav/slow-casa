@@ -84,7 +84,7 @@
     },
     {
       "source": "/design-directory",
-      "destination": "/api/architects-index"
+      "destination": "/api/architect?index=1"
     },
     {
       "source": "/architects/:slug",
