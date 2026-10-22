@@ -59,6 +59,10 @@
   ],
   "rewrites": [
     {
+      "source": "/map",
+      "destination": "/api/map"
+    },
+    {
       "source": "/mallorca",
       "destination": "/api/island?island=mallorca"
     },
