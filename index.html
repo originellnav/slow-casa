@@ -888,20 +888,21 @@
     .home-map-lede a { border-bottom: 1px solid var(--black); }
     .home-map-frame {
       position: relative; display: block; width: 100%; aspect-ratio: 16 / 7; max-height: 80vh;
-      overflow: hidden; background: var(--grey-4); cursor: pointer;
+      overflow: hidden; background: #F6F1E8; cursor: pointer;
     }
     .home-map-frame img, .home-map-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
     .home-map-frame img { object-fit: cover; display: block; }
     .home-map-canvas { opacity: 0; transition: opacity 0.8s ease; }
     .home-map-canvas.is-ready { opacity: 1; }
-    .home-map-pin { width: 12px; height: 12px; border-radius: 50%; background: var(--black); border: 2px solid #FDFCF8; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+    .home-map-frame .mapboxgl-ctrl-logo { opacity: 0.45; }
+    .home-map-frame .mapboxgl-ctrl-attrib.mapboxgl-compact { background: transparent !important; }
     .home-map-cta {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;
-      background: var(--black); color: #FDFCF8;
+      background: #373D32; color: #F6F1E8;
       padding: 20px 36px; font-family: var(--display); font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase;
       transition: background 0.2s; white-space: nowrap;
     }
-    .home-map-frame:hover .home-map-cta { background: #2a2a28; }
+    .home-map-frame:hover .home-map-cta { background: #B77F61; }
 
     .home-signup { margin: 96px 0 0; padding: 0 48px; }
     .home-signup-inner {
@@ -1031,9 +1032,8 @@
       <h2>The Map</h2>
       <a class="home-collection-link" href="/map"><span>Open the map</span><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
     </div>
-    <p class="home-map-lede">Every house, restaurant, beach and bar we rate across the Balearics, on one map. <a href="/map">Take a look.</a></p>
+    <p class="home-map-lede">Every restaurant, winery, beach club and experience we rate across Mallorca, Ibiza and Menorca, on one map. <a href="/map">Take a look.</a></p>
     <div class="home-map-frame" id="home-map-frame">
-      <img src="https://res.cloudinary.com/dw1wmo2go/image/upload/q_auto,f_auto,w_1600/v1791444652/map_graphic_c81oaq.jpg" alt="Map of Mallorca, Ibiza and Menorca showing every house in the collection" loading="lazy" />
       <div class="home-map-canvas" id="home-map" aria-hidden="true"></div>
       <a class="home-map-cta" href="/map">Take a look</a>
     </div>
@@ -1300,9 +1300,9 @@
   })();
   </script>
   <script>
-  // Homepage map: a live Mapbox map framed on the three islands, with a pin per house.
-  // Loads only when the section scrolls near the screen. It cannot be dragged or zoomed;
-  // a click anywhere on it goes to /map. If Mapbox fails, the still image underneath stays.
+  // Homepage map: the same look and pins as /map (shared via /map-style.js),
+  // framed on the three islands. Loads only when the section scrolls near the
+  // screen. It cannot be dragged or zoomed; a click anywhere on it goes to /map.
   (function () {
     var frame = document.getElementById('home-map-frame');
     var el = document.getElementById('home-map');
@@ -1312,42 +1312,38 @@
       window.location.href = '/map';
     });
     var TOKEN = 'pk.eyJ1IjoibHVrZXJ5YSIsImEiOiJjbG96cmZ3OTMwMHRyMmlzNHc1bTZkZzI4In0.8Pmo8eeUh48QHBpzqHwNuQ';
-    var STYLE = 'mapbox://styles/lukerya/cmoime20s006m01r68jvia13j';
     var BOUNDS = [[1.15, 38.62], [4.45, 40.12]];
     var started = false;
+    function addScript(src, cb) { var s = document.createElement('script'); s.src = src; s.onload = cb; document.head.appendChild(s); }
     function load() {
       if (started) return; started = true;
       var css = document.createElement('link');
       css.rel = 'stylesheet'; css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css';
       document.head.appendChild(css);
-      var s = document.createElement('script');
-      s.src = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js';
-      s.onload = function () {
-        try {
-          mapboxgl.accessToken = TOKEN;
-          var map = new mapboxgl.Map({
-            container: el, style: STYLE, bounds: BOUNDS,
-            fitBoundsOptions: { padding: 40 }, interactive: false, attributionControl: true
-          });
-          map.on('load', function () {
-            el.classList.add('is-ready');
-            fetch('/api/properties?all=true')
-              .then(function (r) { return r.json(); })
-              .then(function (d) {
-                ((d && d.records) || []).forEach(function (r) {
-                  var f = r.fields || {};
-                  var lat = parseFloat(f['Latitude']), lon = parseFloat(f['Longitude']);
-                  if (!isFinite(lat) || !isFinite(lon)) return;
-                  var pin = document.createElement('div');
-                  pin.className = 'home-map-pin';
-                  new mapboxgl.Marker({ element: pin }).setLngLat([lon, lat]).addTo(map);
-                });
-              })
-              .catch(function () {});
-          });
-        } catch (e) { /* keep the still image */ }
-      };
-      document.head.appendChild(s);
+      addScript('https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js', function () {
+        addScript('/map-style.js', function () {
+          try {
+            mapboxgl.accessToken = TOKEN;
+            var map = new mapboxgl.Map({
+              container: el, style: SlowCasaMap.BASE_STYLE, bounds: BOUNDS,
+              fitBoundsOptions: { padding: 40 }, interactive: false, attributionControl: false
+            });
+            // Mapbox's terms require the logo and credits; the credits fold into a small (i).
+            map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
+            map.on('load', function () {
+              SlowCasaMap.style(map, SlowCasaMap.BASE_STYLE);
+              fetch('/map?format=geojson')
+                .then(function (r) { return r.json(); })
+                .then(function (geo) {
+                  map.addSource('places', { type: 'geojson', data: geo });
+                  map.addLayer({ id: 'pins', type: 'circle', source: 'places', paint: SlowCasaMap.pinPaint() });
+                })
+                .catch(function () {})
+                .then(function () { el.classList.add('is-ready'); });
+            });
+          } catch (e) { /* leave the ivory frame and button */ }
+        });
+      });
     }
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (es) {

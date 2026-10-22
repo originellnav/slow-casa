@@ -5,9 +5,9 @@
 // Design lives in three places, all in this file:
 //   PALETTE   the five Slow Casa map colours
 //   FILTERS   which Places categories sit under which filter, and their pin colour
-//   styleBaseMap()  recolours Mapbox's light map to the palette and hides clutter
-//                   (shops, bus stops, small roads). Once a custom style is made in
-//                   Mapbox Studio, put its URL in MAP_STYLE and this becomes a no-op.
+//   /map-style.js   recolours Mapbox's light map to the palette and hides clutter
+//                   (shared with the homepage map). Once a custom style is made in
+//                   Mapbox Studio, put its URL in MAP_STYLE and the recolouring stops.
 //
 // Pins merge into numbered circles until you zoom in, so the map never shows a pile.
 // Clicking a pin opens the card: photo, name, one line, Google Maps and the place page.
@@ -100,6 +100,14 @@ module.exports = async function handler(req, res) {
   }
   features.sort((a, b) => a.properties.name.localeCompare(b.properties.name));
 
+  // /map?format=geojson: the same pins as data, for the homepage map.
+  if (req.query && req.query.format === 'geojson') {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=600, stale-while-revalidate=86400');
+    res.setHeader('X-Robots-Tag', 'noindex');
+    return res.status(200).send(JSON.stringify({ type: 'FeatureCollection', features }));
+  }
+
   // Plain list under the map, grouped by island.
   const listHtml = ['mallorca', 'ibiza', 'menorca'].map(isl => {
     const items = features.filter(ft => ft.properties.island === isl);
@@ -152,6 +160,21 @@ module.exports = async function handler(req, res) {
     .mp-isl button:hover, .mp-isl button.on { color: var(--mp-ink); border-bottom-color: var(--mp-ink); }
     .mp-wrap { position: relative; height: calc(100vh - 150px); min-height: 520px; background: var(--mp-ivory); }
     #mp-map { position: absolute; inset: 0; }
+    .mapboxgl-ctrl-logo { opacity: 0.45; }
+    .mapboxgl-ctrl-attrib.mapboxgl-compact { background: transparent !important; }
+
+    /* Email gate: the map sits blurred behind it until an email is given (remembered on this browser) */
+    .mp-gate { position: absolute; inset: 0; z-index: 10; display: none; align-items: center; justify-content: center; padding: 24px; background: rgba(246, 241, 232, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .mp-gated .mp-gate { display: flex; }
+    .mp-gate-box { width: 100%; max-width: 440px; background: var(--mp-ivory); border: 1px solid var(--mp-olive); padding: 40px 36px 32px; text-align: center; color: var(--mp-ink); }
+    .mp-gate-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mp-olive); margin: 0 0 14px; }
+    .mp-gate-title { font-family: var(--display); font-weight: 400; font-size: 26px; line-height: 1.15; letter-spacing: 0.03em; text-transform: uppercase; margin: 0 0 12px; }
+    .mp-gate-text { font-size: 15px; font-weight: 300; line-height: 1.55; margin: 0 0 24px; }
+    .mp-gate-form { display: flex; border: 1px solid var(--mp-ink); }
+    .mp-gate-form input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 14px 16px; font: inherit; font-size: 15px; color: var(--mp-ink); outline: none; }
+    .mp-gate-form button { border: 0; background: var(--mp-ink); color: var(--mp-ivory); padding: 0 20px; font: inherit; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
+    .mp-gate-form button:disabled { opacity: 0.6; cursor: default; }
+    .mp-gate-note { font-size: 12px; color: var(--mp-olive); margin: 14px 0 0; min-height: 1em; }
     .mapboxgl-ctrl-group { border-radius: 0 !important; box-shadow: none !important; border: 1px solid var(--mp-sand); }
     .mapboxgl-ctrl-group button { background: var(--mp-ivory) !important; }
 
@@ -201,8 +224,20 @@ module.exports = async function handler(req, res) {
       <button data-i="mallorca">Mallorca</button><button data-i="ibiza">Ibiza</button><button data-i="menorca">Menorca</button>
     </div>
   </div>
-  <div class="mp-wrap">
+  <div class="mp-wrap mp-gated" id="mp-wrap">
     <div id="mp-map" aria-label="Map of places"></div>
+    <div class="mp-gate" id="mp-gate">
+      <form class="mp-gate-box" id="mp-gate-form" novalidate>
+        <p class="mp-gate-eyebrow">Free access</p>
+        <h2 class="mp-gate-title">Open the map</h2>
+        <p class="mp-gate-text">Every restaurant, winery, beach club and experience we rate across Mallorca, Ibiza and Menorca. Add your email to open it.</p>
+        <div class="mp-gate-form">
+          <input type="email" id="mp-gate-email" placeholder="Your email address" autocomplete="email" required aria-label="Email address" />
+          <button type="submit" id="mp-gate-btn">Open</button>
+        </div>
+        <p class="mp-gate-note" id="mp-gate-note">We'll send the odd email about new places. Unsubscribe any time.</p>
+      </form>
+    </div>
     <article class="mp-card" id="mp-card" aria-live="polite">
       <button class="mp-close" id="mp-close" aria-label="Close">&times;</button>
       <div class="mp-card-img"><img id="mp-card-img" alt="" /></div>
@@ -220,40 +255,20 @@ module.exports = async function handler(req, res) {
   <section class="mp-list" aria-label="All places on the map">${listHtml}</section>
   ${footer()}
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <script src="/map-style.js"></script>
   <script>
   (function () {
     var C = ${JSON.stringify(config).replace(/</g, '\\u003c')};
     var P = C.palette;
     if (!window.mapboxgl) return;
     mapboxgl.accessToken = C.token;
-    var map = new mapboxgl.Map({ container: 'mp-map', style: C.style, center: [2.9, 39.5], zoom: 7.2, attributionControl: true });
+    var map = new mapboxgl.Map({ container: 'mp-map', style: C.style, center: [2.9, 39.5], zoom: 7.2, attributionControl: false });
+    // Mapbox's terms require the logo and credits; the credits fold into a small (i).
+    map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
     map.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true } }), 'top-right');
 
-    // Recolour Mapbox's light map to the Slow Casa palette and hide clutter.
-    // Skipped when a custom Mapbox Studio style is in use.
-    function styleBaseMap() {
-      if (C.custom) return;
-      var hideRe = /(poi|transit|airport|ferry|road-number|road-exit|shield|building|aeroway|path|steps|pedestrian|road-minor|road-street|road-service|road-track|golf|admin-1|admin-2)/;
-      var roadRe = /(road|bridge|tunnel)/;
-      map.getStyle().layers.forEach(function (l) {
-        var id = l.id;
-        try {
-          if (hideRe.test(id)) { map.setLayoutProperty(id, 'visibility', 'none'); return; }
-          if (l.type === 'background') map.setPaintProperty(id, 'background-color', P.ivory);
-          else if (l.type === 'fill' && /water/.test(id)) map.setPaintProperty(id, 'fill-color', P.sand);
-          else if (l.type === 'line' && /water/.test(id)) map.setPaintProperty(id, 'line-color', P.sand);
-          else if (l.type === 'fill' && /(land|park|national|wood|grass|scrub|crop|pitch)/.test(id)) { map.setPaintProperty(id, 'fill-color', '#E7E5D6'); map.setPaintProperty(id, 'fill-opacity', 0.7); }
-          else if (l.type === 'line' && roadRe.test(id)) map.setPaintProperty(id, 'line-color', '#E6DCCB');
-          else if (l.type === 'line' && /admin/.test(id)) map.setLayoutProperty(id, 'visibility', 'none');
-          else if (l.type === 'symbol') {
-            if (roadRe.test(id)) { map.setLayoutProperty(id, 'visibility', 'none'); return; }
-            map.setPaintProperty(id, 'text-color', /(settlement-minor|natural|water)/.test(id) ? P.olive : P.ink);
-            map.setPaintProperty(id, 'text-halo-color', P.ivory);
-          }
-        } catch (e) { /* layer without that property: leave it */ }
-      });
-    }
+    function styleBaseMap() { SlowCasaMap.style(map, C.style); }
 
     var active = 'all';
     function dataFor(key) {
@@ -280,6 +295,33 @@ module.exports = async function handler(req, res) {
     }
     document.getElementById('mp-close').addEventListener('click', closeCard);
 
+    // ---- Email gate ----
+    // Remembered per browser. If storage is blocked, the visitor just enters it again next time.
+    var GATE_KEY = 'sc_map_access';
+    var wrap = document.getElementById('mp-wrap');
+    function hasAccess() { try { return localStorage.getItem(GATE_KEY) === '1'; } catch (e) { return false; } }
+    function unlock() {
+      try { localStorage.setItem(GATE_KEY, '1'); } catch (e) {}
+      wrap.classList.remove('mp-gated');
+    }
+    if (hasAccess()) wrap.classList.remove('mp-gated');
+    document.getElementById('mp-gate-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var input = document.getElementById('mp-gate-email');
+      var btn = document.getElementById('mp-gate-btn');
+      var note = document.getElementById('mp-gate-note');
+      var email = (input.value || '').trim();
+      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) { note.textContent = 'Please enter a valid email address.'; input.focus(); return; }
+      btn.disabled = true; btn.textContent = '…';
+      fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, source: 'map' }) })
+        .catch(function () {})
+        .then(function () {
+          // Open the map even if the signup call fails: never lock a reader out.
+          unlock();
+          try { if (window.plausible) window.plausible('Map Signup'); } catch (e) {}
+        });
+    });
+
     map.on('load', function () {
       styleBaseMap();
       map.addSource('places', { type: 'geojson', data: C.data, cluster: true, clusterRadius: 44, clusterMaxZoom: 11 });
@@ -290,8 +332,7 @@ module.exports = async function handler(req, res) {
         layout: { 'text-field': ['get', 'point_count_abbreviated'], 'text-size': 12, 'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'] },
         paint: { 'text-color': P.ink } });
       map.addLayer({ id: 'pins', type: 'circle', source: 'places', filter: ['!', ['has', 'point_count']],
-        paint: { 'circle-color': ['get', 'color'], 'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, 14, 9],
-          'circle-stroke-color': ['get', 'stroke'], 'circle-stroke-width': 1.5 } });
+        paint: SlowCasaMap.pinPaint() });
 
       map.on('click', 'clusters', function (e) {
         var f = map.queryRenderedFeatures(e.point, { layers: ['clusters'] })[0];
