@@ -11,7 +11,7 @@
 //
 // Pins merge into numbered circles until you zoom in, so the map never shows a pile.
 // Clicking a pin opens the card: photo, name, one line, Google Maps and the place page.
-// Under the map, a plain list of every place links to its page (for readers and Google).
+// Place pages are reached from the cards here, and from the Magazine and island pages.
 
 const { nav, footer } = require('../lib/nav');
 const M = require('../lib/magazine');
@@ -108,16 +108,6 @@ module.exports = async function handler(req, res) {
     return res.status(200).send(JSON.stringify({ type: 'FeatureCollection', features }));
   }
 
-  // Plain list under the map, grouped by island.
-  const listHtml = ['mallorca', 'ibiza', 'menorca'].map(isl => {
-    const items = features.filter(ft => ft.properties.island === isl);
-    if (!items.length) return '';
-    return `<div class="mp-list-col"><h2>${esc(M.ISLANDS[isl])}</h2><ul>${items.map(ft => {
-      const pr = ft.properties;
-      return `<li><a href="${esc(pr.page)}">${esc(pr.name)}</a><span>${esc([pr.label, pr.town].filter(Boolean).join(' · '))}</span></li>`;
-    }).join('')}</ul></div>`;
-  }).join('');
-
   const title = 'The Map: Where to Eat, Drink and Go in Mallorca, Ibiza & Menorca | Slow Casa';
   const desc = 'Every restaurant, winery, beach club and experience we rate across Mallorca, Ibiza and Menorca, on one map.';
   const config = {
@@ -194,13 +184,6 @@ module.exports = async function handler(req, res) {
     .mp-card-actions a:hover { background: var(--mp-terra); color: var(--mp-ivory); }
     .mp-close { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--mp-ivory); color: var(--mp-ink); font-size: 20px; line-height: 32px; cursor: pointer; }
 
-    /* The list under the map */
-    .mp-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; padding: 64px 48px 80px; }
-    .mp-list h2 { font-family: var(--display); font-weight: 400; font-size: 19px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 16px; }
-    .mp-list ul { list-style: none; margin: 0; padding: 0; }
-    .mp-list li { padding: 10px 0; border-top: 1px solid #e4dfd4; display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
-    .mp-list li span { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #888; text-align: right; }
-
     @media (max-width: 768px) {
       .mp-bar { padding: 12px 16px; }
       .mp-chips { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 2px; }
@@ -208,7 +191,6 @@ module.exports = async function handler(req, res) {
       .mp-wrap { height: calc(100vh - 190px); min-height: 440px; }
       .mp-card { left: 0; right: 0; bottom: 0; width: auto; max-width: none; border-left: 0; border-right: 0; border-bottom: 0; }
       .mp-card-img { aspect-ratio: 16 / 9; }
-      .mp-list { grid-template-columns: 1fr; padding: 40px 16px 56px; }
     }
   </style>
 </head>
@@ -252,7 +234,6 @@ module.exports = async function handler(req, res) {
       </div>
     </article>
   </div>
-  <section class="mp-list" aria-label="All places on the map">${listHtml}</section>
   ${footer()}
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <script src="/map-style.js"></script>
