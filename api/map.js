@@ -100,6 +100,23 @@ module.exports = async function handler(req, res) {
   }
   features.sort((a, b) => a.properties.name.localeCompare(b.properties.name));
 
+  // Places at exactly the same spot (two venues in one hotel or estate) would
+  // hide each other. Spread them in a small circle, about 30 m apart, so each
+  // pin can be clicked. Their pages and Google Maps links keep the real spot.
+  const bySpot = {};
+  features.forEach(ft => {
+    const k = ft.geometry.coordinates.map(n => n.toFixed(5)).join(',');
+    (bySpot[k] = bySpot[k] || []).push(ft);
+  });
+  Object.values(bySpot).forEach(group => {
+    if (group.length < 2) return;
+    group.forEach((ft, i) => {
+      const angle = (2 * Math.PI * i) / group.length;
+      const [lon, lat] = ft.geometry.coordinates;
+      ft.geometry.coordinates = [lon + 0.00035 * Math.cos(angle), lat + 0.00027 * Math.sin(angle)];
+    });
+  });
+
   // /map?format=geojson: the same pins as data, for the homepage map.
   if (req.query && req.query.format === 'geojson') {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
