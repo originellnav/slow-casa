@@ -1,6 +1,7 @@
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
 const M = require('../lib/magazine');
+const { titleCase } = require('../lib/titlecase');
 
 // The three islands. `intro` is placeholder copy, meant to be replaced with
 // 400-700 words of real writing per island. Everything else is derived.
@@ -230,7 +231,7 @@ ${nav()}
 
 <header class="page-head">
   <p class="page-crumb"><a href="/">Slow Casa</a> / ${escapeHtml(config.name)}</p>
-  <h1 class="page-title">${escapeHtml(config.title)}</h1>
+  <h1 class="page-title">${escapeHtml(titleCase(config.title))}</h1>
   <div class="page-lede">${introHtml}</div>
   <p class="isl-count">${houseCount} ${houseCount === 1 ? 'house' : 'houses'} on ${escapeHtml(config.name)}</p>
 </header>

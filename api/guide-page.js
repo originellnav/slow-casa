@@ -2,6 +2,7 @@ const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
 const M = require('../lib/magazine');
 const { balearicIsland, gone } = require('../lib/scope');
+const { titleCase, titleCaseHtml } = require('../lib/titlecase');
 const SANITY_PROJECT_ID = 'hchp27po';
 const SANITY_DATASET = 'production';
 const SANITY_API_VERSION = '2024-01-01';
@@ -111,7 +112,7 @@ function renderStayNearby(block, ctx) {
   const raw = String(block.title || '').trim();
   const title = !raw || raw.toLowerCase() === 'stay nearby' ? 'Homes to rent' : raw;
   return '<section class="guide-houses">' +
-    '<h3>' + escapeHtml(title) + '</h3>' +
+    '<h3>' + escapeHtml(titleCase(title)) + '</h3>' +
     '<div class="guide-houses-grid">' + cards.join('') + '</div>' +
   '</section>';
 }
@@ -180,8 +181,8 @@ function renderBlock(block, listContext) {
     return '<li>' + content + '</li>';
   }
 
-  if (style === 'h2') return '<h2>' + content + '</h2>';
-  if (style === 'h3') return '<h3>' + content + '</h3>';
+  if (style === 'h2') return '<h2>' + titleCaseHtml(content) + '</h2>';
+  if (style === 'h3') return '<h3>' + titleCaseHtml(content) + '</h3>';
   if (style === 'blockquote') return '<blockquote>' + content + '</blockquote>';
   return '<p>' + content + '</p>';
 }
@@ -282,7 +283,7 @@ module.exports = async function handler(req, res) {
       res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8').send(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8" /><title>Guide not found | Slow Casa</title><meta name="robots" content="noindex" /></head>
 <body style="font-family: system-ui, sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;">
-<h1>Guide not found</h1>
+<h1>Guide Not Found</h1>
 <p>We couldn't find what you were looking for. <a href="/magazine">Browse the Magazine</a> or <a href="/">return home</a>.</p>
 </body></html>`);
       return;
@@ -662,7 +663,7 @@ module.exports = async function handler(req, res) {
 
   <header class="guide-header">
     <p class="guide-category">${crumbHtml || escapeHtml(sectionLabel)}</p>
-    <h1 class="guide-title">${escapeHtml(title)}</h1>
+    <h1 class="guide-title">${escapeHtml(titleCase(title))}</h1>
   </header>
 
   <article class="guide-body">

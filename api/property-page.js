@@ -310,7 +310,7 @@ module.exports = async function handler(req, res) {
   const recsHtml = places.length ? `
   <section class="pp-section pp-recs">
     <div class="pp-recs-head">
-      <h2 class="pp-h2">Neighbourhood recs</h2>
+      <h2 class="pp-h2">Neighbourhood Recs</h2>
       ${ownerName ? `<p class="pp-recs-from">From ${escapeHtml(ownerName)}</p>` : ''}
     </div>
     <div class="pp-recs-grid">
@@ -888,7 +888,7 @@ async function renderNearbyHouses(currentRecord) {
     return `
     <section class="prop-other">
       <div class="prop-other-header">
-        <h2 class="prop-other-title">Nearby houses</h2>
+        <h2 class="prop-other-title">Nearby Houses</h2>
       </div>
       <div class="house-grid">
         ${cardsHtml}

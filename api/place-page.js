@@ -41,7 +41,7 @@ function notFound(res) {
   res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8').send(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8" /><title>Place not found | Slow Casa</title><meta name="robots" content="noindex" /></head>
 <body style="font-family: system-ui, sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;">
-<h1>Place not found</h1>
+<h1>Place Not Found</h1>
 <p>We couldn't find that place. <a href="/magazine">Browse the Magazine</a> or <a href="/">return home</a>.</p>
 </body></html>`);
 }
@@ -143,7 +143,7 @@ module.exports = async function handler(req, res) {
       });
     });
     if (cards.length) {
-      homesHtml = `<section class="pl-homes"><h2>Homes to rent nearby</h2><div class="pl-homes-grid">${cards.join('')}</div></section>`;
+      homesHtml = `<section class="pl-homes"><h2>Homes to Rent Nearby</h2><div class="pl-homes-grid">${cards.join('')}</div></section>`;
     }
   } catch (e) { homesHtml = ''; }
 

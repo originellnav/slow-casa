@@ -588,7 +588,7 @@ module.exports = async function handler(req, res) {
     ${nav()}
 
   <header class="page-head">
-    <h1 class="page-title">Handpicked homes in the Balearic Islands</h1>
+    <h1 class="page-title">Handpicked Homes in the Balearic Islands</h1>
     <p class="page-lede">Where do you want to go?</p>
   </header>
 

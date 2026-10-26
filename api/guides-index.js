@@ -13,6 +13,7 @@
 // Sections and data sources are defined in lib/magazine.js.
 const { nav, footer } = require('../lib/nav');
 const M = require('../lib/magazine');
+const { titleCase } = require('../lib/titlecase');
 const { esc } = M;
 
 const LANDING = {
@@ -70,7 +71,7 @@ module.exports = async function handler(req, res) {
   const isLanding = section === 'magazine';
   if (!isLanding && !M.SECTIONS[section]) {
     res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.send('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><title>Not found | Slow Casa</title><meta name="robots" content="noindex" /></head><body style="font-family:system-ui,sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;"><h1>Not found</h1><p><a href="/magazine">Go to the Magazine</a></p></body></html>');
+    return res.send('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><title>Not found | Slow Casa</title><meta name="robots" content="noindex" /></head><body style="font-family:system-ui,sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;"><h1>Not Found</h1><p><a href="/magazine">Go to the Magazine</a></p></body></html>');
   }
   const island = M.ISLAND_KEYS.indexOf(String(q.island || '').toLowerCase()) !== -1 ? String(q.island).toLowerCase() : '';
   const islandName = island ? M.ISLANDS[island] : '';
@@ -80,7 +81,7 @@ module.exports = async function handler(req, res) {
   // A hub URL with a section that has no hub (or an unknown island) is not a page.
   if (q.hub === '1' && !isHub) {
     res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.send('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><title>Not found | Slow Casa</title><meta name="robots" content="noindex" /></head><body style="font-family:system-ui,sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;"><h1>Not found</h1><p><a href="/magazine">Go to the Magazine</a></p></body></html>');
+    return res.send('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><title>Not found | Slow Casa</title><meta name="robots" content="noindex" /></head><body style="font-family:system-ui,sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;"><h1>Not Found</h1><p><a href="/magazine">Go to the Magazine</a></p></body></html>');
   }
   // The old filtered URL moves permanently to the island hub: one page, one URL.
   if (!isHub && isHubSection && island) {
@@ -211,7 +212,7 @@ module.exports = async function handler(req, res) {
   ${nav()}
 
   <header class="mag-head">
-    <h1 class="sr-only">${esc(heading)}</h1>
+    <h1 class="sr-only">${esc(titleCase(heading))}</h1>
     ${sectionChips(isLanding ? '' : section, island, counts)}
     ${islandChips(isLanding ? '' : section, island)}
   </header>

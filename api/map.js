@@ -214,7 +214,7 @@ module.exports = async function handler(req, res) {
 <body>
   ${nav()}
   <div class="mp-bar">
-    <h1 class="mp-title">The map</h1>
+    <h1 class="mp-title">The Map</h1>
     <div class="mp-chips" role="group" aria-label="Filter places">
       <button class="mp-chip on" data-f="all">All</button>
       ${FILTERS.map(f => `<button class="mp-chip" data-f="${f.key}"><span class="mp-dot" style="background:${f.color};${f.stroke === PALETTE.ink ? 'border:1px solid ' + PALETTE.ink + ';' : ''}"></span>${esc(f.label)}</button>`).join('')}
@@ -228,7 +228,7 @@ module.exports = async function handler(req, res) {
     <div class="mp-gate" id="mp-gate">
       <form class="mp-gate-box" id="mp-gate-form" novalidate>
         <p class="mp-gate-eyebrow">Free access</p>
-        <h2 class="mp-gate-title">Open the map</h2>
+        <h2 class="mp-gate-title">Open the Map</h2>
         <p class="mp-gate-text">Every restaurant, winery, beach club and experience we love across Mallorca, Ibiza and Menorca. Add your email to open it.</p>
         <div class="mp-gate-form">
           <input type="email" id="mp-gate-email" placeholder="Your email address" autocomplete="email" required aria-label="Email address" />
