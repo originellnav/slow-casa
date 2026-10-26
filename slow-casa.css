@@ -282,6 +282,16 @@ html.menu-open .site-menu {
   font-family: var(--display); font-weight: 400;
   font-size: clamp(18px, 1.6vw, 23px); line-height: 1.2; letter-spacing: 0.01em; margin: 0 0 8px;
 }
+/* Underline draws in under the name on hover (same as the homepage island cards) */
+.house-card-name span {
+  background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
+  padding-bottom: 2px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  transition: background-size 0.35s ease;
+}
+.house-card:hover .house-card-name span,
+.house-card:focus-visible .house-card-name span { background-size: 100% 1px; }
+@media (prefers-reduced-motion: reduce) { .house-card-name span { transition: none; } }
 .house-card-meta { font-family: var(--body); font-size: 15px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
 .house-card-dot { font-size: 10px; margin: 0 8px; position: relative; top: -1px; }
 .house-card:focus-visible { outline: 1px solid var(--black); outline-offset: 6px; }

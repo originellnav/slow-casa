@@ -538,10 +538,14 @@ module.exports = async function handler(req, res) {
     }
 
     /* --- Balearics filter bar --- */
-    .dir-filters { margin: 0 0 56px; padding: 0 var(--gutter); }
+    /* Centred hero: headline, then the filters under it */
+    .page-head { text-align: center; padding-bottom: 40px; }
+    .page-head .page-title { margin: 0 auto; }
+    .dir-filters { margin: 0 0 64px; padding: 0 var(--gutter); }
     .filter-row {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       align-items: center;
       gap: 8px;
       margin-bottom: 10px;
@@ -566,8 +570,10 @@ module.exports = async function handler(req, res) {
     }
     .chip:hover { background: var(--black); color: #ffffff; }
     .chip.active { background: var(--black); color: #ffffff; }
-    .chip-map { margin-left: auto; }
+    .chip-map { margin-left: 16px; }
     .dir-body { display: block; padding: 0 var(--gutter) 40px; }
+    /* Landscape house photos on the directory, closer to Boutique Homes */
+    .dir-body .house-card-img { aspect-ratio: 10 / 7; }
     @media (max-width: 768px) { .dir-body { padding: 0 16px 32px; } }
     @media (max-width: 768px) {
       .dir-filters { padding: 0 16px; }
@@ -589,7 +595,6 @@ module.exports = async function handler(req, res) {
 
   <header class="page-head">
     <h1 class="page-title">Handpicked Homes in the Balearic Islands</h1>
-    <p class="page-lede">Where do you want to go?</p>
   </header>
 
 
