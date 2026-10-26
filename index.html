@@ -1410,8 +1410,7 @@
     var OPTIONS = [
       { label: 'Mallorca', note: 'Island', href: '/mallorca', keys: 'mallorca majorca palma soller sóller deia deià' },
       { label: 'Ibiza', note: 'Island', href: '/ibiza', keys: 'ibiza eivissa formentera' },
-      { label: 'Menorca', note: 'Island', href: '/menorca', keys: 'menorca minorca mahon mahón ciutadella' },
-      { label: 'All three islands', note: 'Every house', href: '/houses', keys: 'all balearics balearic islands every' }
+      { label: 'Menorca', note: 'Island', href: '/menorca', keys: 'menorca minorca mahon mahón ciutadella' }
     ];
     var shown = [], active = -1;
     function norm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); }
@@ -1442,7 +1441,7 @@
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       // Enter or Search: the highlighted option, else the first match, else every house.
-      go(shown[active] || shown[0] || OPTIONS[3]);
+      go(shown[active] || shown[0] || { href: '/houses' });
     });
   })();
   </script>
