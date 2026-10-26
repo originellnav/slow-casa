@@ -291,7 +291,7 @@ module.exports = async function handler(req, res) {
       --sans: 'DM Sans', system-ui, sans-serif;
     }
     html { font-size: 16px; -webkit-font-smoothing: antialiased; }
-    body { font-family: var(--body); background: #FDFCF8 !important; color: var(--black); min-height: 100vh; }
+    body { font-family: var(--body); background: #FFFFFF !important; color: var(--black); min-height: 100vh; }
     a { color: inherit; text-decoration: none; }
 
 
@@ -497,7 +497,7 @@ module.exports = async function handler(req, res) {
     /* Directory map */
     .dir-map-wrap {
       position: relative;
-      padding: 0 48px;
+      padding: 0 var(--gutter);
       display: none;
     }
     .dir-map-wrap.open { display: block; margin-bottom: 48px; }
@@ -538,7 +538,7 @@ module.exports = async function handler(req, res) {
     }
 
     /* --- Balearics filter bar --- */
-    .dir-filters { margin: 0 0 56px; padding: 0 48px; }
+    .dir-filters { margin: 0 0 56px; padding: 0 var(--gutter); }
     .filter-row {
       display: flex;
       flex-wrap: wrap;
@@ -567,7 +567,7 @@ module.exports = async function handler(req, res) {
     .chip:hover { background: var(--black); color: #ffffff; }
     .chip.active { background: var(--black); color: #ffffff; }
     .chip-map { margin-left: auto; }
-    .dir-body { display: block; padding: 0 48px 40px; }
+    .dir-body { display: block; padding: 0 var(--gutter) 40px; }
     @media (max-width: 768px) { .dir-body { padding: 0 16px 32px; } }
     @media (max-width: 768px) {
       .dir-filters { padding: 0 16px; }

@@ -155,7 +155,7 @@
 
 
     .try-section {
-      background: #FDFCF8;
+      background: #FFFFFF;
       padding: 96px 48px;
       text-align: center;
     }
@@ -223,7 +223,7 @@
       align-items: center;
       text-align: center;
       padding: 80px 64px;
-      background: #FDFCF8;
+      background: #FFFFFF;
     }
 
     .featured-eyebrow {
@@ -304,7 +304,7 @@
       flex-direction: column;
       justify-content: center;
       padding: 80px 64px;
-      background: #FDFCF8;
+      background: #FFFFFF;
     }
 
     .map-teaser-eyebrow {
@@ -355,7 +355,7 @@
       position: fixed;
       inset: 0;
       z-index: 1000;
-      background: #FDFCF8;
+      background: #FFFFFF;
       display: none;
       flex-direction: column;
     }
@@ -368,7 +368,7 @@
       align-items: center;
       padding: 20px 32px;
       border-bottom: none;
-      background: #FDFCF8;
+      background: #FFFFFF;
       z-index: 10;
       flex-shrink: 0;
     }
@@ -395,7 +395,7 @@
       bottom: 40px;
       left: 40px;
       width: 280px;
-      background: #FDFCF8;
+      background: #FFFFFF;
       z-index: 20;
       box-shadow: 0 8px 40px rgba(0,0,0,0.12);
     }
@@ -474,7 +474,7 @@
     }
 
     .criteria-section {
-      background: #FDFCF8;
+      background: #FFFFFF;
       padding: 96px 48px;
       text-align: center;
     }
@@ -543,7 +543,7 @@
       flex-direction: column;
       justify-content: center;
       padding: 80px 64px;
-      background: #FDFCF8;
+      background: #FFFFFF;
     }
 
     .map-teaser-eyebrow {
@@ -594,7 +594,7 @@
       position: fixed;
       inset: 0;
       z-index: 1000;
-      background: #FDFCF8;
+      background: #FFFFFF;
       display: none;
       flex-direction: column;
     }
@@ -607,7 +607,7 @@
       align-items: center;
       padding: 20px 32px;
       border-bottom: none;
-      background: #FDFCF8;
+      background: #FFFFFF;
       z-index: 10;
       flex-shrink: 0;
     }
@@ -634,7 +634,7 @@
       bottom: 40px;
       left: 40px;
       width: 280px;
-      background: #FDFCF8;
+      background: #FFFFFF;
       z-index: 20;
       box-shadow: 0 8px 40px rgba(0,0,0,0.12);
     }
@@ -798,7 +798,7 @@
     }
     .home-hero[data-tone="light"] { color: var(--black); background: #EDE6D9; }
     .home-hero[data-tone="light"]::after {
-      background: radial-gradient(ellipse at center, rgba(253,252,248,0.55) 0%, rgba(253,252,248,0.2) 60%, rgba(253,252,248,0) 100%);
+      background: radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.2) 60%, rgba(255,255,255,0) 100%);
     }
     .home-hero-inner { position: relative; z-index: 1; width: 100%; max-width: 1100px; }
     .home-eyebrow {
@@ -816,7 +816,7 @@
     /* Search box: type and pick an island */
     .hero-search {
       position: relative; display: flex; max-width: 560px; margin: 0 auto;
-      background: #FDFCF8; border: 1px solid #FDFCF8; text-align: left;
+      background: #FFFFFF; border: 1px solid #FFFFFF; text-align: left;
     }
     .hero-search input {
       flex: 1; min-width: 0; border: 0; background: transparent; outline: none;
@@ -824,14 +824,14 @@
     }
     .hero-search input::placeholder { color: #8a857b; }
     .hero-search button {
-      border: 0; background: var(--black); color: #FDFCF8; padding: 0 28px; margin: 6px;
+      border: 0; background: var(--black); color: #FFFFFF; padding: 0 28px; margin: 6px;
       font: inherit; font-size: 15px; letter-spacing: 0.02em; cursor: pointer;
       transition: background 0.2s;
     }
     .hero-search button:hover { background: #2a2a28; }
     .hero-search-list {
       position: absolute; top: 100%; left: -1px; right: -1px; margin: 0; padding: 6px 0; list-style: none;
-      background: #FDFCF8; border: 1px solid #e4dfd4; border-top: 0; z-index: 3;
+      background: #FFFFFF; border: 1px solid #e4dfd4; border-top: 0; z-index: 3;
       box-shadow: 0 12px 30px rgba(0,0,0,0.12);
     }
     .hero-search-list li {
@@ -847,21 +847,25 @@
     .home-hero-link:hover { opacity: 0.7; }
     .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    .home-intro { padding: 120px 48px 0; }
+    .home-intro { padding: 120px var(--gutter) 0; }
     .home-intro p {
-      max-width: 50ch; text-indent: 3em;
+      max-width: 46ch; margin: 0 auto; text-align: center;
       font-family: var(--body);
-      font-size: 20px; line-height: 1.6; letter-spacing: 0.01em; margin: 0;
+      font-size: 26px; line-height: 1.5; letter-spacing: 0.01em;
     }
 
-    .home-collection { padding: 120px 48px 0; }
+    .home-collection { padding: 120px var(--gutter) 0; }
     .home-collection-head {
-      display: flex; align-items: baseline; justify-content: space-between;
-      gap: 24px; margin-bottom: 56px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 24px; margin-bottom: 40px;
     }
     .home-collection-head h2 {
       font-family: var(--body); font-weight: 400;
-      font-size: clamp(28px, 3.3vw, 48px); line-height: 1.1; letter-spacing: 0.02em; margin: 0;
+      font-size: clamp(28px, 3.3vw, 44px); line-height: 1.1; letter-spacing: 0.02em; margin: 0;
+    }
+    .home-collection-sub {
+      font-family: var(--body); font-size: 18px; line-height: 1.5; letter-spacing: 0.01em;
+      color: var(--grey-1); margin: 12px 0 0;
     }
     .home-collection-link {
       display: inline-flex; align-items: center; gap: 14px;
@@ -872,19 +876,30 @@
     .home-collection-link svg { width: 9px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: transform 0.2s; }
     .home-collection-link:hover svg { transform: translateX(4px); }
 
-    .island-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 3.6vw, 56px); }
-    .island-card { display: block; color: inherit; }
-    .island-img { width: 100%; aspect-ratio: 4 / 5; overflow: hidden; background: var(--grey-4); margin-bottom: 26px; }
+    .island-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 2.6vw, 36px); }
+    .island-card { display: block; color: inherit; text-align: center; }
+    .island-img { width: 100%; aspect-ratio: 5 / 6; overflow: hidden; background: var(--grey-4); margin-bottom: 20px; }
     .island-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
     .island-card:hover .island-img img { transform: scale(1.03); }
     .island-name {
       font-family: var(--body);
-      font-size: clamp(19px, 1.8vw, 26px); font-weight: 400; letter-spacing: 0.01em; margin: 0 0 8px;
+      font-size: clamp(20px, 1.8vw, 24px); font-weight: 400; letter-spacing: 0.01em; margin: 0 0 6px;
     }
+    /* Underline draws in from the left on hover, like Boutique Homes */
+    .island-name span {
+      background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
+      padding-bottom: 3px;
+      transition: background-size 0.35s ease;
+    }
+    .island-card:hover .island-name span,
+    .island-card:focus-visible .island-name span { background-size: 100% 1px; }
     .island-count {
       font-family: var(--body);
       font-size: 15px; letter-spacing: 0.01em;
       color: var(--grey-1); margin: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .island-name span, .island-img img { transition: none; }
     }
 
     @media (max-width: 768px) {
@@ -894,13 +909,13 @@
       .home-headline { font-size: clamp(30px, 8.5vw, 44px); max-width: none; }
       .home-eyebrow { margin-bottom: 22px; }
       .home-intro { padding: 56px 16px 0; }
-      .home-intro p { font-size: 16px; }
+      .home-intro p { font-size: 19px; }
       .home-collection { padding: 64px 16px 0; }
       .home-collection-head { flex-direction: column; align-items: flex-start; gap: 10px; }
       .island-grid { grid-template-columns: 1fr; gap: 36px; }
     }
   
-    .home-map { padding: 120px 48px 0; }
+    .home-map { padding: 120px var(--gutter) 0; }
     .home-map-lede {
       font-family: var(--body); font-size: 20px; line-height: 1.6; letter-spacing: 0.01em;
       max-width: 50ch; margin: -24px 0 48px;
@@ -924,7 +939,7 @@
     }
     .home-map-frame:hover .home-map-cta { background: #B77F61; }
 
-    .home-signup { margin: 96px 0 0; padding: 0 48px; }
+    .home-signup { margin: 96px 0 0; padding: 0 var(--gutter); }
     .home-signup-inner {
       display: flex; align-items: center; justify-content: space-between; gap: 32px;
       border-top: 1px solid var(--grey-3); padding-top: 28px;
@@ -1029,28 +1044,31 @@
   </header>
 
   <section class="home-intro">
-    <p>Slow Casa is a handpicked collection of vacation homes in Mallorca, Ibiza and Menorca. Each property is chosen for people who care about good design and want to be close to nature. Most are located by the sea or in the countryside, rebuilt with care, with room to cook, swim, read and do very little.</p>
+    <p>Slow Casa is a handpicked collection of vacation homes in Mallorca, Ibiza and Menorca. Each property is chosen for people who care about good design and want to be close to nature. Most are located by the sea or in the countryside, rebuilt with care, with room to cook, swim, read and relax.</p>
   </section>
 
   <section class="home-collection">
     <div class="home-collection-head">
-      <h2>The collection</h2>
+      <div>
+        <h2>The collection</h2>
+        <p class="home-collection-sub">Handpicked houses on each of the three islands</p>
+      </div>
       <a class="home-collection-link" href="/houses"><span>See full collection (<span data-count="all">18</span>)</span><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
     </div>
     <div class="island-grid">
       <a class="island-card" href="/mallorca">
         <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,q_auto,f_auto,w_1000/v1791362039/mallorca_card_v6tx57.jpg" alt="Port de Soller on the north-west coast of Mallorca" loading="lazy" /></div>
-        <p class="island-name">Mallorca</p>
+        <p class="island-name"><span>Mallorca</span></p>
         <p class="island-count"><span data-count="mallorca">14</span> houses</p>
       </a>
       <a class="island-card" href="/menorca">
         <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,q_auto,f_auto,w_1000/v1791362040/menorca_card_ywifq5.jpg" alt="Houses above the limestone cliffs on the coast of Menorca" loading="lazy" /></div>
-        <p class="island-name">Menorca</p>
+        <p class="island-name"><span>Menorca</span></p>
         <p class="island-count"><span data-count="menorca">2</span> houses</p>
       </a>
       <a class="island-card" href="/ibiza">
         <div class="island-img"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,q_auto,f_auto,w_1000/v1791362038/ibiza_card_bbuc6x.jpg" alt="A street in Dalt Vila, the old town of Ibiza" loading="lazy" /></div>
-        <p class="island-name">Ibiza</p>
+        <p class="island-name"><span>Ibiza</span></p>
         <p class="island-count"><span data-count="ibiza">2</span> houses</p>
       </a>
     </div>
