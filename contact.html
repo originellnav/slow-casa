@@ -20,25 +20,34 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/slow-casa.css" />
   <style>
-    /* Contact: big title and photo on the left, the reasons to write on the right. */
-    .contact { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 120px); padding: 96px var(--gutter) 0; align-items: start; }
-    .contact-title { font-family: var(--display); font-weight: 400; font-size: clamp(36px, 4.4vw, 64px); line-height: 1; letter-spacing: 0.02em; margin: 0 0 48px; }
-    .contact-photo { aspect-ratio: 4 / 5; overflow: hidden; background: var(--grey-4); max-width: 560px; }
-    .contact-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .contact-lede { font-family: var(--body); font-size: 20px; line-height: 1.6; margin: 0 0 56px; max-width: 44ch; }
-    .contact-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--grey-3); }
-    .contact-item { padding: 32px 0; border-bottom: 1px solid var(--grey-3); display: grid; gap: 12px; }
-    .contact-item h2 { font-family: var(--display); font-weight: 400; font-size: 19px; letter-spacing: 0.01em; margin: 0; }
-    .contact-item p { font-family: var(--body); font-size: 16px; line-height: 1.6; color: var(--black); margin: 0; max-width: 52ch; }
-    .contact-link { justify-self: start; display: inline-flex; align-items: center; gap: 12px; font-family: var(--display); font-size: 15px; letter-spacing: 0.01em; border: 1px solid var(--black); padding: 14px 22px; margin-top: 8px; transition: background 0.2s, color 0.2s; }
-    .contact-link:hover { background: var(--black); color: var(--bg); }
-    .contact-link svg { width: 8px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.4; }
-    .contact-email { font-family: var(--body); font-size: 16px; user-select: all; border-bottom: 1px solid var(--black); }
+    /* Contact: heading and a short note on the left, the form on the right. */
+    .contact { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(40px, 6vw, 120px); padding: 96px var(--gutter) 0; align-items: start; }
+    .contact-title { font-family: var(--display); font-weight: 400; font-size: clamp(36px, 4.4vw, 60px); line-height: 1.05; letter-spacing: 0.02em; margin: 0 0 28px; }
+    .contact-lede { font-family: var(--body); font-size: 18px; line-height: 1.6; margin: 0; max-width: 34ch; color: var(--black); }
+    .cf { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .cf-field { display: block; }
+    .cf-wide { grid-column: 1 / -1; }
+    .cf input, .cf textarea {
+      width: 100%; font-family: var(--body); font-size: 16px; letter-spacing: 0.01em; color: var(--black);
+      background: #fff; border: 1px solid var(--grey-3); padding: 20px 22px; outline: none; border-radius: 0;
+      transition: border-color 0.2s;
+    }
+    .cf textarea { min-height: 200px; resize: vertical; line-height: 1.6; }
+    .cf input::placeholder, .cf textarea::placeholder { color: var(--grey-1); }
+    .cf input:focus, .cf textarea:focus { border-color: var(--black); }
+    .cf-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+    .cf-submit {
+      grid-column: 1 / -1; margin-top: 16px; font-family: var(--body); font-size: 16px; letter-spacing: 0.01em;
+      padding: 20px; border: 1px solid var(--black); background: var(--black); color: #fff; cursor: pointer; transition: opacity 0.2s;
+    }
+    .cf-submit:hover { opacity: 0.85; }
+    .cf-submit[disabled] { opacity: 0.5; cursor: default; }
+    .cf-msg { grid-column: 1 / -1; font-family: var(--body); font-size: 15px; color: var(--grey-1); margin: 0; min-height: 1.4em; }
+    .cf-done { font-family: var(--body); font-size: 20px; line-height: 1.6; padding: 48px 0; border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     @media (max-width: 900px) {
-      .contact { grid-template-columns: 1fr; padding: 56px 16px 0; gap: 40px; }
-      .contact-title { margin-bottom: 28px; }
-      .contact-photo { max-width: none; aspect-ratio: 4 / 3; }
-      .contact-lede { font-size: 17px; margin-bottom: 40px; }
+      .contact { grid-template-columns: 1fr; padding: 56px 16px 0; gap: 36px; }
+      .cf { grid-template-columns: 1fr; }
     }
   </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-B930Z6F96Z"></script>
@@ -181,7 +190,7 @@
       <a href="/houses">The Collection</a>
       <a href="/magazine">Magazine</a>
       <a href="/map">Map</a>
-      <a href="mailto:luke@slowcasa.com?subject=List%20my%20house%20on%20Slow%20Casa">List Your House</a>
+      <a href="/contact?topic=list-your-house">List Your House</a>
     </div>
     <a class="site-menu-contact" href="/contact">Contact</a>
   </aside>
@@ -189,35 +198,61 @@
 
   <main class="contact">
     <div>
-      <h1 class="contact-title">Contact</h1>
-      <div class="contact-photo"><img src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,w_1200,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg" alt="The coast of Mallorca" /></div>
+      <h1 class="contact-title">Talk to Our Team</h1>
+      <p class="contact-lede" id="cf-lede">Questions about a house, listing your own or working with us? Send us a message and we'll get back to you.</p>
     </div>
 
     <div>
-      <p class="contact-lede">Slow Casa is run by me, Luke. I read every email and reply myself. Here is the best way to reach me, depending on what you need.</p>
-      <ul class="contact-list">
-        <li class="contact-item">
-          <h2>Booking a House</h2>
-          <p>We don't take bookings. Each house page has a Book button that takes you straight to the owner or the people who look after the house, and they can answer questions about dates and prices.</p>
-          <a class="contact-link" href="/houses">See the Houses <svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
-        </li>
-        <li class="contact-item">
-          <h2>List Your House</h2>
-          <p>Own a house in Mallorca, Ibiza or Menorca that you think belongs here? Send me a link and a few photos.</p>
-          <a class="contact-link" href="mailto:luke@slowcasa.com?subject=List%20my%20house%20on%20Slow%20Casa">Email About Your House <svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
-        </li>
-        <li class="contact-item">
-          <h2>Press and Partners</h2>
-          <p>For features, collaborations and partnerships.</p>
-          <a class="contact-link" href="mailto:luke@slowcasa.com?subject=Press%20and%20partnerships">Email About a Partnership <svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
-        </li>
-        <li class="contact-item">
-          <h2>Anything Else</h2>
-          <p>Write to <a class="contact-email" href="mailto:luke@slowcasa.com">luke@slowcasa.com</a></p>
-        </li>
-      </ul>
+      <form class="cf" id="cf" novalidate>
+        <label class="cf-field"><span class="sr-only">First name</span><input name="firstName" type="text" placeholder="First Name" autocomplete="given-name" required /></label>
+        <label class="cf-field"><span class="sr-only">Last name</span><input name="lastName" type="text" placeholder="Last Name" autocomplete="family-name" /></label>
+        <label class="cf-field cf-wide"><span class="sr-only">Email</span><input name="email" type="email" placeholder="Email" autocomplete="email" required /></label>
+        <label class="cf-field cf-wide"><span class="sr-only">Phone number (optional)</span><input name="phone" type="tel" placeholder="Phone Number (optional)" autocomplete="tel" /></label>
+        <label class="cf-field cf-wide"><span class="sr-only">Message</span><textarea name="message" placeholder="Message" required></textarea></label>
+        <!-- Hidden from people. Bots fill it in and get ignored. -->
+        <div class="cf-hp" aria-hidden="true"><label>Website <input name="website" type="text" tabindex="-1" autocomplete="off" /></label></div>
+        <input type="hidden" name="topic" value="" />
+        <button class="cf-submit" type="submit">Send Message</button>
+        <p class="cf-msg" id="cf-msg" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </main>
+  <script>
+  (function () {
+    var form = document.getElementById('cf'); if (!form) return;
+    var msg = document.getElementById('cf-msg');
+    var started = Date.now();
+    // /contact?topic=list-your-house (from the menu) sets the topic and the prompt.
+    var topic = (new URLSearchParams(location.search).get('topic') || '').slice(0, 60);
+    form.topic.value = topic;
+    if (topic === 'list-your-house') {
+      form.message.placeholder = 'Tell us about your house: where it is, a link to it and anything else we should know.';
+    }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = form.email.value.trim();
+      if (!form.firstName.value.trim()) { msg.textContent = 'Please add your first name.'; form.firstName.focus(); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { msg.textContent = 'Please add a valid email.'; form.email.focus(); return; }
+      if (form.message.value.trim().length < 2) { msg.textContent = 'Please add a message.'; form.message.focus(); return; }
+      var btn = form.querySelector('.cf-submit');
+      btn.disabled = true; msg.textContent = 'Sending...';
+      fetch('/api/subscribe', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kind: 'contact', firstName: form.firstName.value, lastName: form.lastName.value,
+          email: email, phone: form.phone.value, message: form.message.value, topic: form.topic.value,
+          hp: form.website.value, t: Date.now() - started
+        })
+      }).then(function (r) {
+        if (!r.ok) throw new Error('failed');
+        if (window.plausible) plausible('Contact Message', { props: { topic: topic || 'general' } });
+        form.outerHTML = '<p class="cf-done">Thanks, your message is on its way. We\'ll get back to you soon.</p>';
+      }).catch(function () {
+        btn.disabled = false; msg.textContent = 'That did not send. Please try again.';
+      });
+    });
+  })();
+  </script>
 
   <!-- Footer: generated from lib/nav.js footer(). Keep in sync. -->
   <footer class="site-footer">
