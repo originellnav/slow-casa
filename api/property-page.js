@@ -358,8 +358,8 @@ module.exports = async function handler(req, res) {
   const galShown = galCls === 'pp-gal-3' ? gal.slice(0, 3) : gal;
   const galleryHtml = galShown.length ? `
   <div class="pp-gallery ${galCls}">
-    ${galShown.map((s, i) => `<button class="pp-gal-tile" type="button" data-i="${i}" aria-label="Open photo ${i + 1} of ${allImgs.length}">${img(s, i === 0 ? 1800 : 900, '', i === 0)}</button>`).join('')}
-    ${allImgs.length > 1 ? `<button class="pp-gal-all" type="button" data-i="0">${icon('grid', 16)}See All ${allImgs.length} Photos</button>` : ''}
+    ${galShown.map((s, i) => `<button class="pp-gal-tile" type="button" data-open="photos" data-i="${i}" aria-label="Open photo ${i + 1} of ${allImgs.length}">${img(s, i === 0 ? 1800 : 900, '', i === 0)}</button>`).join('')}
+    ${allImgs.length > 1 ? `<button class="pp-gal-all" type="button" data-open="photos">${icon('grid', 16)}See All ${allImgs.length} Photos</button>` : ''}
   </div>` : '';
 
   // ---- Image grids ----
@@ -399,25 +399,37 @@ module.exports = async function handler(req, res) {
     ${grid(overviewImgs)}
   </section>` : '';
 
-  // ---- Story sections: heading left, paragraph right, grid below ----
-  const story = (heading, text, set, cls) => (text || set.length) ? `
-  <section class="pp-section pp-story ${cls || ''}">
-    <div class="pp-split">
-      <h2 class="pp-h2">${heading}</h2>
-      <div class="pp-prose">${paras(text)}</div>
+  // ---- The full story: opens in a panel with Story and Photos tabs ----
+  // Room text and room photos are optional. Whatever a house has is used;
+  // a house with only photos and an intro simply has no story button.
+  const chapter = (heading, text, set) => (text || set.length) ? `
+      <section class="pps-ch">
+        <h3>${heading}</h3>
+        ${text ? `<div class="pps-text">${paras(text)}</div>` : ''}
+        ${set.length ? `<div class="pps-imgs pps-n${Math.min(set.length, 3)}">${set.map(s2 => `<figure>${img(s2, 1400)}</figure>`).join('')}</div>` : ''}
+      </section>` : '';
+  const chaptersHtml = chapter('Living Spaces', livingText, livingSet)
+    + chapter('Bedrooms &amp; Bathrooms', bedroomsText, bedroomsSet)
+    + chapter('The Environment', outdoorText, outdoorSet);
+  const hasStory = !!chaptersHtml.trim();
+
+  const panelHtml = (hasStory || allImgs.length > 1) ? `
+  <div class="pp-lightbox" id="pp-lightbox" role="dialog" aria-modal="true" aria-label="${escapeHtml(name)}" hidden>
+    <div class="pp-lb-bar">
+      <div class="pp-lb-tabs" role="tablist">
+        ${hasStory ? `<button type="button" role="tab" data-tab="story">Story</button>` : ''}
+        ${allImgs.length ? `<button type="button" role="tab" data-tab="photos">Photos</button>` : ''}
+      </div>
+      <button class="pp-lightbox-close" type="button" id="pp-lightbox-close" aria-label="Close">&times;</button>
     </div>
-    ${grid(set.slice(0, 3))}
-  </section>` : '';
-
-  const livingHtml   = story('Living Spaces', livingText, livingSet);
-  const bedroomsHtml = story('Bedrooms &amp; Bathrooms', bedroomsText, bedroomsSet);
-  const outdoorHtml  = story('The Environment', outdoorText, outdoorSet, 'pp-env');
-
-  const viewAllHtml = allImgs.length > 1 ? `
-  <div class="pp-lightbox" id="pp-lightbox" hidden>
-    <button class="pp-lightbox-close" type="button" id="pp-lightbox-close" aria-label="Close">&times;</button>
-    <div class="pp-lightbox-inner">
-      ${allImgs.map((s, i) => `<figure id="pp-photo-${i}">${img(s, 1800)}</figure>`).join('')}
+    ${hasStory ? `
+    <div class="pp-lb-pane pps" data-pane="story">
+      <h2 class="pps-title">${escapeHtml(editorialTitle || name)}</h2>
+      ${introText ? `<div class="pps-text pps-lead">${paras(introText)}</div>` : ''}
+      ${chaptersHtml}
+    </div>` : ''}
+    <div class="pp-lb-pane ppp" data-pane="photos">
+      ${allImgs.map((s2, i) => `<figure id="pp-photo-${i}">${img(s2, 1600)}</figure>`).join('')}
     </div>
   </div>` : '';
 
@@ -570,13 +582,17 @@ module.exports = async function handler(req, res) {
     .pp-top { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: clamp(40px, 6vw, 96px); align-items: start; padding-top: 64px; }
     .pp-name { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 3.6vw, 48px); letter-spacing: 0.02em; margin: 0 0 10px; line-height: 1.1; }
     .pp-where { font-size: 16px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
-    .pp-editorial { font-family: var(--display); font-size: 21px; line-height: 1.4; margin: 24px 0 0; max-width: 34ch; }
-    .pp-facts { list-style: none; margin: 36px 0 0; padding: 24px 0; display: flex; flex-wrap: wrap; gap: 14px 36px; border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
+    .pp-facts { list-style: none; margin: 32px 0 0; padding: 24px 0; display: flex; flex-wrap: wrap; gap: 14px 36px; border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
     .pp-facts li { display: inline-flex; align-items: center; gap: 10px; font-size: 16px; letter-spacing: 0.01em; }
-    .pp-features { list-style: none; margin: 36px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .pp-lead { margin-top: 56px; }
+    .pp-lead-title { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 2.6vw, 36px); line-height: 1.2; letter-spacing: 0.01em; margin: 0 0 24px; max-width: 26ch; }
+    .pp-lead-text p { font-size: clamp(18px, 1.5vw, 21px); line-height: 1.65; margin: 0 0 18px; max-width: 58ch; }
+    .pp-story-btn { margin-top: 12px; }
+    .pp-feat { margin-top: 72px; padding-top: 40px; border-top: 1px solid var(--grey-3); }
+    .pp-sub { font-family: var(--display); font-weight: 400; font-size: 24px; letter-spacing: 0.01em; margin: 0 0 24px; }
+    .pp-features { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
     .pp-features li { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; border: 1px solid var(--grey-3); padding: 22px 12px; font-size: 14px; letter-spacing: 0.01em; }
     .ico { flex-shrink: 0; }
-    .pp-intro { margin-top: 56px; }
 
     /* Booking card */
     .pp-book { position: sticky; top: 112px; border: 1px solid var(--black); padding: 32px 28px; }
@@ -609,12 +625,38 @@ module.exports = async function handler(req, res) {
     /* The environment */
 
     /* All photos */
-    .pp-lightbox { position: fixed; inset: 0; background: #FFFFFF; z-index: 100; overflow-y: auto; }
+    .pp-lightbox { position: fixed; inset: 0; background: #FFFFFF; z-index: 1000; overflow-y: auto; }
     .pp-lightbox[hidden] { display: none; }
-    .pp-lightbox-inner { max-width: 1100px; margin: 0 auto; padding: 80px 24px; display: grid; gap: 20px; }
-    .pp-lightbox-inner figure { margin: 0; }
-    .pp-lightbox-inner img { width: 100%; height: auto; display: block; }
-    .pp-lightbox-close { position: fixed; top: 18px; right: 26px; background: #FFFFFF; border: 0; font-size: 40px; line-height: 1; cursor: pointer; z-index: 101; }
+    .pp-lb-bar { position: sticky; top: 0; z-index: 2; background: #fff; display: flex; justify-content: center; align-items: center; height: 72px; border-bottom: 1px solid var(--grey-3); }
+    .pp-lb-tabs { display: flex; gap: 36px; }
+    .pp-lb-tabs button { background: none; border: 0; padding: 24px 2px 22px; font-family: var(--body); font-size: 15px; letter-spacing: 0.01em; color: var(--grey-1); cursor: pointer; border-bottom: 2px solid transparent; }
+    .pp-lb-tabs button[aria-selected="true"] { color: var(--black); border-bottom-color: var(--black); }
+    .pp-lightbox-close { position: absolute; right: 24px; top: 16px; width: 40px; height: 40px; border-radius: 50%; background: var(--black); color: #fff; border: 0; font-size: 24px; line-height: 40px; cursor: pointer; }
+    .pp-lb-pane[hidden] { display: none; }
+    /* Story: a magazine-style read */
+    .pps { max-width: 760px; margin: 0 auto; padding: 72px 24px 120px; }
+    .pps-title { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4vw, 52px); line-height: 1.12; letter-spacing: 0.01em; text-align: center; margin: 0 0 56px; }
+    .pps-text p { font-size: 18px; line-height: 1.75; margin: 0 0 18px; }
+    .pps-lead p { font-size: 21px; line-height: 1.65; }
+    .pps-ch { margin-top: 72px; }
+    .pps-ch h3 { font-family: var(--display); font-weight: 400; font-size: 28px; letter-spacing: 0.01em; margin: 0 0 20px; }
+    .pps-imgs { display: grid; gap: 12px; margin: 32px -80px 0; }
+    .pps-n2, .pps-n3 { grid-template-columns: 1fr 1fr; }
+    .pps-n3 figure:first-child { grid-column: 1 / -1; }
+    .pps-imgs figure { margin: 0; aspect-ratio: 3 / 2; overflow: hidden; background: var(--grey-4); }
+    .pps-n1 figure { aspect-ratio: 16 / 10; }
+    .pps-imgs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Photos: every image, two across */
+    .ppp { max-width: 1240px; margin: 0 auto; padding: 40px 24px 120px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ppp figure { margin: 0; background: var(--grey-4); }
+    .ppp figure:nth-child(3n+1) { grid-column: 1 / -1; }
+    .ppp img { width: 100%; height: auto; display: block; }
+    @media (max-width: 900px) {
+      .pps-imgs { margin-left: 0; margin-right: 0; }
+      .ppp { grid-template-columns: 1fr; }
+      .pp-lightbox-close { right: 12px; }
+      .pp-lb-bar { justify-content: flex-start; padding-left: 20px; }
+    }
 
     /* Location */
     .pp-location .pp-h2 { margin-bottom: 72px; }
@@ -726,17 +768,18 @@ module.exports = async function handler(req, res) {
         <div class="pp-main">
           <h1 class="pp-name">${escapeHtml(name)}</h1>
           ${location ? `<p class="pp-where">${escapeHtml(location)}</p>` : ''}
-          ${editorialTitle ? `<p class="pp-editorial">${escapeHtml(editorialTitle)}</p>` : ''}
           ${factsHtml}
-          ${featuresHtml}
-          ${introText ? `<div class="pp-prose pp-intro">${paras(introText)}</div>` : ''}
+          ${(editorialTitle || introText) ? `
+          <section class="pp-lead">
+            ${editorialTitle ? `<h2 class="pp-lead-title">${escapeHtml(editorialTitle)}</h2>` : ''}
+            ${introText ? `<div class="pp-lead-text">${paras(introText)}</div>` : ''}
+            ${hasStory ? `<button class="pp-btn pp-story-btn" type="button" data-open="story">Read the Full Story</button>` : ''}
+          </section>` : ''}
+          ${featuresHtml ? `<section class="pp-feat"><h2 class="pp-sub">What's Here</h2>${featuresHtml}</section>` : ''}
         </div>
         ${bookHtml}
       </div>
-      ${livingHtml}
-      ${bedroomsHtml}
-      ${outdoorHtml}
-      ${viewAllHtml}
+      ${panelHtml}
       ${locationHtml}
       ${recsHtml}
     </div>
@@ -775,17 +818,28 @@ ${footer()}
     }
   })();
   (function () {
-    // Gallery: any photo, or See All, opens every photo at that one
+    // Panel with Story and Photos tabs. Gallery photos open Photos at that
+    // photo; Read the Full Story opens Story.
     var box = document.getElementById('pp-lightbox');
     var close = document.getElementById('pp-lightbox-close');
+    function show(tab) {
+      if (!box.querySelector('[data-pane="' + tab + '"]')) tab = 'photos';
+      box.querySelectorAll('.pp-lb-pane').forEach(function (p) { p.hidden = p.getAttribute('data-pane') !== tab; });
+      box.querySelectorAll('.pp-lb-tabs button').forEach(function (t) { t.setAttribute('aria-selected', t.getAttribute('data-tab') === tab ? 'true' : 'false'); });
+    }
     function shut() { box.hidden = true; document.body.style.overflow = ''; }
     if (box) {
-      document.querySelectorAll('.pp-gal-tile, .pp-gal-all').forEach(function (b) {
+      document.querySelectorAll('[data-open]').forEach(function (b) {
         b.addEventListener('click', function () {
           box.hidden = false; document.body.style.overflow = 'hidden';
-          var fig = document.getElementById('pp-photo-' + (b.getAttribute('data-i') || 0));
-          box.scrollTop = fig && b.classList.contains('pp-gal-tile') ? fig.offsetTop - 60 : 0;
+          show(b.getAttribute('data-open'));
+          var i = b.getAttribute('data-i');
+          var fig = i !== null && document.getElementById('pp-photo-' + i);
+          box.scrollTop = fig ? fig.offsetTop - 90 : 0;
         });
+      });
+      box.querySelectorAll('.pp-lb-tabs button').forEach(function (t) {
+        t.addEventListener('click', function () { show(t.getAttribute('data-tab')); box.scrollTop = 0; });
       });
       close.addEventListener('click', shut);
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) shut(); });
