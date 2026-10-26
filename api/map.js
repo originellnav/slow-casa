@@ -34,9 +34,9 @@ const PALETTE = {
 // matches; its pin takes the colour of the first match in PIN_PRIORITY.
 const FILTERS = [
   { key: 'eat', label: 'Eat', cats: ['Eat', 'Bakery'], color: PALETTE.terracotta, stroke: PALETTE.ivory },
-  { key: 'wine', label: 'Wine & drinks', cats: ['Winery', 'Drink'], color: PALETTE.ink, stroke: PALETTE.ivory },
+  { key: 'wine', label: 'Wine & Drinks', cats: ['Winery', 'Drink'], color: PALETTE.ink, stroke: PALETTE.ivory },
   { key: 'do', label: 'Experiences', cats: ['Experience', 'Do', 'See', 'Play'], color: PALETTE.olive, stroke: PALETTE.ivory },
-  { key: 'beach', label: 'Beach clubs', cats: ['Beach Club', 'Swim'], color: PALETTE.sand, stroke: PALETTE.ink }
+  { key: 'beach', label: 'Beach Clubs', cats: ['Beach Club', 'Swim'], color: PALETTE.sand, stroke: PALETTE.ink }
 ];
 // Most specific first: a winery that also offers tours is a wine pin.
 const PIN_PRIORITY = ['beach', 'wine', 'eat', 'do'];
@@ -165,7 +165,7 @@ module.exports = async function handler(req, res) {
     .mp-isl { display: flex; gap: 18px; }
     .mp-isl button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 14px; letter-spacing: 0.01em; color: var(--mp-olive); cursor: pointer; border-bottom: 1px solid transparent; }
     .mp-isl button:hover, .mp-isl button.on { color: var(--mp-ink); border-bottom-color: var(--mp-ink); }
-    .mp-wrap { position: relative; height: calc(100vh - 150px); min-height: 520px; background: var(--mp-ivory); }
+    .mp-wrap { position: relative; height: calc(100vh - 190px); min-height: 520px; margin: 0 48px 48px; border: 1px solid #0f0f0f; background: var(--mp-ivory); }
     #mp-map { position: absolute; inset: 0; }
     .mapboxgl-ctrl-logo { opacity: 0.45; }
     .mapboxgl-ctrl-attrib.mapboxgl-compact { background: transparent !important; }
@@ -205,7 +205,7 @@ module.exports = async function handler(req, res) {
       .mp-bar { padding: 12px 16px; }
       .mp-chips { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 2px; }
       .mp-chip { flex: 0 0 auto; }
-      .mp-wrap { height: calc(100vh - 190px); min-height: 440px; }
+      .mp-wrap { height: calc(100vh - 200px); min-height: 440px; margin: 0 16px 24px; }
       .mp-card { left: 0; right: 0; bottom: 0; width: auto; max-width: none; border-left: 0; border-right: 0; border-bottom: 0; }
       .mp-card-img { aspect-ratio: 16 / 9; }
     }
@@ -247,7 +247,7 @@ module.exports = async function handler(req, res) {
       </div>
       <div class="mp-card-actions">
         <a id="mp-card-maps" target="_blank" rel="noopener">Google Maps</a>
-        <a id="mp-card-page">View place</a>
+        <a id="mp-card-page">View Place</a>
       </div>
     </article>
   </div>

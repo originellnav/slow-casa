@@ -439,7 +439,7 @@ module.exports = async function handler(req, res) {
     }
     .prop-card-img {
       width: 100%;
-      aspect-ratio: 4/3;
+      aspect-ratio: 10 / 7;
       overflow: hidden;
       margin-bottom: 16px;
       background: #e8e8e8;
@@ -501,7 +501,7 @@ module.exports = async function handler(req, res) {
     <p class="arch-meta">
       ${location ? escapeHtml(location) : ''}
       ${location && studioUrl ? '<span class="arch-meta-sep">·</span>' : ''}
-      ${studioUrl ? `<a href="${escapeHtml(studioUrl)}" target="_blank" rel="noopener">Visit studio</a>` : ''}
+      ${studioUrl ? `<a href="${escapeHtml(studioUrl)}" target="_blank" rel="noopener">Visit Studio</a>` : ''}
     </p>
   </section>
 

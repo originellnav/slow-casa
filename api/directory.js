@@ -408,7 +408,7 @@ module.exports = async function handler(req, res) {
 
     .dir-sidebar {
       position: sticky;
-      top: 40px;
+      top: 120px;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -572,8 +572,6 @@ module.exports = async function handler(req, res) {
     .chip.active { background: var(--black); color: #ffffff; }
     .chip-map { margin-left: 16px; }
     .dir-body { display: block; padding: 0 var(--gutter) 40px; }
-    /* Landscape house photos on the directory, closer to Boutique Homes */
-    .dir-body .house-card-img { aspect-ratio: 10 / 7; }
     @media (max-width: 768px) { .dir-body { padding: 0 16px 32px; } }
     @media (max-width: 768px) {
       .dir-filters { padding: 0 16px; }
@@ -600,7 +598,7 @@ module.exports = async function handler(req, res) {
 
   <div class="dir-filters">
     <div class="filter-row">
-      <span class="filter-label">Select your stay &rarr;</span>
+      <span class="filter-label">Select Your Stay &rarr;</span>
       <button class="chip active" data-type="setting" data-value="all">All</button>
       <button class="chip" data-type="setting" data-value="sea">Sea</button>
       <button class="chip" data-type="setting" data-value="mountains">Mountains</button>
@@ -611,12 +609,12 @@ module.exports = async function handler(req, res) {
       <span class="filter-pin" aria-hidden="true">
         <svg width="13" height="17" viewBox="0 0 13 17" fill="none"><path d="M6.5 16S12 10.4 12 6.5A5.5 5.5 0 1 0 1 6.5C1 10.4 6.5 16 6.5 16z" stroke="currentColor" stroke-width="1.2"/><circle cx="6.5" cy="6.3" r="1.9" stroke="currentColor" stroke-width="1.2"/></svg>
       </span>
-      <button class="chip active" data-type="island" data-value="all">All islands</button>
+      <button class="chip active" data-type="island" data-value="all">All Islands</button>
       <button class="chip" data-type="island" data-value="mallorca">Mallorca</button>
       <button class="chip" data-type="island" data-value="ibiza">Ibiza</button>
       <button class="chip" data-type="island" data-value="menorca">Menorca</button>
       <button class="chip" data-type="island" data-value="formentera">Formentera</button>
-      <button class="chip chip-map" id="map-toggle" onclick="toggleMap()">Map view</button>
+      <button class="chip chip-map" id="map-toggle" onclick="toggleMap()">Map View</button>
     </div>
   </div>
 
@@ -627,7 +625,7 @@ module.exports = async function handler(req, res) {
       <div class="map-popup-body">
         <p class="map-popup-location" id="map-popup-location"></p>
         <p class="map-popup-name" id="map-popup-name"></p>
-        <a class="map-popup-link" id="map-popup-link" href="#">View property</a>
+        <a class="map-popup-link" id="map-popup-link" href="#">View Property</a>
       </div>
       <button class="map-popup-close" onclick="document.getElementById('map-popup').style.display='none'">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -919,7 +917,7 @@ module.exports = async function handler(req, res) {
       var btn = document.getElementById('map-toggle');
       var open = wrap.classList.toggle('open');
       btn.classList.toggle('active', open);
-      btn.textContent = open ? 'Hide map' : 'Map view';
+      btn.textContent = open ? 'Hide Map' : 'Map View';
       if (open && !mapReady) { mapReady = true; initDirectoryMap(); }
     }
     window.toggleMap = toggleMap;

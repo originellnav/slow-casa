@@ -122,7 +122,12 @@ button, input, select, textarea { font-family: inherit; }
   gap: 24px;
   padding: 26px 48px;
   background: var(--bg);
+  /* Sticky: the nav follows you down the page. A thin line shows once you scroll. */
+  position: sticky; top: 0; z-index: 50;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
 }
+.site-nav.is-stuck { border-bottom-color: var(--grey-3); }
 .site-nav .wordmark {
   font-family: var(--brand);
   font-size: 26px;
@@ -275,7 +280,7 @@ html.menu-open .site-menu {
    ============================================ */
 .house-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 64px clamp(24px, 3.6vw, 56px); }
 .house-card { display: block; color: inherit; }
-.house-card-img { position: relative; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; background: var(--grey-4); margin-bottom: 22px; }
+.house-card-img { position: relative; width: 100%; aspect-ratio: 10 / 7; overflow: hidden; background: var(--grey-4); margin-bottom: 22px; }
 .house-card-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
 .house-card:hover .house-card-img img { transform: scale(1.03); }
 .house-card-name {
@@ -283,15 +288,17 @@ html.menu-open .site-menu {
   font-size: clamp(18px, 1.6vw, 23px); line-height: 1.2; letter-spacing: 0.01em; margin: 0 0 8px;
 }
 /* Underline draws in under the name on hover (same as the homepage island cards) */
-.house-card-name span {
+.house-card-name span, .mg-title span, .pp-rec-name span {
   background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
   padding-bottom: 2px;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
   transition: background-size 0.35s ease;
 }
 .house-card:hover .house-card-name span,
+a.mg-card:hover .mg-title span,
+a.pp-rec:hover .pp-rec-name span,
 .house-card:focus-visible .house-card-name span { background-size: 100% 1px; }
-@media (prefers-reduced-motion: reduce) { .house-card-name span { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .house-card-name span, .mg-title span { transition: none; } }
 .house-card-meta { font-family: var(--body); font-size: 15px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
 .house-card-dot { font-size: 10px; margin: 0 8px; position: relative; top: -1px; }
 .house-card:focus-visible { outline: 1px solid var(--black); outline-offset: 6px; }

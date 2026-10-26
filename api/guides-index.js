@@ -55,7 +55,7 @@ function sectionChips(current, island, counts) {
   </ul>`;
 }
 function islandChips(section, island) {
-  const items = [{ key: '', label: 'All islands' }].concat(M.ISLAND_KEYS.map(k => ({ key: k, label: M.ISLANDS[k] })));
+  const items = [{ key: '', label: 'All Islands' }].concat(M.ISLAND_KEYS.map(k => ({ key: k, label: M.ISLANDS[k] })));
   const href = key => section
     ? (key ? M.sectionUrl(section, key) : '/magazine/' + section)
     : '/magazine' + (key ? '?island=' + key : '');
@@ -135,7 +135,7 @@ module.exports = async function handler(req, res) {
   isEmpty = !cards.length;
   bodyHtml = cards.length
     ? `<div class="mag-grid">${M.magGrid(cards)}</div>`
-    : `<p class="mag-empty">${island ? `Nothing here yet for ${esc(islandName)}. <a href="${isLanding ? '/magazine' : '/magazine/' + section}">See all islands</a>.` : 'The first pieces are on the way.'}</p>`;
+    : `<p class="mag-empty">${island ? `Nothing here yet for ${esc(islandName)}. <a href="${isLanding ? '/magazine' : '/magazine/' + section}">See All Islands</a>.` : 'The first pieces are on the way.'}</p>`;
 
   // Island hubs sit under the island (Slow Casa / Mallorca / Where to eat);
   // everything else sits under the Magazine.

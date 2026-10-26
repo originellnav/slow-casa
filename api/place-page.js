@@ -11,6 +11,7 @@
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
 const M = require('../lib/magazine');
+const { titleCase } = require('../lib/titlecase');
 
 const esc = M.esc;
 const SANITY_PARTNERS_URL = 'https://hchp27po.apicdn.sanity.io/v2024-01-01/data/query/production?query=' +
@@ -151,12 +152,12 @@ module.exports = async function handler(req, res) {
   let carHtml = '';
   const partners = await getPartners();
   if (partners && partners.carHireUrl) {
-    const heading = partners.carHireHeading || 'Hire a car';
+    const heading = partners.carHireHeading || 'Hire a Car';
     carHtml = `<aside class="pl-cta">
-      <p class="pl-cta-eyebrow">Getting around</p>
-      <p class="pl-cta-title">${esc(heading)}</p>
+      <p class="pl-cta-eyebrow">Getting Around</p>
+      <p class="pl-cta-title">${esc(titleCase(heading))}</p>
       ${partners.carHireText ? `<p class="pl-cta-text">${esc(partners.carHireText)}</p>` : ''}
-      <a class="pl-cta-btn" href="/go/car-hire-place-${esc(slug)}" target="_blank" rel="sponsored nofollow noopener"><span>${esc(partners.carHireButton || 'Compare cars')}</span>${M.CHEVRON}</a>
+      <a class="pl-cta-btn" href="/go/car-hire-place-${esc(slug)}" target="_blank" rel="sponsored nofollow noopener"><span>${esc(titleCase(partners.carHireButton || 'Compare Cars'))}</span>${M.CHEVRON}</a>
     </aside>`;
   }
 

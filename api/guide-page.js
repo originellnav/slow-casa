@@ -122,12 +122,12 @@ function renderStayNearby(block, ctx) {
 function renderCarHire(block, ctx) {
   const p = ctx.partners || {};
   if (!p.carHireUrl) return ''; // Partners page not filled in yet: hide the block
-  const heading = block.heading || p.carHireHeading || 'Hire a car';
+  const heading = block.heading || p.carHireHeading || 'Hire a Car';
   const text = block.text || p.carHireText || '';
-  const button = p.carHireButton || 'Compare cars';
+  const button = titleCase(p.carHireButton || 'Compare Cars');
   return '<aside class="guide-cta">' +
-    '<p class="guide-cta-eyebrow">Getting around</p>' +
-    '<p class="guide-cta-title">' + escapeHtml(heading) + '</p>' +
+    '<p class="guide-cta-eyebrow">Getting Around</p>' +
+    '<p class="guide-cta-title">' + escapeHtml(titleCase(heading)) + '</p>' +
     (text ? '<p class="guide-cta-text">' + escapeHtml(text) + '</p>' : '') +
     '<a class="guide-cta-btn" href="/go/car-hire-' + escapeHtml(ctx.slug) + '" target="_blank" rel="sponsored nofollow noopener">' +
       '<span>' + escapeHtml(button) + '</span>' +
@@ -416,7 +416,7 @@ module.exports = async function handler(req, res) {
       relatedHtml += M.row({ title: houseTitle, href: guideIsland ? '/' + guideIsland : '/houses', linkLabel: 'All of ' + (islandLabel || 'the collection'), cards: houseCards });
     }
     const more = (guides || []).filter(g => g.slug !== slug && g.islandKey && g.islandKey === guideIsland).slice(0, 3);
-    relatedHtml += M.row({ title: 'More from ' + islandLabel, href: '/magazine?island=' + guideIsland, linkLabel: 'The magazine', cards: more.map(g => M.storyCard(g)) });
+    relatedHtml += M.row({ title: 'More from ' + islandLabel, href: '/magazine?island=' + guideIsland, linkLabel: 'The Magazine', cards: more.map(g => M.storyCard(g)) });
   } catch (e) { relatedHtml = ''; }
 
   const breadcrumb = {

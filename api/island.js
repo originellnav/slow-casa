@@ -123,7 +123,7 @@ module.exports = async function handler(req, res) {
 
   const gridHtml = houses.length
     ? `<div class="house-grid">${cardsHtml}</div>`
-    : `<p class="isl-empty">We are still adding houses on ${escapeHtml(config.name)}. <a href="/houses">See the whole directory</a>.</p>`;
+    : `<p class="isl-empty">We are still adding houses on ${escapeHtml(config.name)}. <a href="/houses">See the Whole Directory</a>.</p>`;
 
   // Magazine rows: where to stay, where to eat, what to do (then any house tours).
   // Each row shows up to 3 and links to the full Magazine section for this island.
@@ -135,7 +135,7 @@ module.exports = async function handler(req, res) {
       id: k,
       title: `${M.SECTIONS[k].label} in ${config.name}`,
       href: M.sectionUrl(k, key),
-      linkLabel: items.cards.length > ROW_SIZE ? `See all (${items.cards.length})` : 'More in the Magazine',
+      linkLabel: items.cards.length > ROW_SIZE ? `See All (${items.cards.length})` : 'More in the Magazine',
       cards: items.cards.slice(0, ROW_SIZE)
     });
   }).join('');
@@ -143,8 +143,8 @@ module.exports = async function handler(req, res) {
   const otherIslands = Object.keys(ISLANDS).filter(k => k !== key);
   const otherHtml = `<nav class="mag-sublinks" aria-label="More">
     ${otherIslands.map(k => `<a href="/${k}">${escapeHtml(ISLANDS[k].name)}</a>`).join('')}
-    <a href="/houses">All houses</a>
-    <a href="/magazine">The magazine</a>
+    <a href="/houses">All Houses</a>
+    <a href="/magazine">The Magazine</a>
   </nav>`;
 
   const introHtml = config.intro.map(p => `<p>${escapeHtml(p)}</p>`).join('');

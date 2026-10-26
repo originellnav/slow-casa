@@ -55,4 +55,11 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && root.classList.contains('menu-open')) setOpen(false);
   });
+  // Sticky nav: add a hairline under it once the page has scrolled.
+  var bar = document.querySelector('.site-nav');
+  if (bar) {
+    var onScroll = function () { bar.classList.toggle('is-stuck', window.scrollY > 4); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
 })();

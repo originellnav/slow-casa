@@ -874,7 +874,7 @@
 
     .island-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 2.6vw, 36px); }
     .island-card { display: block; color: inherit; text-align: center; }
-    .island-img { width: 100%; aspect-ratio: 5 / 6; overflow: hidden; background: var(--grey-4); margin-bottom: 20px; }
+    .island-img { width: 100%; aspect-ratio: 10 / 7; overflow: hidden; background: var(--grey-4); margin-bottom: 20px; }
     .island-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
     .island-card:hover .island-img img { transform: scale(1.03); }
     .island-name {
@@ -920,6 +920,7 @@
     .home-map-frame {
       position: relative; display: block; width: 100%; aspect-ratio: 16 / 7; max-height: 80vh;
       overflow: hidden; background: #F6F1E8; cursor: pointer;
+      border: 1px solid var(--black);
     }
     .home-map-frame img, .home-map-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
     .home-map-frame img { object-fit: cover; display: block; }
@@ -987,7 +988,7 @@
   <header class="site-nav">
     <a href="/" class="wordmark">Slow Casa</a>
     <div class="site-nav-right">
-      <a class="site-nav-link" href="/houses">The collection</a>
+      <a class="site-nav-link" href="/houses">The Collection</a>
       <a class="site-nav-link" href="/magazine">Magazine</a>
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">Menu <i class="burger" aria-hidden="true"></i></button>
     </div>
@@ -998,10 +999,10 @@
       <button class="menu-close" type="button" data-menu-close>Close <i class="burger is-x" aria-hidden="true"></i></button>
     </div>
     <div class="site-menu-links">
-      <a href="/houses">The collection</a>
+      <a href="/houses">The Collection</a>
       <a href="/magazine">Magazine</a>
       <a href="/map">Map</a>
-      <a href="mailto:luke@slowcasa.com?subject=List%20my%20house%20on%20Slow%20Casa">List your house</a>
+      <a href="mailto:luke@slowcasa.com?subject=List%20my%20house%20on%20Slow%20Casa">List Your House</a>
     </div>
     <nav class="site-menu-sub" aria-label="Islands">
       <a href="/mallorca">Mallorca</a>
@@ -1012,7 +1013,7 @@
     <div class="site-menu-foot">
       <a href="mailto:luke@slowcasa.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg>luke@slowcasa.com</a>
       <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6"/></svg>@theslowcasa</a>
-      <a href="https://newsletter.slowcasa.com/?modal=signup" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>The newsletter</a>
+      <a href="https://newsletter.slowcasa.com/?modal=signup" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>The Newsletter</a>
     </div>
   </aside>
   <script src="/menu.js" defer></script>
@@ -1035,7 +1036,7 @@
         <button type="submit">Search</button>
         <ul class="hero-search-list" id="hero-search-list" role="listbox" hidden></ul>
       </form>
-      <a class="home-hero-link" href="/houses">Or browse all <span data-count="all">24</span> houses</a>
+      <a class="home-hero-link" href="/houses">Or Browse All <span data-count="all">24</span> houses</a>
     </div>
   </header>
 
@@ -1046,7 +1047,7 @@
   <section class="home-collection">
     <div class="home-collection-head">
       <h2>The Collection</h2>
-      <a class="home-collection-link" href="/houses"><span>See full collection (<span data-count="all">18</span>)</span><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
+      <a class="home-collection-link" href="/houses"><span>See Full Collection (<span data-count="all">18</span>)</span><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
     </div>
     <div class="island-grid">
       <a class="island-card" href="/mallorca">
@@ -1075,7 +1076,7 @@
     <p class="home-map-lede">Every restaurant, winery, beach club and experience we love across Mallorca, Ibiza and Menorca, on one map.</p>
     <div class="home-map-frame" id="home-map-frame">
       <div class="home-map-canvas" id="home-map" aria-hidden="true"></div>
-      <a class="home-map-cta" href="/map">Open the map</a>
+      <a class="home-map-cta" href="/map">Open the Map</a>
     </div>
   </section>
 
@@ -1085,7 +1086,7 @@
     <span class="footer-copy">&copy; 2026 Slow Casa</span>
     <div class="footer-right">
       <form class="footer-signup" novalidate>
-        <label for="footer-email">Get the newsletter</label>
+        <label for="footer-email">Get the Newsletter</label>
         <input id="footer-email" name="email" type="email" placeholder="Your email" autocomplete="email" />
         <button type="submit" aria-label="Subscribe"><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></button>
         <span class="footer-signup-msg" role="status" aria-live="polite"></span>
@@ -1248,11 +1249,11 @@
         if (res.ok) {
           input.parentElement.innerHTML = '<p style="font-size:14px;color:var(--grey-1);letter-spacing:0.02em;">You\'re in. See you Thursday.</p>';
         } else {
-          btn.textContent = 'Sign up';
+          btn.textContent = 'Sign Up';
           btn.disabled = false;
         }
       } catch (err) {
-        btn.textContent = 'Sign up';
+        btn.textContent = 'Sign Up';
         btn.disabled = false;
       }
     }
