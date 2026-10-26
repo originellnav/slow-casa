@@ -273,9 +273,9 @@ module.exports = async function handler(req, res) {
     .pl-cta-eyebrow { font-size: 14px; letter-spacing: 0.01em; color: #7a7466; margin: 0 0 0.9em !important; }
     .pl-cta-title { font-family: var(--display); font-size: 24px; letter-spacing: 0.01em; line-height: 1.2; color: #0f0f0f; margin: 0 0 0.5em !important; }
     .pl-cta-text { margin: 0 auto 1.4em; max-width: 34em; }
-    .pl-body .pl-cta-btn { display: inline-flex; align-items: center; gap: 12px; padding: 15px 30px; background: #0f0f0f; color: #FDFCF8; border: 1px solid #0f0f0f; font-size: 15px; letter-spacing: 0.01em; transition: background 0.2s, color 0.2s; }
+    .pl-body .pl-cta-btn { display: inline-flex; align-items: center; gap: 12px; padding: 15px 30px; background: #0f0f0f; color: #FFFFFF; border: 1px solid #0f0f0f; font-size: 15px; letter-spacing: 0.01em; transition: background 0.2s, color 0.2s; }
     .pl-cta-btn svg { width: 8px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.5; }
-    .pl-body .pl-cta-btn:hover { background: #FDFCF8; color: #0f0f0f; }
+    .pl-body .pl-cta-btn:hover { background: #FFFFFF; color: #0f0f0f; }
     @media (max-width: 768px) {
       .pl-header { padding: 48px 24px 24px; }
       .pl-body { padding: 0 24px 16px; font-size: 17px; }

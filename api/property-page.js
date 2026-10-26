@@ -521,9 +521,9 @@ module.exports = async function handler(req, res) {
     @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
     @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-v17-latin-300italic.woff2') format('woff2'); font-weight: 300; font-style: italic; font-display: swap; }
 
-    body { background: #FDFCF8; }
+    body { background: #FFFFFF; }
     /* Every block uses the nav's side gutter (48px, 16px on phones) so all edges line up. */
-    .pp { padding: 0 48px; }
+    .pp { padding: 0 var(--gutter); }
     .pp figure, .pp-hero-wrap figure { margin: 0; overflow: hidden; background: var(--grey-4); }
     .pp figure img, .pp-hero-wrap figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .img-fallback { background: var(--grey-4); }
@@ -531,7 +531,7 @@ module.exports = async function handler(req, res) {
     /* Hero */
     /* Hero runs edge to edge with the same side gutter as the nav,
        so its left edge lines up with the wordmark at every width. */
-    .pp-hero-wrap { padding: 0 48px; }
+    .pp-hero-wrap { padding: 0 var(--gutter); }
     .pp-hero { aspect-ratio: 16 / 8.5; max-height: 86vh; width: 100%; }
 
     /* Title row */
@@ -550,12 +550,12 @@ module.exports = async function handler(req, res) {
 
     /* Key facts + features, full-bleed rules */
     .pp-band { border-top: 1px solid var(--grey-3); }
-    .pp-facts { display: grid; grid-template-columns: repeat(var(--cols), 1fr); padding: 0 48px; }
+    .pp-facts { display: grid; grid-template-columns: repeat(var(--cols), 1fr); padding: 0 var(--gutter); }
     .pp-fact { text-align: center; padding: 30px 12px; }
     .pp-fact-k { font-size: 11.5px; letter-spacing: 0.01em; margin: 0 0 14px; }
     .pp-fact-v { font-size: 22px; margin: 0; }
     .pp-features-band { border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
-    .pp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; padding: 26px 48px; }
+    .pp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; padding: 26px var(--gutter); }
     .pp-feature { border: 1px solid var(--grey-3); padding: 22px 12px; text-align: center; font-size: 14px; letter-spacing: 0.01em; }
 
     /* Shared section rhythm */
@@ -578,12 +578,12 @@ module.exports = async function handler(req, res) {
 
     /* View all */
     .pp-viewall-wrap { text-align: center; padding-top: 110px; }
-    .pp-lightbox { position: fixed; inset: 0; background: #FDFCF8; z-index: 100; overflow-y: auto; }
+    .pp-lightbox { position: fixed; inset: 0; background: #FFFFFF; z-index: 100; overflow-y: auto; }
     .pp-lightbox[hidden] { display: none; }
     .pp-lightbox-inner { max-width: 1100px; margin: 0 auto; padding: 80px 24px; display: grid; gap: 20px; }
     .pp-lightbox-inner figure { margin: 0; }
     .pp-lightbox-inner img { width: 100%; height: auto; display: block; }
-    .pp-lightbox-close { position: fixed; top: 18px; right: 26px; background: #FDFCF8; border: 0; font-size: 40px; line-height: 1; cursor: pointer; z-index: 101; }
+    .pp-lightbox-close { position: fixed; top: 18px; right: 26px; background: #FFFFFF; border: 0; font-size: 40px; line-height: 1; cursor: pointer; z-index: 101; }
 
     /* Location */
     .pp-location .pp-h2 { margin-bottom: 72px; }
@@ -607,7 +607,7 @@ module.exports = async function handler(req, res) {
     .pp-dot { margin: 0 8px; font-size: 10px; }
 
     /* Nearby houses */
-    .prop-other { padding: 150px 48px 0; }
+    .prop-other { padding: 150px var(--gutter) 0; }
     .prop-other-header { margin-bottom: 56px; }
     .prop-other-title { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 3vw, 40px); margin: 0; letter-spacing: 0.02em; }
     .prop-other-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px 32px; }
@@ -664,7 +664,7 @@ module.exports = async function handler(req, res) {
     .pp-cta {
       position: fixed; right: 48px; bottom: calc(32px + env(safe-area-inset-bottom, 0px)); z-index: 800;
       display: inline-flex; align-items: center; justify-content: center; gap: 14px;
-      padding: 20px 32px; background: var(--black); color: #FDFCF8;
+      padding: 20px 32px; background: var(--black); color: #FFFFFF;
       font-family: var(--body); font-size: 15px; font-weight: 400;
       letter-spacing: 0.01em;
       box-shadow: 0 6px 24px rgba(15, 15, 15, 0.18);

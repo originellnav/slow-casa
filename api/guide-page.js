@@ -515,7 +515,7 @@ module.exports = async function handler(req, res) {
       font-display: swap;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #FDFCF8; font-family: var(--body); color: #0f0f0f; }
+    html, body { background: #FFFFFF; font-family: var(--body); color: #0f0f0f; }
     a { color: inherit; text-decoration: none; }
     h1, h2, h3, h4 { font-weight: 400; }
 
@@ -611,12 +611,12 @@ module.exports = async function handler(req, res) {
     .guide-cta-text { margin: 0 auto 1.4em; max-width: 34em; }
     .guide-body .guide-cta-btn {
       display: inline-flex; align-items: center; gap: 12px;
-      padding: 15px 30px; background: #0f0f0f; color: #FDFCF8; border: 1px solid #0f0f0f;
+      padding: 15px 30px; background: #0f0f0f; color: #FFFFFF; border: 1px solid #0f0f0f;
       font-size: 15px; letter-spacing: 0.01em; font-weight: 400;
       transition: background 0.2s, color 0.2s;
     }
     .guide-cta-btn svg { width: 8px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.5; transition: transform 0.2s; }
-    .guide-body .guide-cta-btn:hover { background: #FDFCF8; color: #0f0f0f; }
+    .guide-body .guide-cta-btn:hover { background: #FFFFFF; color: #0f0f0f; }
     .guide-cta-btn:hover svg { transform: translateX(4px); }
     .guide-cta-btn:focus-visible { outline: 1px solid #0f0f0f; outline-offset: 4px; }
 
