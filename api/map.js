@@ -1,5 +1,5 @@
 // api/map.js
-// The Map: every place we rate in Mallorca, Ibiza and Menorca on one map.
+// The Map: every place we love in Mallorca, Ibiza and Menorca on one map.
 // Data: Airtable Places (published only; ?preview=1 also shows drafts, noindex).
 //
 // Design lives in three places, all in this file:
@@ -34,9 +34,9 @@ const PALETTE = {
 // matches; its pin takes the colour of the first match in PIN_PRIORITY.
 const FILTERS = [
   { key: 'eat', label: 'Eat', cats: ['Eat', 'Bakery'], color: PALETTE.terracotta, stroke: PALETTE.ivory },
-  { key: 'wine', label: 'Wine & drinks', cats: ['Winery', 'Drink'], color: PALETTE.ink, stroke: PALETTE.ivory },
+  { key: 'wine', label: 'Wine & Drinks', cats: ['Winery', 'Drink'], color: PALETTE.ink, stroke: PALETTE.ivory },
   { key: 'do', label: 'Experiences', cats: ['Experience', 'Do', 'See', 'Play'], color: PALETTE.olive, stroke: PALETTE.ivory },
-  { key: 'beach', label: 'Beach clubs', cats: ['Beach Club', 'Swim'], color: PALETTE.sand, stroke: PALETTE.ink }
+  { key: 'beach', label: 'Beach Clubs', cats: ['Beach Club', 'Swim'], color: PALETTE.sand, stroke: PALETTE.ink }
 ];
 // Most specific first: a winery that also offers tours is a wine pin.
 const PIN_PRIORITY = ['beach', 'wine', 'eat', 'do'];
@@ -126,7 +126,7 @@ module.exports = async function handler(req, res) {
   }
 
   const title = 'The Map: Where to Eat, Drink and Go in Mallorca, Ibiza & Menorca | Slow Casa';
-  const desc = 'Every restaurant, winery, beach club and experience we rate across Mallorca, Ibiza and Menorca, on one map.';
+  const desc = 'Every restaurant, winery, beach club and experience we love across Mallorca, Ibiza and Menorca, on one map.';
   const config = {
     token: MAPBOX_TOKEN, style: MAP_STYLE, custom: CUSTOM_STYLE, palette: PALETTE,
     filters: FILTERS.map(f => ({ key: f.key, label: f.label })),
@@ -165,7 +165,7 @@ module.exports = async function handler(req, res) {
     .mp-isl { display: flex; gap: 18px; }
     .mp-isl button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 14px; letter-spacing: 0.01em; color: var(--mp-olive); cursor: pointer; border-bottom: 1px solid transparent; }
     .mp-isl button:hover, .mp-isl button.on { color: var(--mp-ink); border-bottom-color: var(--mp-ink); }
-    .mp-wrap { position: relative; height: calc(100vh - 150px); min-height: 520px; background: var(--mp-ivory); }
+    .mp-wrap { position: relative; height: calc(100vh - 190px); min-height: 520px; margin: 0 48px 48px; border: 1px solid #0f0f0f; background: var(--mp-ivory); }
     #mp-map { position: absolute; inset: 0; }
     .mapboxgl-ctrl-logo { opacity: 0.45; }
     .mapboxgl-ctrl-attrib.mapboxgl-compact { background: transparent !important; }
@@ -205,7 +205,7 @@ module.exports = async function handler(req, res) {
       .mp-bar { padding: 12px 16px; }
       .mp-chips { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 2px; }
       .mp-chip { flex: 0 0 auto; }
-      .mp-wrap { height: calc(100vh - 190px); min-height: 440px; }
+      .mp-wrap { height: calc(100vh - 200px); min-height: 440px; margin: 0 16px 24px; }
       .mp-card { left: 0; right: 0; bottom: 0; width: auto; max-width: none; border-left: 0; border-right: 0; border-bottom: 0; }
       .mp-card-img { aspect-ratio: 16 / 9; }
     }
@@ -214,7 +214,7 @@ module.exports = async function handler(req, res) {
 <body>
   ${nav()}
   <div class="mp-bar">
-    <h1 class="mp-title">The map</h1>
+    <h1 class="mp-title">The Map</h1>
     <div class="mp-chips" role="group" aria-label="Filter places">
       <button class="mp-chip on" data-f="all">All</button>
       ${FILTERS.map(f => `<button class="mp-chip" data-f="${f.key}"><span class="mp-dot" style="background:${f.color};${f.stroke === PALETTE.ink ? 'border:1px solid ' + PALETTE.ink + ';' : ''}"></span>${esc(f.label)}</button>`).join('')}
@@ -228,8 +228,8 @@ module.exports = async function handler(req, res) {
     <div class="mp-gate" id="mp-gate">
       <form class="mp-gate-box" id="mp-gate-form" novalidate>
         <p class="mp-gate-eyebrow">Free access</p>
-        <h2 class="mp-gate-title">Open the map</h2>
-        <p class="mp-gate-text">Every restaurant, winery, beach club and experience we rate across Mallorca, Ibiza and Menorca. Add your email to open it.</p>
+        <h2 class="mp-gate-title">Open the Map</h2>
+        <p class="mp-gate-text">Every restaurant, winery, beach club and experience we love across Mallorca, Ibiza and Menorca. Add your email to open it.</p>
         <div class="mp-gate-form">
           <input type="email" id="mp-gate-email" placeholder="Your email address" autocomplete="email" required aria-label="Email address" />
           <button type="submit" id="mp-gate-btn">Open</button>
@@ -247,7 +247,7 @@ module.exports = async function handler(req, res) {
       </div>
       <div class="mp-card-actions">
         <a id="mp-card-maps" target="_blank" rel="noopener">Google Maps</a>
-        <a id="mp-card-page">View place</a>
+        <a id="mp-card-page">View Place</a>
       </div>
     </article>
   </div>

@@ -11,6 +11,7 @@
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
 const M = require('../lib/magazine');
+const { titleCase } = require('../lib/titlecase');
 
 const esc = M.esc;
 const SANITY_PARTNERS_URL = 'https://hchp27po.apicdn.sanity.io/v2024-01-01/data/query/production?query=' +
@@ -41,7 +42,7 @@ function notFound(res) {
   res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8').send(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8" /><title>Place not found | Slow Casa</title><meta name="robots" content="noindex" /></head>
 <body style="font-family: system-ui, sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;">
-<h1>Place not found</h1>
+<h1>Place Not Found</h1>
 <p>We couldn't find that place. <a href="/magazine">Browse the Magazine</a> or <a href="/">return home</a>.</p>
 </body></html>`);
 }
@@ -106,7 +107,7 @@ module.exports = async function handler(req, res) {
   const metaTitle = `${name}${town ? ', ' + town : ''} | Slow Casa`;
   const metaDesc = text
     ? trim(text, 155)
-    : `${name}${where ? ' in ' + where : ''}: a place we rate, close to the houses in the Slow Casa collection.`;
+    : `${name}${where ? ' in ' + where : ''}: a place we love, close to the houses in the Slow Casa collection.`;
 
   // ---- Guides that mention this place (link to its website or to this page) ----
   let featuredHtml = '';
@@ -143,7 +144,7 @@ module.exports = async function handler(req, res) {
       });
     });
     if (cards.length) {
-      homesHtml = `<section class="pl-homes"><h2>Homes to rent nearby</h2><div class="pl-homes-grid">${cards.join('')}</div></section>`;
+      homesHtml = `<section class="pl-homes"><h2>Homes to Rent Nearby</h2><div class="pl-homes-grid">${cards.join('')}</div></section>`;
     }
   } catch (e) { homesHtml = ''; }
 
@@ -151,12 +152,12 @@ module.exports = async function handler(req, res) {
   let carHtml = '';
   const partners = await getPartners();
   if (partners && partners.carHireUrl) {
-    const heading = partners.carHireHeading || 'Hire a car';
+    const heading = partners.carHireHeading || 'Hire a Car';
     carHtml = `<aside class="pl-cta">
-      <p class="pl-cta-eyebrow">Getting around</p>
-      <p class="pl-cta-title">${esc(heading)}</p>
+      <p class="pl-cta-eyebrow">Getting Around</p>
+      <p class="pl-cta-title">${esc(titleCase(heading))}</p>
       ${partners.carHireText ? `<p class="pl-cta-text">${esc(partners.carHireText)}</p>` : ''}
-      <a class="pl-cta-btn" href="/go/car-hire-place-${esc(slug)}" target="_blank" rel="sponsored nofollow noopener"><span>${esc(partners.carHireButton || 'Compare cars')}</span>${M.CHEVRON}</a>
+      <a class="pl-cta-btn" href="/go/car-hire-place-${esc(slug)}" target="_blank" rel="sponsored nofollow noopener"><span>${esc(titleCase(partners.carHireButton || 'Compare Cars'))}</span>${M.CHEVRON}</a>
     </aside>`;
   }
 

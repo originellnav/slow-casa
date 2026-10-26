@@ -310,7 +310,7 @@ module.exports = async function handler(req, res) {
   const recsHtml = places.length ? `
   <section class="pp-section pp-recs">
     <div class="pp-recs-head">
-      <h2 class="pp-h2">Neighbourhood recs</h2>
+      <h2 class="pp-h2">Neighbourhood Recs</h2>
       ${ownerName ? `<p class="pp-recs-from">From ${escapeHtml(ownerName)}</p>` : ''}
     </div>
     <div class="pp-recs-grid">
@@ -324,7 +324,7 @@ module.exports = async function handler(req, res) {
         const pimg = getPlaceImageUrl(p);
         const inner = `
           <div class="pp-rec-img">${pimg ? `<img src="${escapeHtml(responsiveImageUrl(pimg, 900))}" alt="${escapeHtml(pName)}" loading="lazy" ${IMG_ONERROR} />` : ''}</div>
-          <h3 class="pp-rec-name">${escapeHtml(pName)}</h3>
+          <h3 class="pp-rec-name"><span>${escapeHtml(pName)}</span></h3>
           ${sub ? `<p class="pp-rec-sub">${sub}</p>` : ''}`;
         return link
           ? `<a class="pp-rec" href="${escapeHtml(link)}">${inner}</a>`
@@ -402,7 +402,7 @@ module.exports = async function handler(req, res) {
   const outdoorHtml  = story('The Environment', outdoorText, outdoorSet, 'pp-env');
 
   const viewAllHtml = allImgs.length > 1 ? `
-  <div class="pp-viewall-wrap"><button class="pp-btn" type="button" id="pp-viewall">View all images</button></div>
+  <div class="pp-viewall-wrap"><button class="pp-btn" type="button" id="pp-viewall">View All Images</button></div>
   <div class="pp-lightbox" id="pp-lightbox" hidden>
     <button class="pp-lightbox-close" type="button" id="pp-lightbox-close" aria-label="Close">&times;</button>
     <div class="pp-lightbox-inner">
@@ -599,7 +599,7 @@ module.exports = async function handler(req, res) {
     .pp-recs-from { font-size: 14px; letter-spacing: 0.01em; color: var(--grey-1); margin: 14px 0 0; }
     .pp-recs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 72px; }
     .pp-rec { display: block; color: inherit; }
-    .pp-rec-img { aspect-ratio: 1 / 1; overflow: hidden; background: var(--grey-4); margin-bottom: 26px; }
+    .pp-rec-img { aspect-ratio: 10 / 7; overflow: hidden; background: var(--grey-4); margin-bottom: 26px; }
     .pp-rec-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
     a.pp-rec:hover .pp-rec-img img { transform: scale(1.03); }
     .pp-rec-name { font-family: var(--body); font-weight: 400; font-size: 22px; letter-spacing: 0.01em; margin: 0 0 10px; }
@@ -725,7 +725,7 @@ module.exports = async function handler(req, res) {
 
 ${footer()}
 
-  ${bookingUrl ? `<a class="pp-cta" id="pp-cta" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">Check availability <span aria-hidden="true">&rarr;</span></a>` : ''}
+  ${bookingUrl ? `<a class="pp-cta" id="pp-cta" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">Check Availability <span aria-hidden="true">&rarr;</span></a>` : ''}
 
   <script>
   (function () {
@@ -888,7 +888,7 @@ async function renderNearbyHouses(currentRecord) {
     return `
     <section class="prop-other">
       <div class="prop-other-header">
-        <h2 class="prop-other-title">Nearby houses</h2>
+        <h2 class="prop-other-title">Nearby Houses</h2>
       </div>
       <div class="house-grid">
         ${cardsHtml}

@@ -2,6 +2,7 @@ const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
 const M = require('../lib/magazine');
 const { balearicIsland, gone } = require('../lib/scope');
+const { titleCase, titleCaseHtml } = require('../lib/titlecase');
 const SANITY_PROJECT_ID = 'hchp27po';
 const SANITY_DATASET = 'production';
 const SANITY_API_VERSION = '2024-01-01';
@@ -111,7 +112,7 @@ function renderStayNearby(block, ctx) {
   const raw = String(block.title || '').trim();
   const title = !raw || raw.toLowerCase() === 'stay nearby' ? 'Homes to rent' : raw;
   return '<section class="guide-houses">' +
-    '<h3>' + escapeHtml(title) + '</h3>' +
+    '<h3>' + escapeHtml(titleCase(title)) + '</h3>' +
     '<div class="guide-houses-grid">' + cards.join('') + '</div>' +
   '</section>';
 }
@@ -121,12 +122,12 @@ function renderStayNearby(block, ctx) {
 function renderCarHire(block, ctx) {
   const p = ctx.partners || {};
   if (!p.carHireUrl) return ''; // Partners page not filled in yet: hide the block
-  const heading = block.heading || p.carHireHeading || 'Hire a car';
+  const heading = block.heading || p.carHireHeading || 'Hire a Car';
   const text = block.text || p.carHireText || '';
-  const button = p.carHireButton || 'Compare cars';
+  const button = titleCase(p.carHireButton || 'Compare Cars');
   return '<aside class="guide-cta">' +
-    '<p class="guide-cta-eyebrow">Getting around</p>' +
-    '<p class="guide-cta-title">' + escapeHtml(heading) + '</p>' +
+    '<p class="guide-cta-eyebrow">Getting Around</p>' +
+    '<p class="guide-cta-title">' + escapeHtml(titleCase(heading)) + '</p>' +
     (text ? '<p class="guide-cta-text">' + escapeHtml(text) + '</p>' : '') +
     '<a class="guide-cta-btn" href="/go/car-hire-' + escapeHtml(ctx.slug) + '" target="_blank" rel="sponsored nofollow noopener">' +
       '<span>' + escapeHtml(button) + '</span>' +
@@ -180,8 +181,8 @@ function renderBlock(block, listContext) {
     return '<li>' + content + '</li>';
   }
 
-  if (style === 'h2') return '<h2>' + content + '</h2>';
-  if (style === 'h3') return '<h3>' + content + '</h3>';
+  if (style === 'h2') return '<h2>' + titleCaseHtml(content) + '</h2>';
+  if (style === 'h3') return '<h3>' + titleCaseHtml(content) + '</h3>';
   if (style === 'blockquote') return '<blockquote>' + content + '</blockquote>';
   return '<p>' + content + '</p>';
 }
@@ -282,7 +283,7 @@ module.exports = async function handler(req, res) {
       res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8').send(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8" /><title>Guide not found | Slow Casa</title><meta name="robots" content="noindex" /></head>
 <body style="font-family: system-ui, sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;">
-<h1>Guide not found</h1>
+<h1>Guide Not Found</h1>
 <p>We couldn't find what you were looking for. <a href="/magazine">Browse the Magazine</a> or <a href="/">return home</a>.</p>
 </body></html>`);
       return;
@@ -415,7 +416,7 @@ module.exports = async function handler(req, res) {
       relatedHtml += M.row({ title: houseTitle, href: guideIsland ? '/' + guideIsland : '/houses', linkLabel: 'All of ' + (islandLabel || 'the collection'), cards: houseCards });
     }
     const more = (guides || []).filter(g => g.slug !== slug && g.islandKey && g.islandKey === guideIsland).slice(0, 3);
-    relatedHtml += M.row({ title: 'More from ' + islandLabel, href: '/magazine?island=' + guideIsland, linkLabel: 'The magazine', cards: more.map(g => M.storyCard(g)) });
+    relatedHtml += M.row({ title: 'More from ' + islandLabel, href: '/magazine?island=' + guideIsland, linkLabel: 'The Magazine', cards: more.map(g => M.storyCard(g)) });
   } catch (e) { relatedHtml = ''; }
 
   const breadcrumb = {
@@ -662,7 +663,7 @@ module.exports = async function handler(req, res) {
 
   <header class="guide-header">
     <p class="guide-category">${crumbHtml || escapeHtml(sectionLabel)}</p>
-    <h1 class="guide-title">${escapeHtml(title)}</h1>
+    <h1 class="guide-title">${escapeHtml(titleCase(title))}</h1>
   </header>
 
   <article class="guide-body">
