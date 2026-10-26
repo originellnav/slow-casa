@@ -814,13 +814,13 @@
     }
     .home-hero-inner { position: relative; z-index: 1; width: 100%; max-width: 1100px; }
     .home-eyebrow {
-      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: inherit; opacity: 0.9; margin: 0 0 28px;
+      font-size: 16px; letter-spacing: 0.02em;
+      color: inherit; opacity: 0.92; margin: 0 0 22px;
     }
     .home-headline {
       font-family: var(--display); font-weight: 400; color: inherit;
-      font-size: clamp(36px, 5.4vw, 72px); line-height: 1.06; letter-spacing: 0.02em; text-transform: uppercase;
-      margin: 0 auto 44px; max-width: 17ch;
+      font-size: clamp(38px, 5.6vw, 76px); line-height: 1.05; letter-spacing: -0.01em;
+      margin: 0 auto 44px; max-width: 16ch;
     }
     .home-hero[data-tone="dark"] .home-headline,
     .home-hero[data-tone="dark"] .home-eyebrow { text-shadow: 0 1px 24px rgba(0,0,0,0.25); }
@@ -837,7 +837,7 @@
     .hero-search input::placeholder { color: #8a857b; }
     .hero-search button {
       border: 0; background: var(--black); color: #FDFCF8; padding: 0 28px; margin: 6px;
-      font: inherit; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer;
+      font: inherit; font-size: 15px; letter-spacing: 0.02em; cursor: pointer;
       transition: background 0.2s;
     }
     .hero-search button:hover { background: #2a2a28; }
@@ -850,10 +850,10 @@
       display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
       padding: 12px 20px; cursor: pointer; color: var(--black); font-size: 15px;
     }
-    .hero-search-list li span { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #8a857b; }
+    .hero-search-list li span { font-size: 13px; color: #8a857b; }
     .hero-search-list li[aria-selected="true"], .hero-search-list li:hover { background: #F1ECE2; }
     .home-hero-link {
-      display: inline-block; margin-top: 22px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+      display: inline-block; margin-top: 22px; font-size: 15px; letter-spacing: 0.01em;
       color: inherit; border-bottom: 1px solid currentColor; padding-bottom: 2px; opacity: 0.95;
     }
     .home-hero-link:hover { opacity: 0.7; }
