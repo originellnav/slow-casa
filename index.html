@@ -1392,9 +1392,9 @@
     var input = document.getElementById('hero-search-input');
     var list = document.getElementById('hero-search-list');
     var OPTIONS = [
-      { label: 'Mallorca', note: 'Island', href: '/mallorca', keys: 'mallorca majorca palma soller sóller deia deià' },
-      { label: 'Ibiza', note: 'Island', href: '/ibiza', keys: 'ibiza eivissa formentera' },
-      { label: 'Menorca', note: 'Island', href: '/menorca', keys: 'menorca minorca mahon mahón ciutadella' }
+      { label: 'Mallorca', href: '/mallorca', keys: 'mallorca majorca palma soller sóller deia deià' },
+      { label: 'Ibiza', href: '/ibiza', keys: 'ibiza eivissa formentera' },
+      { label: 'Menorca', href: '/menorca', keys: 'menorca minorca mahon mahón ciutadella' }
     ];
     var shown = [], active = -1;
     function norm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); }
@@ -1402,7 +1402,7 @@
       var q = norm(input.value);
       shown = OPTIONS.filter(function (o) { return !q || norm(o.label + ' ' + o.keys).indexOf(q) !== -1; });
       list.innerHTML = shown.map(function (o, i) {
-        return '<li role="option" id="hs-' + i + '" aria-selected="' + (i === active) + '">' + o.label + '<span>' + o.note + '</span></li>';
+        return '<li role="option" id="hs-' + i + '" aria-selected="' + (i === active) + '">' + o.label + (o.note ? '<span>' + o.note + '</span>' : '') + '</li>';
       }).join('');
       var open = shown.length > 0;
       list.hidden = !open;
