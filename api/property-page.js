@@ -1,6 +1,7 @@
 const { nav, footer } = require('../lib/nav');
 const { balearicIsland, gone } = require('../lib/scope');
 const { houseCard, placeOf } = require('../lib/card');
+const { icon } = require('../lib/icons');
 const { placeCategories, placeIslandName, placeLink, placeImages, placeSlug, islandOf } = require('../lib/magazine');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
@@ -335,19 +336,30 @@ module.exports = async function handler(req, res) {
 
   // ---- Key facts ----
   const facts = [
-    sleeps ? ['Max guests', sleeps] : null,
-    (bedrooms !== undefined && bedrooms !== null && bedrooms !== '') ? ['Bedrooms', bedrooms] : null,
-    (bathrooms !== undefined && bathrooms !== null && bathrooms !== '') ? ['Bathrooms', bathrooms] : null,
-    houseType ? ['Type', houseType] : null
+    sleeps ? ['guests', sleeps + ' guests'] : null,
+    (bedrooms !== undefined && bedrooms !== null && bedrooms !== '') ? ['bedrooms', bedrooms + (Number(bedrooms) === 1 ? ' bedroom' : ' bedrooms')] : null,
+    (bathrooms !== undefined && bathrooms !== null && bathrooms !== '') ? ['bathrooms', bathrooms + (Number(bathrooms) === 1 ? ' bathroom' : ' bathrooms')] : null,
+    houseType ? ['type', houseType] : null
   ].filter(Boolean);
   const factsHtml = facts.length ? `
-  <div class="pp-facts" style="--cols:${facts.length}">
-    ${facts.map(([k, v]) => `<div class="pp-fact"><p class="pp-fact-k">${escapeHtml(k)}</p><p class="pp-fact-v">${escapeHtml(String(v))}</p></div>`).join('')}
-  </div>` : '';
+  <ul class="pp-facts">
+    ${facts.map(([k, v]) => `<li>${icon(k, 22)}<span>${escapeHtml(String(v))}</span></li>`).join('')}
+  </ul>` : '';
 
   const featuresHtml = features.length ? `
-  <div class="pp-features">
-    ${features.map(t => `<div class="pp-feature">${escapeHtml(t)}</div>`).join('')}
+  <ul class="pp-features">
+    ${features.map(t => `<li>${icon(t, 26)}<span>${escapeHtml(t)}</span></li>`).join('')}
+  </ul>` : '';
+
+  // ---- Gallery: one big photo and four small, Boutique Homes style ----
+  // Uses every image on the record in order, so no sorting into rooms is needed.
+  const gal = allImgs.slice(0, 5);
+  const galCls = gal.length >= 5 ? 'pp-gal-5' : gal.length >= 3 ? 'pp-gal-3' : gal.length === 2 ? 'pp-gal-2' : 'pp-gal-1';
+  const galShown = galCls === 'pp-gal-3' ? gal.slice(0, 3) : gal;
+  const galleryHtml = galShown.length ? `
+  <div class="pp-gallery ${galCls}">
+    ${galShown.map((s, i) => `<button class="pp-gal-tile" type="button" data-i="${i}" aria-label="Open photo ${i + 1} of ${allImgs.length}">${img(s, i === 0 ? 1800 : 900, '', i === 0)}</button>`).join('')}
+    ${allImgs.length > 1 ? `<button class="pp-gal-all" type="button" data-i="0">${icon('grid', 16)}See All ${allImgs.length} Photos</button>` : ''}
   </div>` : '';
 
   // ---- Image grids ----
@@ -394,7 +406,7 @@ module.exports = async function handler(req, res) {
       <h2 class="pp-h2">${heading}</h2>
       <div class="pp-prose">${paras(text)}</div>
     </div>
-    ${grid(set)}
+    ${grid(set.slice(0, 3))}
   </section>` : '';
 
   const livingHtml   = story('Living Spaces', livingText, livingSet);
@@ -402,13 +414,21 @@ module.exports = async function handler(req, res) {
   const outdoorHtml  = story('The Environment', outdoorText, outdoorSet, 'pp-env');
 
   const viewAllHtml = allImgs.length > 1 ? `
-  <div class="pp-viewall-wrap"><button class="pp-btn" type="button" id="pp-viewall">View All Images</button></div>
   <div class="pp-lightbox" id="pp-lightbox" hidden>
     <button class="pp-lightbox-close" type="button" id="pp-lightbox-close" aria-label="Close">&times;</button>
     <div class="pp-lightbox-inner">
-      ${allImgs.map(s => `<figure>${img(s, 1800)}</figure>`).join('')}
+      ${allImgs.map((s, i) => `<figure id="pp-photo-${i}">${img(s, 1800)}</figure>`).join('')}
     </div>
   </div>` : '';
+
+  const bookHref = bookingUrl ? `/go/${encodeURIComponent(slugVal)}` : `/contact?topic=house-${encodeURIComponent(slugVal)}`;
+  const bookHtml = `
+  <aside class="pp-book">
+    <p class="pp-book-title">Book This House</p>
+    ${facts.length ? `<p class="pp-book-meta">${facts.filter(x => x[0] !== 'type').map(x => escapeHtml(String(x[1]))).join(' &middot; ')}</p>` : ''}
+    <a class="pp-book-btn" id="pp-book" href="${bookHref}"${bookingUrl ? ' target="_blank" rel="noopener"' : ''}>${bookingUrl ? 'Check Availability' : 'Ask About This House'} <span aria-hidden="true">&rarr;</span></a>
+    <p class="pp-book-note">${bookingUrl ? 'You book directly with the owner or the people who look after the house.' : 'Send us a message and we will put you in touch.'}</p>
+  </aside>`;
 
   const coords = getCoords(record);
   const locationHtml = (coords || locationText) ? `
@@ -528,19 +548,47 @@ module.exports = async function handler(req, res) {
     .pp figure img, .pp-hero-wrap figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .img-fallback { background: var(--grey-4); }
 
-    /* Hero */
-    /* Hero runs edge to edge with the same side gutter as the nav,
-       so its left edge lines up with the wordmark at every width. */
-    .pp-hero-wrap { padding: 0 var(--gutter); }
-    .pp-hero { aspect-ratio: 16 / 8.5; max-height: 86vh; width: 100%; }
+    /* Gallery: one big photo and four small. Grid cells crop, so photos that
+       are not wide enough for a full-width hero still look right. */
+    .pp-gallery { position: relative; display: grid; gap: 8px; padding: 0 48px; height: clamp(320px, 46vw, 640px); }
+    .pp-gal-5 { grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .pp-gal-5 .pp-gal-tile:first-child, .pp-gal-3 .pp-gal-tile:first-child { grid-row: 1 / span 2; }
+    .pp-gal-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
+    .pp-gal-2 { grid-template-columns: 1fr 1fr; }
+    .pp-gal-1 { grid-template-columns: 1fr; }
+    .pp-gal-tile { position: relative; display: block; padding: 0; border: 0; margin: 0; overflow: hidden; background: var(--grey-4); cursor: zoom-in; min-height: 0; }
+    .pp-gal-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease, opacity 0.3s; }
+    .pp-gal-tile:hover img { transform: scale(1.02); opacity: 0.94; }
+    .pp-gal-all {
+      position: absolute; right: 68px; bottom: 20px; display: inline-flex; align-items: center; gap: 10px;
+      background: #fff; color: var(--black); border: 1px solid var(--black); padding: 11px 16px;
+      font-family: var(--body); font-size: 14px; letter-spacing: 0.01em; cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .pp-gal-all:hover { background: var(--black); color: #fff; }
 
-    /* Title row */
-    .pp-titlebar { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; padding: 64px 0 88px; }
-    .pp-name { font-family: var(--body); font-weight: 400; font-size: 28px; letter-spacing: 0.01em; margin: 0 0 6px; line-height: 1.15; }
-    .pp-where { font-size: 15px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
-    .pp-editorial { font-family: var(--display); font-size: 21px; line-height: 1.35; margin: 22px 0 0; max-width: 32ch; }
-    .pp-actions { display: flex; align-items: center; gap: 28px; flex-shrink: 0; }
-    .pp-share { background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--body); font-size: 14px; letter-spacing: 0.01em; color: var(--black); }
+    /* Title, facts, features and intro on the left; booking card on the right */
+    .pp-top { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: clamp(40px, 6vw, 96px); align-items: start; padding-top: 64px; }
+    .pp-name { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 3.6vw, 48px); letter-spacing: 0.02em; margin: 0 0 10px; line-height: 1.1; }
+    .pp-where { font-size: 16px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
+    .pp-editorial { font-family: var(--display); font-size: 21px; line-height: 1.4; margin: 24px 0 0; max-width: 34ch; }
+    .pp-facts { list-style: none; margin: 36px 0 0; padding: 24px 0; display: flex; flex-wrap: wrap; gap: 14px 36px; border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
+    .pp-facts li { display: inline-flex; align-items: center; gap: 10px; font-size: 16px; letter-spacing: 0.01em; }
+    .pp-features { list-style: none; margin: 36px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .pp-features li { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; border: 1px solid var(--grey-3); padding: 22px 12px; font-size: 14px; letter-spacing: 0.01em; }
+    .ico { flex-shrink: 0; }
+    .pp-intro { margin-top: 56px; }
+
+    /* Booking card */
+    .pp-book { position: sticky; top: 112px; border: 1px solid var(--black); padding: 32px 28px; }
+    .pp-book-title { font-family: var(--display); font-size: 24px; letter-spacing: 0.01em; margin: 0 0 8px; }
+    .pp-book-meta { font-size: 14px; color: var(--grey-1); margin: 0 0 24px; letter-spacing: 0.01em; }
+    .pp-book-btn {
+      display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;
+      padding: 18px 20px; background: var(--black); color: #fff; border: 1px solid var(--black);
+      font-family: var(--body); font-size: 16px; letter-spacing: 0.01em; transition: background 0.2s, color 0.2s;
+    }
+    .pp-book-btn:hover { background: #fff; color: var(--black); }
+    .pp-book-note { font-size: 13px; line-height: 1.5; color: var(--grey-1); margin: 14px 0 0; }
     .pp-btn {
       display: inline-block; border: 1px solid var(--black); background: transparent; color: var(--black);
       padding: 17px 34px; font-family: var(--body); font-size: 14px; letter-spacing: 0.01em;
@@ -548,36 +596,19 @@ module.exports = async function handler(req, res) {
     }
     .pp-btn:hover { background: var(--black); color: #fff; }
 
-    /* Key facts + features, full-bleed rules */
-    .pp-band { border-top: 1px solid var(--grey-3); }
-    .pp-facts { display: grid; grid-template-columns: repeat(var(--cols), 1fr); padding: 0 var(--gutter); }
-    .pp-fact { text-align: center; padding: 30px 12px; }
-    .pp-fact-k { font-size: 11.5px; letter-spacing: 0.01em; margin: 0 0 14px; }
-    .pp-fact-v { font-size: 22px; margin: 0; }
-    .pp-features-band { border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
-    .pp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; padding: 26px var(--gutter); }
-    .pp-feature { border: 1px solid var(--grey-3); padding: 22px 12px; text-align: center; font-size: 14px; letter-spacing: 0.01em; }
-
     /* Shared section rhythm */
     .pp-section { padding-top: 150px; }
     .pp-h2 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 3.6vw, 52px); line-height: 1.05; margin: 0; letter-spacing: 0.01em; letter-spacing: 0.02em; }
     .pp-prose p { font-size: 17px; line-height: 1.75; margin: 0 0 16px; text-indent: 3.5em; }
     .pp-prose p:last-child { margin-bottom: 0; }
 
-    /* Intro: right column only */
-    .pp-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding-top: 170px; }
-    .pp-intro .pp-prose { grid-column: 2; }
-
-    /* Overview mosaic */
-    .pp-overview .pp-h2 { margin-bottom: 72px; }
 
     /* Story sections */
     .pp-split { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-bottom: 120px; }
 
     /* The environment */
 
-    /* View all */
-    .pp-viewall-wrap { text-align: center; padding-top: 110px; }
+    /* All photos */
     .pp-lightbox { position: fixed; inset: 0; background: #FFFFFF; z-index: 100; overflow-y: auto; }
     .pp-lightbox[hidden] { display: none; }
     .pp-lightbox-inner { max-width: 1100px; margin: 0 auto; padding: 80px 24px; display: grid; gap: 20px; }
@@ -616,12 +647,10 @@ module.exports = async function handler(req, res) {
     footer { margin-top: 140px; }
 
     @media (max-width: 900px) {
-      .pp-titlebar { flex-direction: column; padding: 40px 0 56px; }
-      .pp-facts { grid-template-columns: repeat(2, 1fr); }
-      .pp-features { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-      .pp-section, .pp-intro { padding-top: 90px; }
-      .pp-intro, .pp-split { grid-template-columns: 1fr; gap: 28px; }
-      .pp-intro .pp-prose { grid-column: 1; }
+      .pp-top { grid-template-columns: 1fr; gap: 40px; padding-top: 40px; }
+      .pp-book { position: static; }
+      .pp-section { padding-top: 90px; }
+      .pp-split { grid-template-columns: 1fr; gap: 28px; }
       .pp-split { margin-bottom: 48px; }
       .pp-loc-grid { grid-template-columns: 1fr; gap: 28px; }
       .pp-loc-nomap .pp-loc-text { grid-column: 1; }
@@ -632,10 +661,7 @@ module.exports = async function handler(req, res) {
       .pp-overview .pp-h2, .pp-location .pp-h2, .pp-recs-head { margin-bottom: 36px; }
     }
     @media (max-width: 560px) {
-      .pp-hero { aspect-ratio: 4 / 5; max-height: none; }
-      .pp-name { font-size: 23px; }
-      .pp-fact-v { font-size: 19px; }
-      .pp-features { grid-template-columns: 1fr; }
+      .pp-features { grid-template-columns: repeat(2, 1fr); }
       .pp-recs-grid, .prop-other-grid { grid-template-columns: 1fr; }
       .pp-prose p { text-indent: 2em; }
     }
@@ -678,8 +704,12 @@ module.exports = async function handler(req, res) {
 
       /* Phone gutters: must stay last so they win over the base rules. */
     @media (max-width: 768px) {
-      .pp-hero-wrap, .pp, .pp-facts { padding-left: 16px; padding-right: 16px; }
-      .pp-features { padding: 20px 16px; }
+      .pp { padding-left: 16px; padding-right: 16px; }
+      /* Phones: just the first photo, with the See All button on it */
+      .pp-gallery { padding: 0; height: auto; display: block; }
+      .pp-gal-tile { display: none; aspect-ratio: 4 / 3; width: 100%; }
+      .pp-gal-tile:first-child { display: block; }
+      .pp-gal-all { right: 16px; bottom: 16px; }
       .prop-other { padding-left: 16px; padding-right: 16px; }
       .pp-cta { left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); padding: 18px 20px; }
     }
@@ -690,28 +720,19 @@ module.exports = async function handler(req, res) {
   ${nav()}
 
   <main>
-    ${heroImage ? `<div class="pp-hero-wrap"><figure class="pp-hero">${img(heroImage, 2400, '', true)}</figure></div>` : ''}
+    ${galleryHtml}
     <div class="pp">
-
-      <div class="pp-titlebar">
-        <div>
+      <div class="pp-top">
+        <div class="pp-main">
           <h1 class="pp-name">${escapeHtml(name)}</h1>
           ${location ? `<p class="pp-where">${escapeHtml(location)}</p>` : ''}
           ${editorialTitle ? `<p class="pp-editorial">${escapeHtml(editorialTitle)}</p>` : ''}
+          ${factsHtml}
+          ${featuresHtml}
+          ${introText ? `<div class="pp-prose pp-intro">${paras(introText)}</div>` : ''}
         </div>
-        <div class="pp-actions">
-          <button class="pp-share" type="button" id="pp-share">Share</button>
-          ${bookingUrl ? `<a class="pp-btn" id="pp-book" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener">Book</a>` : ''}
-        </div>
+        ${bookHtml}
       </div>
-    </div>
-
-    ${factsHtml ? `<div class="pp-band">${factsHtml}</div>` : ''}
-    ${featuresHtml ? `<div class="pp-features-band">${featuresHtml}</div>` : (factsHtml ? '<div class="pp-band"></div>' : '')}
-
-    <div class="pp">
-      ${introText ? `<section class="pp-intro"><div class="pp-prose">${paras(introText)}</div></section>` : ''}
-      ${overviewHtml}
       ${livingHtml}
       ${bedroomsHtml}
       ${outdoorHtml}
@@ -729,8 +750,9 @@ ${footer()}
 
   <script>
   (function () {
-    // Floating CTA: shows once the Book button in the title bar has scrolled
-    // out of view, hides again while the footer is on screen.
+    // Floating CTA: shows whenever the booking card is off screen (on phones that
+    // is most of the page; on desktop the card is sticky, so rarely), and hides
+    // while the footer is on screen.
     var cta = document.getElementById('pp-cta');
     var book = document.getElementById('pp-book');
     var foot = document.querySelector('footer');
@@ -743,7 +765,7 @@ ${footer()}
         cta.tabIndex = on ? 0 : -1;
       };
       new IntersectionObserver(function (es) {
-        es.forEach(function (e) { pastBook = !e.isIntersecting && e.boundingClientRect.top < 0; });
+        es.forEach(function (e) { pastBook = !e.isIntersecting; });
         update();
       }).observe(book);
       if (foot) new IntersectionObserver(function (es) {
@@ -753,26 +775,18 @@ ${footer()}
     }
   })();
   (function () {
-    // Share: native sheet on phones, copy link elsewhere
-    var share = document.getElementById('pp-share');
-    if (share) share.addEventListener('click', function () {
-      var url = window.location.href;
-      if (navigator.share) { navigator.share({ title: document.title, url: url }).catch(function () {}); return; }
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(function () {
-          share.textContent = 'Link copied';
-          setTimeout(function () { share.textContent = 'Share'; }, 2000);
-        });
-      }
-    });
-
-    // View all images
-    var open = document.getElementById('pp-viewall');
+    // Gallery: any photo, or See All, opens every photo at that one
     var box = document.getElementById('pp-lightbox');
     var close = document.getElementById('pp-lightbox-close');
     function shut() { box.hidden = true; document.body.style.overflow = ''; }
-    if (open && box) {
-      open.addEventListener('click', function () { box.hidden = false; document.body.style.overflow = 'hidden'; });
+    if (box) {
+      document.querySelectorAll('.pp-gal-tile, .pp-gal-all').forEach(function (b) {
+        b.addEventListener('click', function () {
+          box.hidden = false; document.body.style.overflow = 'hidden';
+          var fig = document.getElementById('pp-photo-' + (b.getAttribute('data-i') || 0));
+          box.scrollTop = fig && b.classList.contains('pp-gal-tile') ? fig.offsetTop - 60 : 0;
+        });
+      });
       close.addEventListener('click', shut);
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) shut(); });
     }
