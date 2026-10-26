@@ -19,7 +19,7 @@ const LANDING = {
   title: 'Where to Stay, Eat and Swim in Mallorca, Ibiza & Menorca | Slow Casa',
   description: 'Village guides, restaurants, beaches and things to do in Mallorca, Ibiza and Menorca, chosen around the houses in the Slow Casa collection.',
   heading: 'Magazine',
-  intro: 'Where to stay, eat and swim in Mallorca, Ibiza and Menorca. Village guides, places we rate and the stories behind the houses.'
+  intro: 'Where to stay, eat and swim in Mallorca, Ibiza and Menorca. Village guides, places we love and the stories behind the houses.'
 };
 
 // Copy for the island hubs. {island} is swapped for the island name.
@@ -31,8 +31,8 @@ const HUB_COPY = {
   },
   'where-to-eat': {
     title: 'Where to Eat in {island} | Slow Casa',
-    description: 'The restaurants, cafés and bars we rate in {island}, close to the houses in the Slow Casa collection.',
-    intro: 'The restaurants, cafés and bars we rate in {island}, close to the houses in the collection.'
+    description: 'The restaurants, cafés and bars we love in {island}, close to the houses in the Slow Casa collection.',
+    intro: 'The restaurants, cafés and bars we love in {island}, close to the houses in the collection.'
   },
   'what-to-do': {
     title: 'Things to Do in {island} | Slow Casa',

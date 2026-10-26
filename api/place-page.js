@@ -106,7 +106,7 @@ module.exports = async function handler(req, res) {
   const metaTitle = `${name}${town ? ', ' + town : ''} | Slow Casa`;
   const metaDesc = text
     ? trim(text, 155)
-    : `${name}${where ? ' in ' + where : ''}: a place we rate, close to the houses in the Slow Casa collection.`;
+    : `${name}${where ? ' in ' + where : ''}: a place we love, close to the houses in the Slow Casa collection.`;
 
   // ---- Guides that mention this place (link to its website or to this page) ----
   let featuredHtml = '';

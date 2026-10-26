@@ -1,5 +1,5 @@
 // api/map.js
-// The Map: every place we rate in Mallorca, Ibiza and Menorca on one map.
+// The Map: every place we love in Mallorca, Ibiza and Menorca on one map.
 // Data: Airtable Places (published only; ?preview=1 also shows drafts, noindex).
 //
 // Design lives in three places, all in this file:
@@ -126,7 +126,7 @@ module.exports = async function handler(req, res) {
   }
 
   const title = 'The Map: Where to Eat, Drink and Go in Mallorca, Ibiza & Menorca | Slow Casa';
-  const desc = 'Every restaurant, winery, beach club and experience we rate across Mallorca, Ibiza and Menorca, on one map.';
+  const desc = 'Every restaurant, winery, beach club and experience we love across Mallorca, Ibiza and Menorca, on one map.';
   const config = {
     token: MAPBOX_TOKEN, style: MAP_STYLE, custom: CUSTOM_STYLE, palette: PALETTE,
     filters: FILTERS.map(f => ({ key: f.key, label: f.label })),
@@ -229,7 +229,7 @@ module.exports = async function handler(req, res) {
       <form class="mp-gate-box" id="mp-gate-form" novalidate>
         <p class="mp-gate-eyebrow">Free access</p>
         <h2 class="mp-gate-title">Open the map</h2>
-        <p class="mp-gate-text">Every restaurant, winery, beach club and experience we rate across Mallorca, Ibiza and Menorca. Add your email to open it.</p>
+        <p class="mp-gate-text">Every restaurant, winery, beach club and experience we love across Mallorca, Ibiza and Menorca. Add your email to open it.</p>
         <div class="mp-gate-form">
           <input type="email" id="mp-gate-email" placeholder="Your email address" autocomplete="email" required aria-label="Email address" />
           <button type="submit" id="mp-gate-btn">Open</button>
