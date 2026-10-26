@@ -856,16 +856,12 @@
 
     .home-collection { padding: 120px var(--gutter) 0; }
     .home-collection-head {
-      display: flex; align-items: flex-end; justify-content: space-between;
+      display: flex; align-items: baseline; justify-content: space-between;
       gap: 24px; margin-bottom: 40px;
     }
     .home-collection-head h2 {
       font-family: var(--body); font-weight: 400;
       font-size: clamp(28px, 3.3vw, 44px); line-height: 1.1; letter-spacing: 0.02em; margin: 0;
-    }
-    .home-collection-sub {
-      font-family: var(--body); font-size: 18px; line-height: 1.5; letter-spacing: 0.01em;
-      color: var(--grey-1); margin: 12px 0 0;
     }
     .home-collection-link {
       display: inline-flex; align-items: center; gap: 14px;
@@ -1049,10 +1045,7 @@
 
   <section class="home-collection">
     <div class="home-collection-head">
-      <div>
-        <h2>The collection</h2>
-        <p class="home-collection-sub">Handpicked houses on each of the three islands</p>
-      </div>
+      <h2>The collection</h2>
       <a class="home-collection-link" href="/houses"><span>See full collection (<span data-count="all">18</span>)</span><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></a>
     </div>
     <div class="island-grid">
