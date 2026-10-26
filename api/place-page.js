@@ -251,10 +251,10 @@ module.exports = async function handler(req, res) {
   </script>
   <style>
     .pl-header { max-width: 720px; margin: 0 auto; padding: 64px 48px 32px; text-align: center; }
-    .pl-crumbs { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #888; margin-bottom: 24px; }
+    .pl-crumbs { font-size: 14px; letter-spacing: 0.01em; color: #888; margin-bottom: 24px; }
     .pl-crumbs a:hover { color: #0f0f0f; }
-    .pl-title { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4.5vw, 52px); line-height: 1.1; text-transform: uppercase; letter-spacing: 0.02em; color: #0f0f0f; }
-    .pl-kicker { margin-top: 18px; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: #6f6a60; }
+    .pl-title { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4.5vw, 52px); line-height: 1.1; letter-spacing: 0.02em; color: #0f0f0f; }
+    .pl-kicker { margin-top: 18px; font-size: 14px; letter-spacing: 0.01em; color: #6f6a60; }
     .pl-body { max-width: 680px; margin: 0 auto; padding: 0 48px 24px; font-size: 18px; font-weight: 300; line-height: 1.7; color: #2a2a28; }
     .pl-body p { margin-bottom: 1.4em; }
     .pl-body a { color: #0f0f0f; border-bottom: 0.5px solid #888; }
@@ -262,18 +262,18 @@ module.exports = async function handler(req, res) {
     .pl-image { margin: 0 0 2.4em; }
     .pl-image img { width: 100%; height: auto; max-height: min(80vh, 760px); object-fit: cover; display: block; }
     .pl-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px; border-top: 1px solid #e4dfd4; border-bottom: 1px solid #e4dfd4; padding: 24px 0; margin: 0.4em 0 2.4em; }
-    .pl-detail-k { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #888; margin: 0 0 6px !important; }
+    .pl-detail-k { font-size: 14px; letter-spacing: 0.01em; color: #888; margin: 0 0 6px !important; }
     .pl-detail-v { font-size: 16px; margin: 0 !important; }
     .pl-homes { margin: 2.4em 0; }
-    .pl-homes h2 { font-family: var(--display); font-weight: 400; font-size: 19px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 0.9em; color: #0f0f0f; }
+    .pl-homes h2 { font-family: var(--display); font-weight: 400; font-size: 19px; letter-spacing: 0.01em; margin: 0 0 0.9em; color: #0f0f0f; }
     .pl-homes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 24px; }
     .pl-body .pl-homes a { border-bottom: 0; }
     .pl-homes .house-card-img { margin-bottom: 16px; }
     .pl-cta { margin: 2.4em 0; padding: 40px 36px; background: #F1ECE2; text-align: center; }
-    .pl-cta-eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #7a7466; margin: 0 0 0.9em !important; }
-    .pl-cta-title { font-family: var(--display); font-size: 24px; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; color: #0f0f0f; margin: 0 0 0.5em !important; }
+    .pl-cta-eyebrow { font-size: 14px; letter-spacing: 0.01em; color: #7a7466; margin: 0 0 0.9em !important; }
+    .pl-cta-title { font-family: var(--display); font-size: 24px; letter-spacing: 0.01em; line-height: 1.2; color: #0f0f0f; margin: 0 0 0.5em !important; }
     .pl-cta-text { margin: 0 auto 1.4em; max-width: 34em; }
-    .pl-body .pl-cta-btn { display: inline-flex; align-items: center; gap: 12px; padding: 15px 30px; background: #0f0f0f; color: #FDFCF8; border: 1px solid #0f0f0f; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.2s, color 0.2s; }
+    .pl-body .pl-cta-btn { display: inline-flex; align-items: center; gap: 12px; padding: 15px 30px; background: #0f0f0f; color: #FDFCF8; border: 1px solid #0f0f0f; font-size: 15px; letter-spacing: 0.01em; transition: background 0.2s, color 0.2s; }
     .pl-cta-btn svg { width: 8px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.5; }
     .pl-body .pl-cta-btn:hover { background: #FDFCF8; color: #0f0f0f; }
     @media (max-width: 768px) {

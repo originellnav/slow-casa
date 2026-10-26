@@ -156,14 +156,14 @@ module.exports = async function handler(req, res) {
   <style>
     :root { --mp-ivory: ${PALETTE.ivory}; --mp-sand: ${PALETTE.sand}; --mp-olive: ${PALETTE.olive}; --mp-ink: ${PALETTE.ink}; --mp-terra: ${PALETTE.terracotta}; }
     .mp-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding: 16px 48px; border-bottom: 1px solid var(--mp-sand); background: var(--mp-ivory); }
-    .mp-title { font-family: var(--display); font-weight: 400; font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mp-ink); margin: 0; }
+    .mp-title { font-family: var(--display); font-weight: 400; font-size: 15px; letter-spacing: 0.01em; color: var(--mp-ink); margin: 0; }
     .mp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .mp-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--mp-sand); background: transparent; color: var(--mp-ink); font: inherit; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+    .mp-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--mp-sand); background: transparent; color: var(--mp-ink); font: inherit; font-size: 14px; letter-spacing: 0.01em; cursor: pointer; }
     .mp-chip:hover { border-color: var(--mp-ink); }
     .mp-chip.on { background: var(--mp-ink); border-color: var(--mp-ink); color: var(--mp-ivory); }
     .mp-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; box-sizing: border-box; }
     .mp-isl { display: flex; gap: 18px; }
-    .mp-isl button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mp-olive); cursor: pointer; border-bottom: 1px solid transparent; }
+    .mp-isl button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 14px; letter-spacing: 0.01em; color: var(--mp-olive); cursor: pointer; border-bottom: 1px solid transparent; }
     .mp-isl button:hover, .mp-isl button.on { color: var(--mp-ink); border-bottom-color: var(--mp-ink); }
     .mp-wrap { position: relative; height: calc(100vh - 150px); min-height: 520px; background: var(--mp-ivory); }
     #mp-map { position: absolute; inset: 0; }
@@ -174,12 +174,12 @@ module.exports = async function handler(req, res) {
     .mp-gate { position: absolute; inset: 0; z-index: 10; display: none; align-items: center; justify-content: center; padding: 24px; background: rgba(246, 241, 232, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
     .mp-gated .mp-gate { display: flex; }
     .mp-gate-box { width: 100%; max-width: 440px; background: var(--mp-ivory); border: 1px solid var(--mp-olive); padding: 40px 36px 32px; text-align: center; color: var(--mp-ink); }
-    .mp-gate-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mp-olive); margin: 0 0 14px; }
-    .mp-gate-title { font-family: var(--display); font-weight: 400; font-size: 26px; line-height: 1.15; letter-spacing: 0.03em; text-transform: uppercase; margin: 0 0 12px; }
+    .mp-gate-eyebrow { font-size: 13px; letter-spacing: 0.01em; color: var(--mp-olive); margin: 0 0 14px; }
+    .mp-gate-title { font-family: var(--display); font-weight: 400; font-size: 26px; line-height: 1.15; letter-spacing: 0.03em; margin: 0 0 12px; }
     .mp-gate-text { font-size: 15px; font-weight: 300; line-height: 1.55; margin: 0 0 24px; }
     .mp-gate-form { display: flex; border: 1px solid var(--mp-ink); }
     .mp-gate-form input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 14px 16px; font: inherit; font-size: 15px; color: var(--mp-ink); outline: none; }
-    .mp-gate-form button { border: 0; background: var(--mp-ink); color: var(--mp-ivory); padding: 0 20px; font: inherit; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
+    .mp-gate-form button { border: 0; background: var(--mp-ink); color: var(--mp-ivory); padding: 0 20px; font: inherit; font-size: 14px; letter-spacing: 0.01em; cursor: pointer; }
     .mp-gate-form button:disabled { opacity: 0.6; cursor: default; }
     .mp-gate-note { font-size: 12px; color: var(--mp-olive); margin: 14px 0 0; min-height: 1em; }
     .mapboxgl-ctrl-group { border-radius: 0 !important; box-shadow: none !important; border: 1px solid var(--mp-sand); }
@@ -192,11 +192,11 @@ module.exports = async function handler(req, res) {
     .mp-card-img { aspect-ratio: 4 / 3; background: var(--mp-sand); overflow: hidden; }
     .mp-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .mp-card-body { padding: 20px 22px 18px; }
-    .mp-card-kicker { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mp-olive); margin: 0 0 8px; }
-    .mp-card-name { font-family: var(--display); font-weight: 400; font-size: 22px; line-height: 1.15; letter-spacing: 0.03em; text-transform: uppercase; margin: 0 0 10px; }
+    .mp-card-kicker { font-size: 13px; letter-spacing: 0.01em; color: var(--mp-olive); margin: 0 0 8px; }
+    .mp-card-name { font-family: var(--display); font-weight: 400; font-size: 22px; line-height: 1.15; letter-spacing: 0.03em; margin: 0 0 10px; }
     .mp-card-text { font-size: 14px; font-weight: 300; line-height: 1.55; margin: 0; }
     .mp-card-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--mp-olive); }
-    .mp-card-actions a { padding: 14px 10px; text-align: center; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mp-terra); }
+    .mp-card-actions a { padding: 14px 10px; text-align: center; font-size: 14px; letter-spacing: 0.01em; color: var(--mp-terra); }
     .mp-card-actions a + a { border-left: 1px solid var(--mp-olive); }
     .mp-card-actions a:hover { background: var(--mp-terra); color: var(--mp-ivory); }
     .mp-close { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--mp-ivory); color: var(--mp-ink); font-size: 20px; line-height: 32px; cursor: pointer; }
@@ -214,7 +214,7 @@ module.exports = async function handler(req, res) {
 <body>
   ${nav()}
   <div class="mp-bar">
-    <h1 class="mp-title">The Map</h1>
+    <h1 class="mp-title">The map</h1>
     <div class="mp-chips" role="group" aria-label="Filter places">
       <button class="mp-chip on" data-f="all">All</button>
       ${FILTERS.map(f => `<button class="mp-chip" data-f="${f.key}"><span class="mp-dot" style="background:${f.color};${f.stroke === PALETTE.ink ? 'border:1px solid ' + PALETTE.ink + ';' : ''}"></span>${esc(f.label)}</button>`).join('')}

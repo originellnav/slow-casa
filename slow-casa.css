@@ -42,15 +42,15 @@ button, input, select, textarea { font-family: inherit; }
 .card-img { width: 100%; aspect-ratio: 4/3; overflow: hidden; margin-bottom: 16px; background: var(--grey-4); }
 .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
 .card-img-placeholder { width: 100%; height: 100%; background: var(--grey-4); }
-.card-location { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 6px; }
+.card-location { font-size: 12px; letter-spacing: 0.01em; color: var(--grey-1); margin-bottom: 6px; }
 .card-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
 .card-detail { font-size: 13px; color: var(--grey-1); line-height: 1.5; margin-bottom: 12px; }
-.card-tag { display: inline-block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey-1); border: 0.5px solid var(--grey-3); padding: 4px 10px; }
+.card-tag { display: inline-block; font-size: 12px; letter-spacing: 0.01em; color: var(--grey-1); border: 0.5px solid var(--grey-3); padding: 4px 10px; }
 
 /* SECTION HEADERS — shared */
 .section { padding: 0 48px 80px; }
 .section-header { display: flex; justify-content: space-between; align-items: baseline; padding-top: 20px; margin-bottom: 40px; }
-.section-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); }
+.section-label { font-size: 13px; letter-spacing: 0.01em; color: var(--grey-1); }
 .section-link { font-size: 12px; color: var(--grey-1); cursor: pointer; transition: color 0.2s; }
 .section-link:hover { color: var(--black); }
 
@@ -134,10 +134,9 @@ button, input, select, textarea { font-family: inherit; }
 .menu-btn,
 .menu-close {
   font-family: var(--body);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: var(--black);
 }
 .site-nav-link:hover,
@@ -207,8 +206,7 @@ html.menu-open .site-menu {
   font-family: var(--body);
   font-size: 19px;
   font-weight: 400;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: var(--black);
 }
 .site-menu-contact {
@@ -219,8 +217,7 @@ html.menu-open .site-menu {
   text-align: center;
   font-family: var(--body);
   font-size: 15px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: var(--black);
   transition: background 0.2s, color 0.2s;
 }
@@ -260,13 +257,12 @@ html.menu-open .site-menu {
    Reading pages (a guide, About, Privacy) use a centred text column.
    ============================================ */
 .page-head { padding: 96px 48px 56px; }
-.page-crumb { font-family: var(--body); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey-1); margin: 0 0 24px; }
+.page-crumb { font-family: var(--body); font-size: 14px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0 0 24px; }
 .page-crumb a { color: var(--grey-1); }
 .page-crumb a:hover { color: var(--black); }
 .page-title {
   font-family: var(--display); font-weight: 400;
-  font-size: clamp(32px, 4vw, 56px); line-height: 1.08; letter-spacing: 0.02em;
-  text-transform: uppercase; margin: 0; max-width: 20ch; text-wrap: balance;
+  font-size: clamp(32px, 4vw, 56px); line-height: 1.08; letter-spacing: 0.02em; margin: 0; max-width: 20ch; text-wrap: balance;
 }
 .page-lede { font-family: var(--body); font-size: 18px; line-height: 1.6; color: var(--black); margin: 20px 0 0; max-width: 56ch; }
 .page-lede p { margin: 0 0 14px; }
@@ -281,10 +277,9 @@ html.menu-open .site-menu {
 .house-card:hover .house-card-img img { transform: scale(1.03); }
 .house-card-name {
   font-family: var(--display); font-weight: 400;
-  font-size: clamp(18px, 1.6vw, 23px); line-height: 1.2; letter-spacing: 0.04em;
-  text-transform: uppercase; margin: 0 0 8px;
+  font-size: clamp(18px, 1.6vw, 23px); line-height: 1.2; letter-spacing: 0.01em; margin: 0 0 8px;
 }
-.house-card-meta { font-family: var(--body); font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-1); margin: 0; }
+.house-card-meta { font-family: var(--body); font-size: 15px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
 .house-card-dot { font-size: 10px; margin: 0 8px; position: relative; top: -1px; }
 .house-card:focus-visible { outline: 1px solid var(--black); outline-offset: 6px; }
 
@@ -306,7 +301,7 @@ html.menu-open .site-menu {
 .site-footer {
   display: flex; align-items: center; justify-content: space-between; gap: 32px;
   padding: 40px 48px 44px; margin-top: 140px; border-top: 1px solid var(--grey-3);
-  font-family: var(--display); font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--black);
+  font-family: var(--display); font-size: 15px; letter-spacing: 0.01em; color: var(--black);
 }
 .site-footer .footer-copy { color: var(--grey-1); white-space: nowrap; }
 .footer-right { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; justify-content: flex-end; }
@@ -345,12 +340,11 @@ html.menu-open .site-menu {
 .mag-row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 56px; }
 .mag-row-head h2 {
   font-family: var(--display); font-weight: 400;
-  font-size: clamp(28px, 3.3vw, 48px); line-height: 1.1; letter-spacing: 0.02em;
-  text-transform: uppercase; margin: 0;
+  font-size: clamp(28px, 3.3vw, 48px); line-height: 1.1; letter-spacing: 0.02em; margin: 0;
 }
 .mag-row-link {
   display: inline-flex; align-items: center; gap: 14px; white-space: nowrap;
-  font-family: var(--body); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--black);
+  font-family: var(--body); font-size: 15px; letter-spacing: 0.01em; color: var(--black);
 }
 .mag-row-link svg { width: 9px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: transform 0.2s; }
 .mag-row-link:hover svg { transform: translateX(4px); }
@@ -362,7 +356,7 @@ html.menu-open .site-menu {
 .mag-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 32px 0 0; padding: 0; list-style: none; }
 .mag-chips a {
   display: inline-block; padding: 9px 18px; border: 1px solid var(--grey-2);
-  font-family: var(--body); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--black);
+  font-family: var(--body); font-size: 14px; letter-spacing: 0.01em; color: var(--black);
   transition: border-color 0.2s, background 0.2s, color 0.2s;
 }
 .mag-chips a:hover { border-color: var(--black); }
@@ -371,12 +365,12 @@ html.menu-open .site-menu {
 .mag-empty a { color: var(--black); text-decoration: underline; text-underline-offset: 4px; }
 .mag-grid { padding: 0 48px; }
 .mag-sublinks { display: flex; flex-wrap: wrap; gap: 28px; padding: 120px 48px 0; }
-.mag-sublinks a { font-family: var(--body); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--grey-2); padding-bottom: 3px; }
+.mag-sublinks a { font-family: var(--body); font-size: 15px; letter-spacing: 0.01em; border-bottom: 1px solid var(--grey-2); padding-bottom: 3px; }
 .mag-sublinks a:hover { border-color: var(--black); }
 
 /* Slide-out menu: the islands, set smaller under the main links */
 .site-menu-sub { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--grey-3); display: flex; flex-wrap: wrap; gap: 12px 28px; }
-.site-menu-sub a { font-family: var(--body); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--black); }
+.site-menu-sub a { font-family: var(--body); font-size: 15px; letter-spacing: 0.01em; color: var(--black); }
 .site-menu-sub a:hover { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
 
 @media (max-width: 768px) {
@@ -406,13 +400,13 @@ html.menu-open .site-menu {
 .mg-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
 a.mg-card:hover .mg-img img { transform: scale(1.03); }
 .mg-title {
-  font-family: var(--display); font-weight: 400; text-transform: uppercase; text-align: center;
+  font-family: var(--display); font-weight: 400; text-align: center;
   font-size: clamp(16px, 1.35vw, 19px); line-height: 1.2; letter-spacing: 0.03em;
   margin: 18px 4px 28px;
 }
 .mg-meta {
   margin: auto 0 0; display: flex; justify-content: space-between; gap: 12px;
-  font-family: var(--body); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey-1);
+  font-family: var(--body); font-size: 14px; letter-spacing: 0.01em; color: var(--grey-1);
 }
 .mg-card:focus-visible { outline: 1px solid var(--black); outline-offset: -6px; }
 .mag-chips + .mag-chips-islands { margin-top: 12px; }

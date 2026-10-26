@@ -143,7 +143,7 @@ module.exports = async function handler(req, res) {
   const otherHtml = `<nav class="mag-sublinks" aria-label="More">
     ${otherIslands.map(k => `<a href="/${k}">${escapeHtml(ISLANDS[k].name)}</a>`).join('')}
     <a href="/houses">All houses</a>
-    <a href="/magazine">The Magazine</a>
+    <a href="/magazine">The magazine</a>
   </nav>`;
 
   const introHtml = config.intro.map(p => `<p>${escapeHtml(p)}</p>`).join('');
@@ -208,13 +208,13 @@ module.exports = async function handler(req, res) {
   </script>
   <style>
     .isl-hero { max-width: 1200px; margin: 0 auto; padding: 48px 48px 0; }
-    .isl-crumb { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 24px; }
+    .isl-crumb { font-size: 13px; letter-spacing: 0.01em; color: var(--grey-1); margin-bottom: 24px; }
     .isl-crumb a { color: var(--grey-1); }
     .isl-crumb a:hover { color: var(--black); }
-    .isl-hero h1 { font-family: var(--display); font-size: 46px; line-height: 1.12; margin: 0 0 24px; max-width: 16ch; text-transform: uppercase; letter-spacing: 0.02em; }
+    .isl-hero h1 { font-family: var(--display); font-size: 46px; line-height: 1.12; margin: 0 0 24px; max-width: 16ch; letter-spacing: 0.02em; }
     .isl-intro { max-width: 62ch; }
     .isl-intro p { font-size: 16px; line-height: 1.65; color: var(--black); margin: 0 0 16px; }
-    .isl-count { font-family: var(--body); font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-1); margin: 40px 0 0; }
+    .isl-count { font-family: var(--body); font-size: 15px; letter-spacing: 0.01em; color: var(--grey-1); margin: 40px 0 0; }
     .isl-houses { padding-top: 0; padding-bottom: 0; }
     .isl-empty { font-size: 15px; color: var(--grey-1); }
     .isl-empty a { text-decoration: underline; }

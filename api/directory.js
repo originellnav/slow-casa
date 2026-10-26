@@ -338,9 +338,8 @@ module.exports = async function handler(req, res) {
       height: 100%;
       padding: 0 20px;
       font-family: var(--body);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.01em;
       background: var(--black);
       color: var(--white);
       border: none;
@@ -357,9 +356,8 @@ module.exports = async function handler(req, res) {
       top: 50%;
       transform: translateY(-50%);
       font-family: var(--body);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.01em;
       color: var(--grey-1);
       background: none;
       border: none;
@@ -385,9 +383,8 @@ module.exports = async function handler(req, res) {
     .search-dropdown.open { display: block; }
 
     .dropdown-label {
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.01em;
       color: var(--grey-1);
       padding: 12px 20px 6px;
     }
@@ -443,14 +440,14 @@ module.exports = async function handler(req, res) {
 
     .card-img { width: 100%; aspect-ratio: 3/2; overflow: hidden; margin-bottom: 20px; background: var(--grey-4); position: relative; }
     .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; top: 0; left: 0; transition: opacity 0.4s ease; }
-    .card-featured { position: absolute; top: 16px; left: 16px; font-family: var(--body); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--white); background: rgba(0,0,0,0.35); border: 0.5px solid rgba(255,255,255,0.5); padding: 5px 12px; z-index: 2; backdrop-filter: blur(4px); }
+    .card-featured { position: absolute; top: 16px; left: 16px; font-family: var(--body); font-size: 12px; letter-spacing: 0.01em; color: var(--white); background: rgba(0,0,0,0.35); border: 0.5px solid rgba(255,255,255,0.5); padding: 5px 12px; z-index: 2; backdrop-filter: blur(4px); }
     .card-img img.img-primary { opacity: 1; }
     .card-img-placeholder { width: 100%; height: 100%; background: var(--grey-4); }
 
-    .card-location { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 8px; }
-    .card-name { font-size: 18px; font-weight: 400; font-family: var(--display); margin-bottom: 6px; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.02em; }
+    .card-location { font-size: 12px; letter-spacing: 0.01em; color: var(--grey-1); margin-bottom: 8px; }
+    .card-name { font-size: 18px; font-weight: 400; font-family: var(--display); margin-bottom: 6px; line-height: 1.2; letter-spacing: 0.02em; }
     .card-detail { font-family: var(--body); font-size: 14px; font-weight: 300; color: var(--grey-1); line-height: 1.6; margin-bottom: 0; }
-    .card-tag { display: inline-block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey-1); border: 0.5px solid var(--grey-3); padding: 4px 10px; }
+    .card-tag { display: inline-block; font-size: 12px; letter-spacing: 0.01em; color: var(--grey-1); border: 0.5px solid var(--grey-3); padding: 4px 10px; }
 
     .loading { grid-column: 1 / -1; text-align: center; padding: 80px 48px; font-size: 13px; color: var(--grey-1); letter-spacing: 0.06em; }
     .no-results { grid-column: 1 / -1; text-align: center; padding: 80px 48px; }
@@ -525,9 +522,9 @@ module.exports = async function handler(req, res) {
     }
     .map-popup-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
     .map-popup-body { padding: 16px 18px 18px; }
-    .map-popup-location { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin-bottom: 6px; }
-    .map-popup-name { font-family: var(--display); font-size: 19px; line-height: 1.2; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.02em; }
-    .map-popup-link { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid var(--black); padding-bottom: 2px; }
+    .map-popup-location { font-size: 12px; letter-spacing: 0.01em; color: var(--grey-1); margin-bottom: 6px; }
+    .map-popup-name { font-family: var(--display); font-size: 19px; line-height: 1.2; margin-bottom: 12px; letter-spacing: 0.02em; }
+    .map-popup-link { font-size: 13px; letter-spacing: 0.01em; border-bottom: 1px solid var(--black); padding-bottom: 2px; }
     .map-popup-close {
       position: absolute; top: 10px; right: 10px; width: 26px; height: 26px;
       background: rgba(255,255,255,0.9); border: none; border-radius: 50%;
@@ -558,9 +555,8 @@ module.exports = async function handler(req, res) {
     .filter-pin { color: var(--black); display: flex; align-items: center; margin-right: 4px; }
     .chip {
       font-family: var(--body);
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-size: 14px;
+      letter-spacing: 0.01em;
       padding: 9px 15px;
       border: 1px solid var(--black);
       background: none;
@@ -884,7 +880,7 @@ module.exports = async function handler(req, res) {
               var popupImg = document.getElementById('map-popup-img');
               if (imgUrl) { popupImg.src = mapImage(imgUrl, 600); popupImg.style.display = 'block'; }
               else { popupImg.style.display = 'none'; }
-              document.getElementById('map-popup-location').textContent = (f['Location label'] || f['Region'] || f['Country'] || '').toUpperCase();
+              document.getElementById('map-popup-location').textContent = (f['Location label'] || f['Region'] || f['Country'] || '');
               document.getElementById('map-popup-name').textContent = f['Name'] || '';
               var isl = String(f['Island'] || '').trim().toLowerCase();
               document.getElementById('map-popup-link').href =
