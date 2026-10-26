@@ -791,40 +791,73 @@
   
     /* ---------- HOMEPAGE 2026 ---------- */
 
-    .home-hero { text-align: center; padding: 104px 48px 92px; max-width: 1100px; margin: 0 auto; }
+    /* Hero: full-bleed photo, text and search laid over it. */
+    .home-hero {
+      position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+      min-height: calc(100vh - 90px); min-height: calc(100svh - 90px); max-height: 900px;
+      padding: 96px 48px; text-align: center; background: #2c2f28; color: #fff;
+    }
+    .home-hero-img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+      transform-origin: center; animation: film-drift 26s ease-in-out infinite alternate;
+    }
+    @keyframes film-drift { from { transform: scale(1); } to { transform: scale(1.06); } }
+    @media (prefers-reduced-motion: reduce) { .home-hero-img { animation: none; } }
+    /* A soft shade behind the text so it stays readable on any photo */
+    .home-hero::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.16) 55%, rgba(0,0,0,0.08) 100%);
+    }
+    .home-hero[data-tone="light"] { color: var(--black); background: #EDE6D9; }
+    .home-hero[data-tone="light"]::after {
+      background: radial-gradient(ellipse at center, rgba(253,252,248,0.55) 0%, rgba(253,252,248,0.2) 60%, rgba(253,252,248,0) 100%);
+    }
+    .home-hero-inner { position: relative; z-index: 1; width: 100%; max-width: 1100px; }
     .home-eyebrow {
-      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--black); opacity: 0.6; margin: 0 0 34px;
+      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: inherit; opacity: 0.9; margin: 0 0 28px;
     }
     .home-headline {
-      font-family: var(--display); font-weight: 400;
-      font-size: clamp(38px, 5.6vw, 76px); line-height: 1.06; letter-spacing: -0.005em;
-      margin: 0 auto 46px; max-width: 17ch; text-transform: uppercase; letter-spacing: 0.02em; }
-    .home-cta {
-      display: inline-block; border: 1px solid var(--black); padding: 17px 34px;
-      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--black); transition: background 0.2s, color 0.2s;
+      font-family: var(--display); font-weight: 400; color: inherit;
+      font-size: clamp(36px, 5.4vw, 72px); line-height: 1.06; letter-spacing: 0.02em; text-transform: uppercase;
+      margin: 0 auto 44px; max-width: 17ch;
     }
-    .home-cta:hover { background: var(--black); color: #fff; }
+    .home-hero[data-tone="dark"] .home-headline,
+    .home-hero[data-tone="dark"] .home-eyebrow { text-shadow: 0 1px 24px rgba(0,0,0,0.25); }
 
-    /* Homepage sections share the nav's 48px gutter (16px on phones), no width cap, so every edge lines up. */
-    .home-film { padding: 0 48px; }
-    .home-film-frame {
-      width: 100%; aspect-ratio: 16 / 9; max-height: 86vh; overflow: hidden;
-      background: var(--grey-4); display: block;
+    /* Search box: type and pick an island */
+    .hero-search {
+      position: relative; display: flex; max-width: 560px; margin: 0 auto;
+      background: #FDFCF8; border: 1px solid #FDFCF8; text-align: left;
     }
-    .home-film-still {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-      transform-origin: center;
-      animation: film-drift 26s ease-in-out infinite alternate;
+    .hero-search input {
+      flex: 1; min-width: 0; border: 0; background: transparent; outline: none;
+      padding: 18px 20px; font: inherit; font-size: 15px; letter-spacing: 0.02em; color: var(--black);
     }
-    @keyframes film-drift {
-      from { transform: scale(1); }
-      to   { transform: scale(1.06); }
+    .hero-search input::placeholder { color: #8a857b; }
+    .hero-search button {
+      border: 0; background: var(--black); color: #FDFCF8; padding: 0 28px; margin: 6px;
+      font: inherit; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer;
+      transition: background 0.2s;
     }
-    @media (prefers-reduced-motion: reduce) {
-      .home-film-still { animation: none; }
+    .hero-search button:hover { background: #2a2a28; }
+    .hero-search-list {
+      position: absolute; top: 100%; left: -1px; right: -1px; margin: 0; padding: 6px 0; list-style: none;
+      background: #FDFCF8; border: 1px solid #e4dfd4; border-top: 0; z-index: 3;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
     }
+    .hero-search-list li {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+      padding: 12px 20px; cursor: pointer; color: var(--black); font-size: 15px;
+    }
+    .hero-search-list li span { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #8a857b; }
+    .hero-search-list li[aria-selected="true"], .hero-search-list li:hover { background: #F1ECE2; }
+    .home-hero-link {
+      display: inline-block; margin-top: 22px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: inherit; border-bottom: 1px solid currentColor; padding-bottom: 2px; opacity: 0.95;
+    }
+    .home-hero-link:hover { opacity: 0.7; }
+    .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
     .home-intro { padding: 120px 48px 0; }
     .home-intro p {
@@ -869,10 +902,11 @@
     }
 
     @media (max-width: 768px) {
-      .home-hero { padding: 56px 16px 52px; }
+      .home-hero { min-height: calc(100svh - 72px); padding: 72px 16px; }
+      .hero-search input { padding: 16px; font-size: 16px; }
+      .hero-search button { padding: 0 18px; }
       .home-headline { font-size: clamp(30px, 8.5vw, 44px); max-width: none; }
       .home-eyebrow { margin-bottom: 22px; }
-      .home-film { padding: 0 16px; }
       .home-intro { padding: 56px 16px 0; }
       .home-intro p { font-size: 16px; }
       .home-collection { padding: 64px 16px 0; }
@@ -986,17 +1020,27 @@
   </aside>
   <script src="/menu.js" defer></script>
 
-  <header class="home-hero">
-    <p class="home-eyebrow">Vacation homes for design lovers</p>
-    <h1 class="home-headline">The best houses to rent in Mallorca, Ibiza and Menorca</h1>
-    <a class="home-cta" href="/houses">Explore collection (<span data-count="all">18</span>)</a>
-  </header>
-
-  <section class="home-film">
-    <div class="home-film-frame">
-      <img class="home-film-still" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_16:9,g_auto,w_2400,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg" alt="Mallorca" loading="lazy" />
+  <!-- Hero: full-bleed photo with the headline and search laid over it.
+       data-tone="dark" = dark photo, white text. Use data-tone="light" for a light photo (black text). -->
+  <header class="home-hero" data-tone="dark">
+    <img class="home-hero-img" src="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_16:9,g_auto,w_2400,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg"
+      srcset="https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_4:5,g_auto,w_900,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg 900w,
+              https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_16:9,g_auto,w_1600,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg 1600w,
+              https://res.cloudinary.com/dw1wmo2go/image/upload/c_fill,ar_16:9,g_auto,w_2400,q_auto,f_auto/v1791362967/mallorca_homepage_hero_placeholder_wxixn6.jpg 2400w"
+      sizes="100vw" alt="Mallorca" fetchpriority="high" />
+    <div class="home-hero-inner">
+      <p class="home-eyebrow">Vacation homes for design lovers</p>
+      <h1 class="home-headline">The best houses to rent in Mallorca, Ibiza and Menorca</h1>
+      <form class="hero-search" id="hero-search" role="search" autocomplete="off">
+        <label class="visually-hidden" for="hero-search-input">Where to?</label>
+        <input id="hero-search-input" type="text" placeholder="Where to? Mallorca, Ibiza or Menorca"
+          role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="hero-search-list" />
+        <button type="submit">Search</button>
+        <ul class="hero-search-list" id="hero-search-list" role="listbox" hidden></ul>
+      </form>
+      <a class="home-hero-link" href="/houses">Or browse all <span data-count="all">24</span> houses</a>
     </div>
-  </section>
+  </header>
 
   <section class="home-intro">
     <p>Slow Casa is a handpicked collection of vacation homes in Mallorca, Ibiza and Menorca. Each property is chosen for people who care about good design and want to be close to nature. Most are located by the sea or in the countryside, rebuilt with care, with room to cook, swim, read and do very little.</p>
@@ -1350,6 +1394,52 @@
       }, { rootMargin: '400px 0px' });
       io.observe(frame);
     } else { load(); }
+  })();
+  </script>
+  <script>
+  // Hero search: type and pick an island. Arrow keys move, Enter goes.
+  (function () {
+    var form = document.getElementById('hero-search');
+    if (!form) return;
+    var input = document.getElementById('hero-search-input');
+    var list = document.getElementById('hero-search-list');
+    var OPTIONS = [
+      { label: 'Mallorca', note: 'Island', href: '/mallorca', keys: 'mallorca majorca palma soller sóller deia deià' },
+      { label: 'Ibiza', note: 'Island', href: '/ibiza', keys: 'ibiza eivissa formentera' },
+      { label: 'Menorca', note: 'Island', href: '/menorca', keys: 'menorca minorca mahon mahón ciutadella' },
+      { label: 'All three islands', note: 'Every house', href: '/houses', keys: 'all balearics balearic islands every' }
+    ];
+    var shown = [], active = -1;
+    function norm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); }
+    function render() {
+      var q = norm(input.value);
+      shown = OPTIONS.filter(function (o) { return !q || norm(o.label + ' ' + o.keys).indexOf(q) !== -1; });
+      list.innerHTML = shown.map(function (o, i) {
+        return '<li role="option" id="hs-' + i + '" aria-selected="' + (i === active) + '">' + o.label + '<span>' + o.note + '</span></li>';
+      }).join('');
+      var open = shown.length > 0;
+      list.hidden = !open;
+      input.setAttribute('aria-expanded', open ? 'true' : 'false');
+      input.setAttribute('aria-activedescendant', active >= 0 ? 'hs-' + active : '');
+    }
+    function go(o) { if (o) window.location.href = o.href; }
+    input.addEventListener('focus', function () { active = -1; render(); });
+    input.addEventListener('input', function () { active = 0; render(); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(active + 1, shown.length - 1); render(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(active - 1, 0); render(); }
+      else if (e.key === 'Escape') { list.hidden = true; input.setAttribute('aria-expanded', 'false'); }
+    });
+    list.addEventListener('mousedown', function (e) {
+      var li = e.target.closest('li'); if (!li) return;
+      e.preventDefault(); go(shown[Array.prototype.indexOf.call(list.children, li)]);
+    });
+    document.addEventListener('click', function (e) { if (!form.contains(e.target)) { list.hidden = true; input.setAttribute('aria-expanded', 'false'); } });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      // Enter or Search: the highlighted option, else the first match, else every house.
+      go(shown[active] || shown[0] || OPTIONS[3]);
+    });
   })();
   </script>
 </body>
