@@ -313,10 +313,9 @@ module.exports = async function handler(req, res) {
     }
     .arch-eyebrow {
       font-family: var(--body);
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
+      letter-spacing: 0.01em;
       color: #888;
       margin-bottom: 24px;
     }
@@ -326,7 +325,7 @@ module.exports = async function handler(req, res) {
       line-height: 1.0;
       letter-spacing: -0.02em;
       color: #0f0f0f;
-      margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.02em; }
+      margin-bottom: 24px; letter-spacing: 0.02em; }
     .arch-meta {
       font-family: var(--body);
       font-size: 15px;
@@ -386,10 +385,9 @@ module.exports = async function handler(req, res) {
     }
     .arch-section-label {
       font-family: var(--body);
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
+      letter-spacing: 0.01em;
       color: #0f0f0f;
       margin-bottom: 36px;
       text-align: center;
@@ -429,7 +427,7 @@ module.exports = async function handler(req, res) {
       font-size: clamp(32px, 4vw, 44px);
       font-weight: 400;
       line-height: 1.1;
-      color: #0f0f0f; text-transform: uppercase; letter-spacing: 0.02em; }
+      color: #0f0f0f; letter-spacing: 0.02em; }
     .arch-properties-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -455,9 +453,8 @@ module.exports = async function handler(req, res) {
     }
     .prop-card:hover .prop-card-img img { transform: scale(1.03); }
     .prop-card-location {
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.01em;
       color: #888;
       margin-bottom: 6px;
     }
@@ -466,7 +463,7 @@ module.exports = async function handler(req, res) {
       font-size: 18px;
       font-weight: 400;
       line-height: 1.2;
-      color: #0f0f0f; text-transform: uppercase; letter-spacing: 0.02em; }
+      color: #0f0f0f; letter-spacing: 0.02em; }
 
     .arch-empty-properties {
       text-align: center;

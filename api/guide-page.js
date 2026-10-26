@@ -415,7 +415,7 @@ module.exports = async function handler(req, res) {
       relatedHtml += M.row({ title: houseTitle, href: guideIsland ? '/' + guideIsland : '/houses', linkLabel: 'All of ' + (islandLabel || 'the collection'), cards: houseCards });
     }
     const more = (guides || []).filter(g => g.slug !== slug && g.islandKey && g.islandKey === guideIsland).slice(0, 3);
-    relatedHtml += M.row({ title: 'More from ' + islandLabel, href: '/magazine?island=' + guideIsland, linkLabel: 'The Magazine', cards: more.map(g => M.storyCard(g)) });
+    relatedHtml += M.row({ title: 'More from ' + islandLabel, href: '/magazine?island=' + guideIsland, linkLabel: 'The magazine', cards: more.map(g => M.storyCard(g)) });
   } catch (e) { relatedHtml = ''; }
 
   const breadcrumb = {
@@ -528,9 +528,8 @@ module.exports = async function handler(req, res) {
     }
     .guide-category a:hover { color: #0f0f0f; }
     .guide-category {
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-size: 14px;
+      letter-spacing: 0.01em;
       color: #888;
       margin-bottom: 24px;
     }
@@ -539,7 +538,7 @@ module.exports = async function handler(req, res) {
       font-size: clamp(32px, 4.5vw, 52px);
       line-height: 1.1;
       letter-spacing: -0.01em;
-      color: #0f0f0f; text-transform: uppercase; letter-spacing: 0.02em; }
+      color: #0f0f0f; letter-spacing: 0.02em; }
 
     .guide-body {
       max-width: 680px;
@@ -557,14 +556,13 @@ module.exports = async function handler(req, res) {
       font-size: clamp(24px, 2.8vw, 32px);
       margin: 2em 0 0.8em;
       line-height: 1.2;
-      color: #0f0f0f; text-transform: uppercase; letter-spacing: 0.02em; }
+      color: #0f0f0f; letter-spacing: 0.02em; }
     /* Sub-headings (h3): same type as h2, one step down, e.g. "Homes to rent", "Hotels to book" */
     .guide-body h3 {
       font-family: var(--display);
       font-weight: 400;
       font-size: 19px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      letter-spacing: 0.01em;
       line-height: 1.3;
       margin: 2em 0 0.9em;
       color: #0f0f0f;
@@ -603,18 +601,18 @@ module.exports = async function handler(req, res) {
       margin: 2.8em 0; padding: 40px 36px; background: #F1ECE2; text-align: center;
     }
     .guide-cta-eyebrow {
-      font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+      font-size: 14px; letter-spacing: 0.01em;
       color: #7a7466; margin: 0 0 0.9em;
     }
     .guide-cta-title {
-      font-family: var(--display); font-size: 24px; text-transform: uppercase;
-      letter-spacing: 0.04em; line-height: 1.2; color: #0f0f0f; margin: 0 0 0.5em;
+      font-family: var(--display); font-size: 24px;
+      letter-spacing: 0.01em; line-height: 1.2; color: #0f0f0f; margin: 0 0 0.5em;
     }
     .guide-cta-text { margin: 0 auto 1.4em; max-width: 34em; }
     .guide-body .guide-cta-btn {
       display: inline-flex; align-items: center; gap: 12px;
       padding: 15px 30px; background: #0f0f0f; color: #FDFCF8; border: 1px solid #0f0f0f;
-      font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 400;
+      font-size: 15px; letter-spacing: 0.01em; font-weight: 400;
       transition: background 0.2s, color 0.2s;
     }
     .guide-cta-btn svg { width: 8px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.5; transition: transform 0.2s; }

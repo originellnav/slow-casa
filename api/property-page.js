@@ -310,7 +310,7 @@ module.exports = async function handler(req, res) {
   const recsHtml = places.length ? `
   <section class="pp-section pp-recs">
     <div class="pp-recs-head">
-      <h2 class="pp-h2">Neighbourhood Recs</h2>
+      <h2 class="pp-h2">Neighbourhood recs</h2>
       ${ownerName ? `<p class="pp-recs-from">From ${escapeHtml(ownerName)}</p>` : ''}
     </div>
     <div class="pp-recs-grid">
@@ -536,14 +536,14 @@ module.exports = async function handler(req, res) {
 
     /* Title row */
     .pp-titlebar { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; padding: 64px 0 88px; }
-    .pp-name { font-family: var(--body); font-weight: 400; font-size: 28px; letter-spacing: 0.04em; text-transform: uppercase; margin: 0 0 6px; line-height: 1.15; }
-    .pp-where { font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-1); margin: 0; }
+    .pp-name { font-family: var(--body); font-weight: 400; font-size: 28px; letter-spacing: 0.01em; margin: 0 0 6px; line-height: 1.15; }
+    .pp-where { font-size: 15px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
     .pp-editorial { font-family: var(--display); font-size: 21px; line-height: 1.35; margin: 22px 0 0; max-width: 32ch; }
     .pp-actions { display: flex; align-items: center; gap: 28px; flex-shrink: 0; }
-    .pp-share { background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--body); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); }
+    .pp-share { background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--body); font-size: 14px; letter-spacing: 0.01em; color: var(--black); }
     .pp-btn {
       display: inline-block; border: 1px solid var(--black); background: transparent; color: var(--black);
-      padding: 17px 34px; font-family: var(--body); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 17px 34px; font-family: var(--body); font-size: 14px; letter-spacing: 0.01em;
       cursor: pointer; transition: background 0.2s, color 0.2s;
     }
     .pp-btn:hover { background: var(--black); color: #fff; }
@@ -552,15 +552,15 @@ module.exports = async function handler(req, res) {
     .pp-band { border-top: 1px solid var(--grey-3); }
     .pp-facts { display: grid; grid-template-columns: repeat(var(--cols), 1fr); padding: 0 48px; }
     .pp-fact { text-align: center; padding: 30px 12px; }
-    .pp-fact-k { font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 14px; }
+    .pp-fact-k { font-size: 11.5px; letter-spacing: 0.01em; margin: 0 0 14px; }
     .pp-fact-v { font-size: 22px; margin: 0; }
     .pp-features-band { border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
     .pp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; padding: 26px 48px; }
-    .pp-feature { border: 1px solid var(--grey-3); padding: 22px 12px; text-align: center; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .pp-feature { border: 1px solid var(--grey-3); padding: 22px 12px; text-align: center; font-size: 14px; letter-spacing: 0.01em; }
 
     /* Shared section rhythm */
     .pp-section { padding-top: 150px; }
-    .pp-h2 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 3.6vw, 52px); line-height: 1.05; margin: 0; text-transform: uppercase; letter-spacing: 0.01em; text-transform: uppercase; letter-spacing: 0.02em; }
+    .pp-h2 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 3.6vw, 52px); line-height: 1.05; margin: 0; letter-spacing: 0.01em; letter-spacing: 0.02em; }
     .pp-prose p { font-size: 17px; line-height: 1.75; margin: 0 0 16px; text-indent: 3.5em; }
     .pp-prose p:last-child { margin-bottom: 0; }
 
@@ -596,20 +596,20 @@ module.exports = async function handler(req, res) {
 
     /* Neighbourhood recs */
     .pp-recs-head { margin-bottom: 72px; }
-    .pp-recs-from { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-1); margin: 14px 0 0; }
+    .pp-recs-from { font-size: 14px; letter-spacing: 0.01em; color: var(--grey-1); margin: 14px 0 0; }
     .pp-recs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 72px; }
     .pp-rec { display: block; color: inherit; }
     .pp-rec-img { aspect-ratio: 1 / 1; overflow: hidden; background: var(--grey-4); margin-bottom: 26px; }
     .pp-rec-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
     a.pp-rec:hover .pp-rec-img img { transform: scale(1.03); }
-    .pp-rec-name { font-family: var(--body); font-weight: 400; font-size: 22px; letter-spacing: 0.05em; text-transform: uppercase; margin: 0 0 10px; }
-    .pp-rec-sub { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-1); margin: 0; }
+    .pp-rec-name { font-family: var(--body); font-weight: 400; font-size: 22px; letter-spacing: 0.01em; margin: 0 0 10px; }
+    .pp-rec-sub { font-size: 14px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
     .pp-dot { margin: 0 8px; font-size: 10px; }
 
     /* Nearby houses */
     .prop-other { padding: 150px 48px 0; }
     .prop-other-header { margin-bottom: 56px; }
-    .prop-other-title { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 3vw, 40px); text-transform: uppercase; margin: 0; text-transform: uppercase; letter-spacing: 0.02em; }
+    .prop-other-title { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 3vw, 40px); margin: 0; letter-spacing: 0.02em; }
     .prop-other-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px 32px; }
     .prop-other-grid > a { display: block; color: inherit; }
     .prop-other-grid > a:hover .card-img img { transform: scale(1.03); }
@@ -665,8 +665,8 @@ module.exports = async function handler(req, res) {
       position: fixed; right: 48px; bottom: calc(32px + env(safe-area-inset-bottom, 0px)); z-index: 800;
       display: inline-flex; align-items: center; justify-content: center; gap: 14px;
       padding: 20px 32px; background: var(--black); color: #FDFCF8;
-      font-family: var(--body); font-size: 14px; font-weight: 400;
-      letter-spacing: 0.08em; text-transform: uppercase;
+      font-family: var(--body); font-size: 15px; font-weight: 400;
+      letter-spacing: 0.01em;
       box-shadow: 0 6px 24px rgba(15, 15, 15, 0.18);
       opacity: 0; transform: translateY(16px); pointer-events: none;
       transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
