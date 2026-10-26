@@ -255,6 +255,7 @@ module.exports = async function handler(req, res) {
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <script src="/map-style.js"></script>
   <script>
+    var mpLoaded = Date.now();
   (function () {
     var C = ${JSON.stringify(config).replace(/</g, '\\u003c')};
     var P = C.palette;
@@ -311,7 +312,7 @@ module.exports = async function handler(req, res) {
       var email = (input.value || '').trim();
       if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) { note.textContent = 'Please enter a valid email address.'; input.focus(); return; }
       btn.disabled = true; btn.textContent = '…';
-      fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, source: 'map' }) })
+      fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, source: 'map', t: Date.now() - mpLoaded }) })
         .catch(function () {})
         .then(function () {
           // Open the map even if the signup call fails: never lock a reader out.

@@ -3,6 +3,7 @@
 (function () {
   // Footer newsletter sign-up (on every page).
   var form = document.querySelector('.footer-signup');
+  var pageLoaded = Date.now();
   if (form) {
     var input = form.querySelector('input');
     var msg = form.querySelector('.footer-signup-msg');
@@ -16,7 +17,7 @@
       fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email })
+        body: JSON.stringify({ email: email, source: 'footer', t: Date.now() - pageLoaded })
       }).then(function (r) {
         if (!r.ok) throw new Error('failed');
         form.classList.add('is-done');
