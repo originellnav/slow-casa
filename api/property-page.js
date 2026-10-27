@@ -278,8 +278,11 @@ module.exports = async function handler(req, res) {
   const legacySet   = getAllImageUrls(record).slice(1);
   const overviewImgs = hasSections ? overviewSet : legacySet;
 
+  // Photos come from one field: Gallery Images (one URL per line). Hero Image,
+  // if set, goes first. The older room fields are still read so nothing on
+  // existing houses disappears, but new houses only need Gallery Images.
   const allImgs = [];
-  [heroImage].concat(overviewImgs, livingSet, bedroomsSet, outdoorSet).forEach(u => {
+  [heroImage].concat(legacySet, overviewSet, livingSet, bedroomsSet, outdoorSet).forEach(u => {
     if (u && allImgs.indexOf(u) === -1) allImgs.push(u);
   });
 
@@ -289,36 +292,50 @@ module.exports = async function handler(req, res) {
   const paras = (txt) => String(txt || '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
     .map(p => `<p>${escapeHtml(p)}</p>`).join('');
 
-  // ---- Neighbourhood recs: linked Places ----
+  // ---- Neighbourhood recs ----
+  // Places linked to this house in Airtable come first. The rest of the three
+  // slots fill automatically with the nearest published places (with a photo)
+  // within 25 km, so every house gets recs without any linking.
   let places = [];
+  let anyLinked = false;
   try {
     const allPlaces = await getAllPlaces();
-    places = allPlaces.filter(p => {
+    const live = allPlaces.filter(p => {
       const pf = p.fields || {};
-      const linked = pf['Properties'];
-      const isLinked = Array.isArray(linked) && linked.indexOf(record.id) !== -1;
-      const status = String(pf['Status'] || '').toLowerCase();
-      return isLinked && status !== 'draft' && pf['Name'];
+      return pf['Name'] && String(pf['Status'] || '').toLowerCase() !== 'draft';
     });
+    const linked = live.filter(p => Array.isArray(p.fields['Properties']) && p.fields['Properties'].indexOf(record.id) !== -1);
+    const catOrder = ['Eat', 'Drink', 'Stay', 'Swim', 'Play', 'See', 'Do'];
+    linked.sort((a, b) => {
+      const ra = catOrder.indexOf(placeCategories(a.fields)[0] || ''); const rb = catOrder.indexOf(placeCategories(b.fields)[0] || '');
+      return (ra === -1 ? 99 : ra) - (rb === -1 ? 99 : rb);
+    });
+    anyLinked = linked.length > 0;
+    places = linked.slice(0, 3);
+    const here = getCoords(record);
+    if (here && places.length < 3) {
+      const near = live
+        .filter(p => places.indexOf(p) === -1 && getPlaceImageUrl(p))
+        .map(p => { const c = getCoords(p); return c ? { p, km: haversineKm(here.lat, here.lon, c.lat, c.lon) } : null; })
+        .filter(x => x && x.km <= 25)
+        .sort((a, b) => a.km - b.km)
+        .slice(0, 3 - places.length);
+      near.forEach(x => { x.p._km = x.km; places.push(x.p); });
+    }
   } catch (e) { places = []; }
-
-  const catOrder = ['Eat', 'Drink', 'Stay', 'Swim', 'Play', 'See', 'Do'];
-  places.sort((a, b) => {
-    const ra = catOrder.indexOf(placeCategories(a.fields)[0] || ''); const rb = catOrder.indexOf(placeCategories(b.fields)[0] || '');
-    return (ra === -1 ? 99 : ra) - (rb === -1 ? 99 : rb);
-  });
 
   const recsHtml = places.length ? `
   <section class="pp-section pp-recs">
     <div class="pp-recs-head">
       <h2 class="pp-h2">Neighbourhood Recs</h2>
-      ${ownerName ? `<p class="pp-recs-from">From ${escapeHtml(ownerName)}</p>` : ''}
+      ${ownerName && anyLinked ? `<p class="pp-recs-from">From ${escapeHtml(ownerName)}</p>` : ''}
     </div>
     <div class="pp-recs-grid">
       ${places.map(p => {
         const pf = p.fields || {};
         const pName = pf['Name'] || '';
-        const sub = [placeCategories(pf)[0], String(pf['Town'] || '').trim() || placeIslandName(pf)].filter(Boolean).map(escapeHtml).join(' <span class="pp-dot">&bull;</span> ');
+        const away = typeof p._km === 'number' ? (p._km < 1 ? 'Under 1 km away' : Math.round(p._km) + ' km away') : '';
+        const sub = [placeCategories(pf)[0], String(pf['Town'] || '').trim() || placeIslandName(pf), away].filter(Boolean).map(escapeHtml).join(' <span class="pp-dot">&bull;</span> ');
         // Each rec opens its place page on Slow Casa (island from the place, else this house).
         const pIsland = islandOf(placeIslandName(pf)) || islandOf(region);
         const link = pIsland && placeSlug(pf) ? '/' + pIsland + '/places/' + placeSlug(pf) : '';
@@ -402,15 +419,16 @@ module.exports = async function handler(req, res) {
   // ---- The full story: opens in a panel with Story and Photos tabs ----
   // Room text and room photos are optional. Whatever a house has is used;
   // a house with only photos and an intro simply has no story button.
-  const chapter = (heading, text, set) => (text || set.length) ? `
+  // The story is text only, like a short blog post; every photo follows at the end.
+  const chapter = (heading, text) => text ? `
       <section class="pps-ch">
         <h3>${heading}</h3>
-        ${text ? `<div class="pps-text">${paras(text)}</div>` : ''}
-        ${set.length ? `<div class="pps-imgs pps-n${Math.min(set.length, 3)}">${set.map(s2 => `<figure>${img(s2, 1400)}</figure>`).join('')}</div>` : ''}
+        <div class="pps-text">${paras(text)}</div>
       </section>` : '';
-  const chaptersHtml = chapter('Living Spaces', livingText, livingSet)
-    + chapter('Bedrooms &amp; Bathrooms', bedroomsText, bedroomsSet)
-    + chapter('The Environment', outdoorText, outdoorSet);
+  const chaptersHtml = chapter('Living Spaces', livingText)
+    + chapter('Bedrooms &amp; Bathrooms', bedroomsText)
+    + chapter('The Environment', outdoorText)
+    + chapter('The Location', locationText);
   const hasStory = !!chaptersHtml.trim();
 
   const panelHtml = (hasStory || allImgs.length > 1) ? `
@@ -427,6 +445,10 @@ module.exports = async function handler(req, res) {
       <h2 class="pps-title">${escapeHtml(editorialTitle || name)}</h2>
       ${introText ? `<div class="pps-text pps-lead">${paras(introText)}</div>` : ''}
       ${chaptersHtml}
+      ${allImgs.length ? `<h3 class="pps-photos-title">Photos</h3>` : ''}
+    </div>
+    <div class="pp-lb-pane ppp pps-photos" data-pane="story">
+      ${allImgs.map(s2 => `<figure>${img(s2, 1600)}</figure>`).join('')}
     </div>` : ''}
     <div class="pp-lb-pane ppp" data-pane="photos">
       ${allImgs.map((s2, i) => `<figure id="pp-photo-${i}">${img(s2, 1600)}</figure>`).join('')}
@@ -439,7 +461,7 @@ module.exports = async function handler(req, res) {
     <p class="pp-book-title">Book This House</p>
     ${facts.length ? `<p class="pp-book-meta">${facts.filter(x => x[0] !== 'type').map(x => escapeHtml(String(x[1]))).join(' &middot; ')}</p>` : ''}
     <a class="pp-book-btn" id="pp-book" href="${bookHref}"${bookingUrl ? ' target="_blank" rel="noopener"' : ''}>${bookingUrl ? 'Check Availability' : 'Ask About This House'} <span aria-hidden="true">&rarr;</span></a>
-    <p class="pp-book-note">${bookingUrl ? 'You book directly with the owner or the people who look after the house.' : 'Send us a message and we will put you in touch.'}</p>
+    <p class="pp-book-note">${bookingUrl ? 'You book directly with the home owner to secure the best rates.' : 'Send us a message and we will put you in touch.'}</p>
   </aside>`;
 
   const coords = getCoords(record);
@@ -447,14 +469,16 @@ module.exports = async function handler(req, res) {
   <section class="pp-section pp-location">
     <h2 class="pp-h2">The Location</h2>
     <div class="pp-loc-grid${coords ? '' : ' pp-loc-nomap'}">
-      ${coords ? `<div class="pp-map" id="pp-map"></div>` : ''}
-      <div class="pp-prose pp-loc-text">${paras(locationText)}</div>
+      ${coords ? `<div class="pp-map">
+        <iframe title="Map of ${escapeHtml(name)}" src="https://www.google.com/maps?q=${coords.lat},${coords.lon}&z=12&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>` : ''}
+      <div class="pp-loc-text">
+        ${paras(locationText)}
+        ${coords ? `<a class="pp-btn pp-gmaps" href="https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lon}" target="_blank" rel="noopener">Open in Google Maps</a>` : ''}
+      </div>
     </div>
   </section>` : '';
 
-  const mapData = coords
-    ? JSON.stringify({ lat: coords.lat, lon: coords.lon }).replace(/</g, '\\u003c')
-    : 'null';
 
   // SEO
   const title = `${name}${location ? ' — ' + location : ''} | Slow Casa`;
@@ -634,7 +658,7 @@ module.exports = async function handler(req, res) {
     .pp-lightbox-close { position: absolute; right: 24px; top: 16px; width: 40px; height: 40px; border-radius: 50%; background: var(--black); color: #fff; border: 0; font-size: 24px; line-height: 40px; cursor: pointer; }
     .pp-lb-pane[hidden] { display: none; }
     /* Story: a magazine-style read */
-    .pps { max-width: 760px; margin: 0 auto; padding: 72px 24px 120px; }
+    .pps { max-width: 760px; margin: 0 auto; padding: 72px 24px 48px; }
     .pps-title { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4vw, 52px); line-height: 1.12; letter-spacing: 0.01em; text-align: center; margin: 0 0 56px; }
     .pps-text p { font-size: 18px; line-height: 1.75; margin: 0 0 18px; }
     .pps-lead p { font-size: 21px; line-height: 1.65; }
@@ -660,12 +684,16 @@ module.exports = async function handler(req, res) {
 
     /* Location */
     .pp-location .pp-h2 { margin-bottom: 72px; }
-    .pp-loc-grid { display: grid; grid-template-columns: 2.6fr 1fr; gap: 56px; align-items: end; }
+    .pp-loc-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: clamp(40px, 5vw, 80px); align-items: center; }
     .pp-loc-grid.pp-loc-nomap { grid-template-columns: 1fr 1fr; }
     .pp-loc-nomap .pp-loc-text { grid-column: 2; }
-    .pp-map { aspect-ratio: 16 / 11; background: var(--grey-4); border: 1px solid var(--grey-3); }
-    .pp-loc-text p { font-size: 16px; text-indent: 0; text-align: center; }
-    .pp-marker { width: 22px; height: 22px; background: var(--black); transform: rotate(45deg); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+    .pp-map { aspect-ratio: 16 / 11; background: var(--grey-4); border: 1px solid var(--black); overflow: hidden; }
+    .pp-map iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .pp-loc-text { text-align: center; }
+    .pp-loc-text p { font-family: var(--display); font-size: clamp(19px, 1.7vw, 24px); line-height: 1.55; margin: 0 0 18px; }
+    .pp-gmaps { margin-top: 12px; }
+    .pps-photos-title { font-family: var(--display); font-weight: 400; font-size: 28px; letter-spacing: 0.01em; margin: 96px 0 0; text-align: center; }
+    .pps-photos { padding-top: 32px; }
 
     /* Neighbourhood recs */
     .pp-recs-head { margin-bottom: 72px; }
@@ -696,7 +724,7 @@ module.exports = async function handler(req, res) {
       .pp-split { margin-bottom: 48px; }
       .pp-loc-grid { grid-template-columns: 1fr; gap: 28px; }
       .pp-loc-nomap .pp-loc-text { grid-column: 1; }
-      .pp-loc-text p { text-align: left; }
+      .pp-loc-text { text-align: left; }
       .pp-recs-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
       .prop-other { padding-top: 90px; }
       .prop-other-grid { grid-template-columns: 1fr 1fr; gap: 32px 20px; }
@@ -845,37 +873,6 @@ ${footer()}
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) shut(); });
     }
 
-    // Location map, loaded only when it scrolls near the viewport
-    var HOUSE = ${mapData};
-    var el = document.getElementById('pp-map');
-    if (!HOUSE || !el) return;
-    var TOKEN = 'pk.eyJ1IjoibHVrZXJ5YSIsImEiOiJjbG96cmZ3OTMwMHRyMmlzNHc1bTZkZzI4In0.8Pmo8eeUh48QHBpzqHwNuQ';
-    var STYLE = 'mapbox://styles/lukerya/cmoime20s006m01r68jvia13j';
-    var started = false;
-    function start() {
-      if (started) return; started = true;
-      var css = document.createElement('link');
-      css.rel = 'stylesheet'; css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css';
-      document.head.appendChild(css);
-      var s = document.createElement('script');
-      s.src = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js';
-      s.onload = function () {
-        try {
-          mapboxgl.accessToken = TOKEN;
-          var map = new mapboxgl.Map({ container: 'pp-map', style: STYLE, center: [HOUSE.lon, HOUSE.lat], zoom: 8.6, attributionControl: true, cooperativeGestures: true });
-          map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
-          var m = document.createElement('div'); m.className = 'pp-marker';
-          new mapboxgl.Marker({ element: m }).setLngLat([HOUSE.lon, HOUSE.lat]).addTo(map);
-        } catch (e) { console.error('map error', e); }
-      };
-      document.head.appendChild(s);
-    }
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
-        if (entries.some(function (e) { return e.isIntersecting; })) { start(); io.disconnect(); }
-      }, { rootMargin: '400px' });
-      io.observe(el);
-    } else { start(); }
   })();
   </script>
 </body>
