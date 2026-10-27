@@ -1,3 +1,4 @@
+const { normaliseProperty } = require('../lib/props');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 
 module.exports = async function handler(req, res) {
@@ -62,11 +63,11 @@ module.exports = async function handler(req, res) {
         let offset = null;
         let attempts = 0;
         do {
-          let url = 'https://api.airtable.com/v0/appndrnWrdlgxRJAG/Properties?fields[]=Slug&fields[]=Date+added&fields[]=Island&pageSize=100';
+          let url = 'https://api.airtable.com/v0/appndrnWrdlgxRJAG/Properties?pageSize=100';
           if (offset) url += '&offset=' + encodeURIComponent(offset);
           const r = await fetch(url, { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } });
           const data = await r.json();
-          recs = recs.concat(data.records || []);
+          recs = recs.concat((data.records || []).map(normaliseProperty));
           offset = data.offset;
           attempts++;
         } while (offset && attempts < 10);

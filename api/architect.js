@@ -1,5 +1,6 @@
 const { nav, footer } = require('../lib/nav');
 const { architectInScope, balearicIsland, gone } = require('../lib/scope');
+const { normaliseProperty } = require('../lib/props');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const ARCHITECTS_TABLE = 'Architects';
@@ -41,7 +42,7 @@ async function getAllProperties() {
     });
     if (!response.ok) throw new Error('Airtable properties fetch failed: ' + response.status);
     const data = await response.json();
-    allRecords = allRecords.concat(data.records || []);
+    allRecords = allRecords.concat((data.records || []).map(normaliseProperty));
     offset = data.offset;
     attempts++;
   } while (offset && attempts < 10);
