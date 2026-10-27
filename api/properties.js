@@ -1,20 +1,13 @@
+const { normaliseProperty } = require('../lib/props');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 
-// Fields read by the homepage grid and the /houses map.
-// Requesting a field that no longer exists in Airtable makes the whole
-// request fail, so this list must match the table.
+// Fields read by the homepage grid and the /houses map. The request asks for
+// every field (so deleting a column in Airtable can never break it), then each
+// record is filled in by lib/props.js and trimmed to these before sending.
 const FIELDS = [
-  'Name',
-  'Slug',
-  'Location label',
-  'Island',
-  'Town',
-  'Hero Image',
-  'Gallery Images',
-  'Latitude',
-  'Longitude',
-  'Date added'
+  'Name', 'Slug', 'Location label', 'Island', 'Town',
+  'Hero Image', 'Gallery Images', 'Latitude', 'Longitude', 'Date added'
 ];
 
 // Balearic houses only. Island is the single switch, same as everywhere else.
@@ -22,15 +15,16 @@ const FILTER = "LEN({Island} & '') > 0";
 
 const HOMEPAGE_LIMIT = 12;
 
-function buildUrl(extra) {
-  const params = [];
-  for (const f of FIELDS) params.push('fields%5B%5D=' + encodeURIComponent(f));
-  params.push('filterByFormula=' + encodeURIComponent(FILTER));
-  params.push('sort%5B0%5D%5Bfield%5D=' + encodeURIComponent('Date added'));
-  params.push('sort%5B0%5D%5Bdirection%5D=desc');
-  params.push('pageSize=100');
-  for (const p of (extra || [])) params.push(p);
+function buildUrl(offset) {
+  const params = ['filterByFormula=' + encodeURIComponent(FILTER), 'pageSize=100'];
+  if (offset) params.push('offset=' + encodeURIComponent(offset));
   return `https://api.airtable.com/v0/${BASE_ID}/Properties?` + params.join('&');
+}
+
+function slim(rec) {
+  const out = {};
+  FIELDS.forEach(k => { if (rec.fields[k] !== undefined && rec.fields[k] !== '') out[k] = rec.fields[k]; });
+  return { id: rec.id, createdTime: rec.createdTime, fields: out };
 }
 
 async function airtableGet(url) {
@@ -53,23 +47,20 @@ module.exports = async function handler(req, res) {
   const wantAll = !!(req.query && req.query.all);
 
   try {
-    if (!wantAll) {
-      const data = await airtableGet(buildUrl(['maxRecords=' + HOMEPAGE_LIMIT]));
-      return res.status(200).json({ records: data.records || [] });
-    }
-
     let records = [];
     let offset = null;
     let attempts = 0;
     do {
-      const extra = offset ? ['offset=' + encodeURIComponent(offset)] : [];
-      const data = await airtableGet(buildUrl(extra));
-      records = records.concat(data.records || []);
+      const data = await airtableGet(buildUrl(offset));
+      records = records.concat((data.records || []).map(normaliseProperty));
       offset = data.offset;
       attempts++;
     } while (offset && attempts < 10);
 
-    return res.status(200).json({ records });
+    // Newest first (Date added, else when the row was created in Airtable).
+    records.sort((a, b) => String(b.fields['Date added'] || '').localeCompare(String(a.fields['Date added'] || '')));
+    if (!wantAll) records = records.slice(0, HOMEPAGE_LIMIT);
+    return res.status(200).json({ records: records.map(slim) });
   } catch (e) {
     console.error('properties fetch failed:', e && e.message);
     return res.status(502).json({ records: [], error: 'Upstream fetch failed' });

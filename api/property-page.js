@@ -4,6 +4,7 @@ const { houseCard, placeOf } = require('../lib/card');
 const { icon } = require('../lib/icons');
 const { placeCategories, placeIslandName, placeLink, placeImages, placeSlug, islandOf } = require('../lib/magazine');
 const { fetchUrl } = require('../lib/img');
+const { normaliseProperty } = require('../lib/props');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const PROPERTIES_TABLE = 'Properties';
@@ -50,7 +51,7 @@ async function getAllProperties() {
     });
     if (!response.ok) throw new Error('Airtable fetch failed: ' + response.status);
     const data = await response.json();
-    allRecords = allRecords.concat(data.records || []);
+    allRecords = allRecords.concat((data.records || []).map(normaliseProperty));
     offset = data.offset;
     attempts++;
   } while (offset && attempts < 10);

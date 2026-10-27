@@ -1,6 +1,7 @@
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
 const { fetchUrl } = require('../lib/img');
+const { normaliseProperty } = require('../lib/props');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 
@@ -22,7 +23,7 @@ async function fetchAllPropertiesFromAirtable() {
     });
     if (!response.ok) throw new Error('Airtable fetch failed: ' + response.status);
     const data = await response.json();
-    allRecords = allRecords.concat(data.records || []);
+    allRecords = allRecords.concat((data.records || []).map(normaliseProperty));
     offset = data.offset;
     attempts++;
   } while (offset && attempts < 10);
