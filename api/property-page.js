@@ -1,6 +1,7 @@
 const { nav, footer } = require('../lib/nav');
 const { balearicIsland, gone } = require('../lib/scope');
 const { houseCard, placeOf } = require('../lib/card');
+const { icon } = require('../lib/icons');
 const { placeCategories, placeIslandName, placeLink, placeImages, placeSlug, islandOf } = require('../lib/magazine');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
@@ -277,8 +278,11 @@ module.exports = async function handler(req, res) {
   const legacySet   = getAllImageUrls(record).slice(1);
   const overviewImgs = hasSections ? overviewSet : legacySet;
 
+  // Photos come from one field: Gallery Images (one URL per line). Hero Image,
+  // if set, goes first. The older room fields are still read so nothing on
+  // existing houses disappears, but new houses only need Gallery Images.
   const allImgs = [];
-  [heroImage].concat(overviewImgs, livingSet, bedroomsSet, outdoorSet).forEach(u => {
+  [heroImage].concat(legacySet, overviewSet, livingSet, bedroomsSet, outdoorSet).forEach(u => {
     if (u && allImgs.indexOf(u) === -1) allImgs.push(u);
   });
 
@@ -288,36 +292,50 @@ module.exports = async function handler(req, res) {
   const paras = (txt) => String(txt || '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
     .map(p => `<p>${escapeHtml(p)}</p>`).join('');
 
-  // ---- Neighbourhood recs: linked Places ----
+  // ---- Neighbourhood recs ----
+  // Places linked to this house in Airtable come first. The rest of the three
+  // slots fill automatically with the nearest published places (with a photo)
+  // within 25 km, so every house gets recs without any linking.
   let places = [];
+  let anyLinked = false;
   try {
     const allPlaces = await getAllPlaces();
-    places = allPlaces.filter(p => {
+    const live = allPlaces.filter(p => {
       const pf = p.fields || {};
-      const linked = pf['Properties'];
-      const isLinked = Array.isArray(linked) && linked.indexOf(record.id) !== -1;
-      const status = String(pf['Status'] || '').toLowerCase();
-      return isLinked && status !== 'draft' && pf['Name'];
+      return pf['Name'] && String(pf['Status'] || '').toLowerCase() !== 'draft';
     });
+    const linked = live.filter(p => Array.isArray(p.fields['Properties']) && p.fields['Properties'].indexOf(record.id) !== -1);
+    const catOrder = ['Eat', 'Drink', 'Stay', 'Swim', 'Play', 'See', 'Do'];
+    linked.sort((a, b) => {
+      const ra = catOrder.indexOf(placeCategories(a.fields)[0] || ''); const rb = catOrder.indexOf(placeCategories(b.fields)[0] || '');
+      return (ra === -1 ? 99 : ra) - (rb === -1 ? 99 : rb);
+    });
+    anyLinked = linked.length > 0;
+    places = linked.slice(0, 3);
+    const here = getCoords(record);
+    if (here && places.length < 3) {
+      const near = live
+        .filter(p => places.indexOf(p) === -1 && getPlaceImageUrl(p))
+        .map(p => { const c = getCoords(p); return c ? { p, km: haversineKm(here.lat, here.lon, c.lat, c.lon) } : null; })
+        .filter(x => x && x.km <= 25)
+        .sort((a, b) => a.km - b.km)
+        .slice(0, 3 - places.length);
+      near.forEach(x => { x.p._km = x.km; places.push(x.p); });
+    }
   } catch (e) { places = []; }
-
-  const catOrder = ['Eat', 'Drink', 'Stay', 'Swim', 'Play', 'See', 'Do'];
-  places.sort((a, b) => {
-    const ra = catOrder.indexOf(placeCategories(a.fields)[0] || ''); const rb = catOrder.indexOf(placeCategories(b.fields)[0] || '');
-    return (ra === -1 ? 99 : ra) - (rb === -1 ? 99 : rb);
-  });
 
   const recsHtml = places.length ? `
   <section class="pp-section pp-recs">
     <div class="pp-recs-head">
       <h2 class="pp-h2">Neighbourhood Recs</h2>
-      ${ownerName ? `<p class="pp-recs-from">From ${escapeHtml(ownerName)}</p>` : ''}
+      ${ownerName && anyLinked ? `<p class="pp-recs-from">From ${escapeHtml(ownerName)}</p>` : ''}
     </div>
     <div class="pp-recs-grid">
       ${places.map(p => {
         const pf = p.fields || {};
         const pName = pf['Name'] || '';
-        const sub = [placeCategories(pf)[0], String(pf['Town'] || '').trim() || placeIslandName(pf)].filter(Boolean).map(escapeHtml).join(' <span class="pp-dot">&bull;</span> ');
+        const away = typeof p._km === 'number' ? (p._km < 1 ? 'Under 1 km away' : Math.round(p._km) + ' km away') : '';
+        const sub = [placeCategories(pf)[0], String(pf['Town'] || '').trim() || placeIslandName(pf), away].filter(Boolean).map(escapeHtml).join(' <span class="pp-dot">&bull;</span> ');
         // Each rec opens its place page on Slow Casa (island from the place, else this house).
         const pIsland = islandOf(placeIslandName(pf)) || islandOf(region);
         const link = pIsland && placeSlug(pf) ? '/' + pIsland + '/places/' + placeSlug(pf) : '';
@@ -335,19 +353,30 @@ module.exports = async function handler(req, res) {
 
   // ---- Key facts ----
   const facts = [
-    sleeps ? ['Max guests', sleeps] : null,
-    (bedrooms !== undefined && bedrooms !== null && bedrooms !== '') ? ['Bedrooms', bedrooms] : null,
-    (bathrooms !== undefined && bathrooms !== null && bathrooms !== '') ? ['Bathrooms', bathrooms] : null,
-    houseType ? ['Type', houseType] : null
+    sleeps ? ['guests', sleeps + ' guests'] : null,
+    (bedrooms !== undefined && bedrooms !== null && bedrooms !== '') ? ['bedrooms', bedrooms + (Number(bedrooms) === 1 ? ' bedroom' : ' bedrooms')] : null,
+    (bathrooms !== undefined && bathrooms !== null && bathrooms !== '') ? ['bathrooms', bathrooms + (Number(bathrooms) === 1 ? ' bathroom' : ' bathrooms')] : null,
+    houseType ? ['type', houseType] : null
   ].filter(Boolean);
   const factsHtml = facts.length ? `
-  <div class="pp-facts" style="--cols:${facts.length}">
-    ${facts.map(([k, v]) => `<div class="pp-fact"><p class="pp-fact-k">${escapeHtml(k)}</p><p class="pp-fact-v">${escapeHtml(String(v))}</p></div>`).join('')}
-  </div>` : '';
+  <ul class="pp-facts">
+    ${facts.map(([k, v]) => `<li>${icon(k, 22)}<span>${escapeHtml(String(v))}</span></li>`).join('')}
+  </ul>` : '';
 
   const featuresHtml = features.length ? `
-  <div class="pp-features">
-    ${features.map(t => `<div class="pp-feature">${escapeHtml(t)}</div>`).join('')}
+  <ul class="pp-features">
+    ${features.map(t => `<li>${icon(t, 26)}<span>${escapeHtml(t)}</span></li>`).join('')}
+  </ul>` : '';
+
+  // ---- Gallery: one big photo and four small, Boutique Homes style ----
+  // Uses every image on the record in order, so no sorting into rooms is needed.
+  const gal = allImgs.slice(0, 5);
+  const galCls = gal.length >= 5 ? 'pp-gal-5' : gal.length >= 3 ? 'pp-gal-3' : gal.length === 2 ? 'pp-gal-2' : 'pp-gal-1';
+  const galShown = galCls === 'pp-gal-3' ? gal.slice(0, 3) : gal;
+  const galleryHtml = galShown.length ? `
+  <div class="pp-gallery ${galCls}">
+    ${galShown.map((s, i) => `<button class="pp-gal-tile" type="button" data-open="photos" data-i="${i}" aria-label="Open photo ${i + 1} of ${allImgs.length}">${img(s, i === 0 ? 1800 : 900, '', i === 0)}</button>`).join('')}
+    ${allImgs.length > 1 ? `<button class="pp-gal-all" type="button" data-open="photos">${icon('grid', 16)}See All ${allImgs.length} Photos</button>` : ''}
   </div>` : '';
 
   // ---- Image grids ----
@@ -387,42 +416,69 @@ module.exports = async function handler(req, res) {
     ${grid(overviewImgs)}
   </section>` : '';
 
-  // ---- Story sections: heading left, paragraph right, grid below ----
-  const story = (heading, text, set, cls) => (text || set.length) ? `
-  <section class="pp-section pp-story ${cls || ''}">
-    <div class="pp-split">
-      <h2 class="pp-h2">${heading}</h2>
-      <div class="pp-prose">${paras(text)}</div>
+  // ---- The full story: opens in a panel with Story and Photos tabs ----
+  // Room text and room photos are optional. Whatever a house has is used;
+  // a house with only photos and an intro simply has no story button.
+  // The story is text only, like a short blog post; every photo follows at the end.
+  const chapter = (heading, text) => text ? `
+      <section class="pps-ch">
+        <h3>${heading}</h3>
+        <div class="pps-text">${paras(text)}</div>
+      </section>` : '';
+  const chaptersHtml = chapter('Living Spaces', livingText)
+    + chapter('Bedrooms &amp; Bathrooms', bedroomsText)
+    + chapter('The Environment', outdoorText)
+    + chapter('The Location', locationText);
+  const hasStory = !!chaptersHtml.trim();
+
+  const panelHtml = (hasStory || allImgs.length > 1) ? `
+  <div class="pp-lightbox" id="pp-lightbox" role="dialog" aria-modal="true" aria-label="${escapeHtml(name)}" hidden>
+    <div class="pp-lb-bar">
+      <div class="pp-lb-tabs" role="tablist">
+        ${hasStory ? `<button type="button" role="tab" data-tab="story">Story</button>` : ''}
+        ${allImgs.length ? `<button type="button" role="tab" data-tab="photos">Photos</button>` : ''}
+      </div>
+      <button class="pp-lightbox-close" type="button" id="pp-lightbox-close" aria-label="Close">&times;</button>
     </div>
-    ${grid(set)}
-  </section>` : '';
-
-  const livingHtml   = story('Living Spaces', livingText, livingSet);
-  const bedroomsHtml = story('Bedrooms &amp; Bathrooms', bedroomsText, bedroomsSet);
-  const outdoorHtml  = story('The Environment', outdoorText, outdoorSet, 'pp-env');
-
-  const viewAllHtml = allImgs.length > 1 ? `
-  <div class="pp-viewall-wrap"><button class="pp-btn" type="button" id="pp-viewall">View All Images</button></div>
-  <div class="pp-lightbox" id="pp-lightbox" hidden>
-    <button class="pp-lightbox-close" type="button" id="pp-lightbox-close" aria-label="Close">&times;</button>
-    <div class="pp-lightbox-inner">
-      ${allImgs.map(s => `<figure>${img(s, 1800)}</figure>`).join('')}
+    ${hasStory ? `
+    <div class="pp-lb-pane pps" data-pane="story">
+      <h2 class="pps-title">${escapeHtml(editorialTitle || name)}</h2>
+      ${introText ? `<div class="pps-text pps-lead">${paras(introText)}</div>` : ''}
+      ${chaptersHtml}
+      ${allImgs.length ? `<h3 class="pps-photos-title">Photos</h3>` : ''}
+    </div>
+    <div class="pp-lb-pane ppp pps-photos" data-pane="story">
+      ${allImgs.map(s2 => `<figure>${img(s2, 1600)}</figure>`).join('')}
+    </div>` : ''}
+    <div class="pp-lb-pane ppp" data-pane="photos">
+      ${allImgs.map((s2, i) => `<figure id="pp-photo-${i}">${img(s2, 1600)}</figure>`).join('')}
     </div>
   </div>` : '';
+
+  const bookHref = bookingUrl ? `/go/${encodeURIComponent(slugVal)}` : `/contact?topic=house-${encodeURIComponent(slugVal)}`;
+  const bookHtml = `
+  <aside class="pp-book">
+    <p class="pp-book-title">Book This House</p>
+    ${facts.length ? `<p class="pp-book-meta">${facts.filter(x => x[0] !== 'type').map(x => escapeHtml(String(x[1]))).join(' &middot; ')}</p>` : ''}
+    <a class="pp-book-btn" id="pp-book" href="${bookHref}"${bookingUrl ? ' target="_blank" rel="noopener"' : ''}>${bookingUrl ? 'Check Availability' : 'Ask About This House'} <span aria-hidden="true">&rarr;</span></a>
+    <p class="pp-book-note">${bookingUrl ? 'You book directly with the home owner to secure the best rates.' : 'Send us a message and we will put you in touch.'}</p>
+  </aside>`;
 
   const coords = getCoords(record);
   const locationHtml = (coords || locationText) ? `
   <section class="pp-section pp-location">
     <h2 class="pp-h2">The Location</h2>
     <div class="pp-loc-grid${coords ? '' : ' pp-loc-nomap'}">
-      ${coords ? `<div class="pp-map" id="pp-map"></div>` : ''}
-      <div class="pp-prose pp-loc-text">${paras(locationText)}</div>
+      ${coords ? `<div class="pp-map">
+        <iframe title="Map of ${escapeHtml(name)}" src="https://www.google.com/maps?q=${coords.lat},${coords.lon}&z=12&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>` : ''}
+      <div class="pp-loc-text">
+        ${paras(locationText)}
+        ${coords ? `<a class="pp-btn pp-gmaps" href="https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lon}" target="_blank" rel="noopener">Open in Google Maps</a>` : ''}
+      </div>
     </div>
   </section>` : '';
 
-  const mapData = coords
-    ? JSON.stringify({ lat: coords.lat, lon: coords.lon }).replace(/</g, '\\u003c')
-    : 'null';
 
   // SEO
   const title = `${name}${location ? ' — ' + location : ''} | Slow Casa`;
@@ -528,19 +584,51 @@ module.exports = async function handler(req, res) {
     .pp figure img, .pp-hero-wrap figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .img-fallback { background: var(--grey-4); }
 
-    /* Hero */
-    /* Hero runs edge to edge with the same side gutter as the nav,
-       so its left edge lines up with the wordmark at every width. */
-    .pp-hero-wrap { padding: 0 var(--gutter); }
-    .pp-hero { aspect-ratio: 16 / 8.5; max-height: 86vh; width: 100%; }
+    /* Gallery: one big photo and four small. Grid cells crop, so photos that
+       are not wide enough for a full-width hero still look right. */
+    .pp-gallery { position: relative; display: grid; gap: 8px; padding: 0 48px; height: clamp(320px, 46vw, 640px); }
+    .pp-gal-5 { grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .pp-gal-5 .pp-gal-tile:first-child, .pp-gal-3 .pp-gal-tile:first-child { grid-row: 1 / span 2; }
+    .pp-gal-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
+    .pp-gal-2 { grid-template-columns: 1fr 1fr; }
+    .pp-gal-1 { grid-template-columns: 1fr; }
+    .pp-gal-tile { position: relative; display: block; padding: 0; border: 0; margin: 0; overflow: hidden; background: var(--grey-4); cursor: zoom-in; min-height: 0; }
+    .pp-gal-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease, opacity 0.3s; }
+    .pp-gal-tile:hover img { transform: scale(1.02); opacity: 0.94; }
+    .pp-gal-all {
+      position: absolute; right: 68px; bottom: 20px; display: inline-flex; align-items: center; gap: 10px;
+      background: #fff; color: var(--black); border: 1px solid var(--black); padding: 11px 16px;
+      font-family: var(--body); font-size: 14px; letter-spacing: 0.01em; cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .pp-gal-all:hover { background: var(--black); color: #fff; }
 
-    /* Title row */
-    .pp-titlebar { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; padding: 64px 0 88px; }
-    .pp-name { font-family: var(--body); font-weight: 400; font-size: 28px; letter-spacing: 0.01em; margin: 0 0 6px; line-height: 1.15; }
-    .pp-where { font-size: 15px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
-    .pp-editorial { font-family: var(--display); font-size: 21px; line-height: 1.35; margin: 22px 0 0; max-width: 32ch; }
-    .pp-actions { display: flex; align-items: center; gap: 28px; flex-shrink: 0; }
-    .pp-share { background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--body); font-size: 14px; letter-spacing: 0.01em; color: var(--black); }
+    /* Title, facts, features and intro on the left; booking card on the right */
+    .pp-top { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: clamp(40px, 6vw, 96px); align-items: start; padding-top: 64px; }
+    .pp-name { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 3.6vw, 48px); letter-spacing: 0.02em; margin: 0 0 10px; line-height: 1.1; }
+    .pp-where { font-size: 16px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
+    .pp-facts { list-style: none; margin: 32px 0 0; padding: 24px 0; display: flex; flex-wrap: wrap; gap: 14px 36px; border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
+    .pp-facts li { display: inline-flex; align-items: center; gap: 10px; font-size: 16px; letter-spacing: 0.01em; }
+    .pp-lead { margin-top: 56px; }
+    .pp-lead-title { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 2.6vw, 36px); line-height: 1.2; letter-spacing: 0.01em; margin: 0 0 24px; max-width: 26ch; }
+    .pp-lead-text p { font-size: clamp(18px, 1.5vw, 21px); line-height: 1.65; margin: 0 0 18px; max-width: 58ch; }
+    .pp-story-btn { margin-top: 12px; }
+    .pp-feat { margin-top: 72px; padding-top: 40px; border-top: 1px solid var(--grey-3); }
+    .pp-sub { font-family: var(--display); font-weight: 400; font-size: 24px; letter-spacing: 0.01em; margin: 0 0 24px; }
+    .pp-features { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .pp-features li { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; border: 1px solid var(--grey-3); padding: 22px 12px; font-size: 14px; letter-spacing: 0.01em; }
+    .ico { flex-shrink: 0; }
+
+    /* Booking card */
+    .pp-book { position: sticky; top: 112px; border: 1px solid var(--black); padding: 32px 28px; }
+    .pp-book-title { font-family: var(--display); font-size: 24px; letter-spacing: 0.01em; margin: 0 0 8px; }
+    .pp-book-meta { font-size: 14px; color: var(--grey-1); margin: 0 0 24px; letter-spacing: 0.01em; }
+    .pp-book-btn {
+      display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;
+      padding: 18px 20px; background: var(--black); color: #fff; border: 1px solid var(--black);
+      font-family: var(--body); font-size: 16px; letter-spacing: 0.01em; transition: background 0.2s, color 0.2s;
+    }
+    .pp-book-btn:hover { background: #fff; color: var(--black); }
+    .pp-book-note { font-size: 13px; line-height: 1.5; color: var(--grey-1); margin: 14px 0 0; }
     .pp-btn {
       display: inline-block; border: 1px solid var(--black); background: transparent; color: var(--black);
       padding: 17px 34px; font-family: var(--body); font-size: 14px; letter-spacing: 0.01em;
@@ -548,51 +636,64 @@ module.exports = async function handler(req, res) {
     }
     .pp-btn:hover { background: var(--black); color: #fff; }
 
-    /* Key facts + features, full-bleed rules */
-    .pp-band { border-top: 1px solid var(--grey-3); }
-    .pp-facts { display: grid; grid-template-columns: repeat(var(--cols), 1fr); padding: 0 var(--gutter); }
-    .pp-fact { text-align: center; padding: 30px 12px; }
-    .pp-fact-k { font-size: 11.5px; letter-spacing: 0.01em; margin: 0 0 14px; }
-    .pp-fact-v { font-size: 22px; margin: 0; }
-    .pp-features-band { border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
-    .pp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; padding: 26px var(--gutter); }
-    .pp-feature { border: 1px solid var(--grey-3); padding: 22px 12px; text-align: center; font-size: 14px; letter-spacing: 0.01em; }
-
     /* Shared section rhythm */
     .pp-section { padding-top: 150px; }
     .pp-h2 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 3.6vw, 52px); line-height: 1.05; margin: 0; letter-spacing: 0.01em; letter-spacing: 0.02em; }
     .pp-prose p { font-size: 17px; line-height: 1.75; margin: 0 0 16px; text-indent: 3.5em; }
     .pp-prose p:last-child { margin-bottom: 0; }
 
-    /* Intro: right column only */
-    .pp-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding-top: 170px; }
-    .pp-intro .pp-prose { grid-column: 2; }
-
-    /* Overview mosaic */
-    .pp-overview .pp-h2 { margin-bottom: 72px; }
 
     /* Story sections */
     .pp-split { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-bottom: 120px; }
 
     /* The environment */
 
-    /* View all */
-    .pp-viewall-wrap { text-align: center; padding-top: 110px; }
-    .pp-lightbox { position: fixed; inset: 0; background: #FFFFFF; z-index: 100; overflow-y: auto; }
+    /* All photos */
+    .pp-lightbox { position: fixed; inset: 0; background: #FFFFFF; z-index: 1000; overflow-y: auto; }
     .pp-lightbox[hidden] { display: none; }
-    .pp-lightbox-inner { max-width: 1100px; margin: 0 auto; padding: 80px 24px; display: grid; gap: 20px; }
-    .pp-lightbox-inner figure { margin: 0; }
-    .pp-lightbox-inner img { width: 100%; height: auto; display: block; }
-    .pp-lightbox-close { position: fixed; top: 18px; right: 26px; background: #FFFFFF; border: 0; font-size: 40px; line-height: 1; cursor: pointer; z-index: 101; }
+    .pp-lb-bar { position: sticky; top: 0; z-index: 2; background: #fff; display: flex; justify-content: center; align-items: center; height: 72px; border-bottom: 1px solid var(--grey-3); }
+    .pp-lb-tabs { display: flex; gap: 36px; }
+    .pp-lb-tabs button { background: none; border: 0; padding: 24px 2px 22px; font-family: var(--body); font-size: 15px; letter-spacing: 0.01em; color: var(--grey-1); cursor: pointer; border-bottom: 2px solid transparent; }
+    .pp-lb-tabs button[aria-selected="true"] { color: var(--black); border-bottom-color: var(--black); }
+    .pp-lightbox-close { position: absolute; right: 24px; top: 16px; width: 40px; height: 40px; border-radius: 50%; background: var(--black); color: #fff; border: 0; font-size: 24px; line-height: 40px; cursor: pointer; }
+    .pp-lb-pane[hidden] { display: none; }
+    /* Story: a magazine-style read */
+    .pps { max-width: 760px; margin: 0 auto; padding: 72px 24px 48px; }
+    .pps-title { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4vw, 52px); line-height: 1.12; letter-spacing: 0.01em; text-align: center; margin: 0 0 56px; }
+    .pps-text p { font-size: 18px; line-height: 1.75; margin: 0 0 18px; }
+    .pps-lead p { font-size: 21px; line-height: 1.65; }
+    .pps-ch { margin-top: 72px; }
+    .pps-ch h3 { font-family: var(--display); font-weight: 400; font-size: 28px; letter-spacing: 0.01em; margin: 0 0 20px; }
+    .pps-imgs { display: grid; gap: 12px; margin: 32px -80px 0; }
+    .pps-n2, .pps-n3 { grid-template-columns: 1fr 1fr; }
+    .pps-n3 figure:first-child { grid-column: 1 / -1; }
+    .pps-imgs figure { margin: 0; aspect-ratio: 3 / 2; overflow: hidden; background: var(--grey-4); }
+    .pps-n1 figure { aspect-ratio: 16 / 10; }
+    .pps-imgs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Photos: every image, two across */
+    .ppp { max-width: 1240px; margin: 0 auto; padding: 40px 24px 120px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ppp figure { margin: 0; background: var(--grey-4); }
+    .ppp figure:nth-child(3n+1) { grid-column: 1 / -1; }
+    .ppp img { width: 100%; height: auto; display: block; }
+    @media (max-width: 900px) {
+      .pps-imgs { margin-left: 0; margin-right: 0; }
+      .ppp { grid-template-columns: 1fr; }
+      .pp-lightbox-close { right: 12px; }
+      .pp-lb-bar { justify-content: flex-start; padding-left: 20px; }
+    }
 
     /* Location */
     .pp-location .pp-h2 { margin-bottom: 72px; }
-    .pp-loc-grid { display: grid; grid-template-columns: 2.6fr 1fr; gap: 56px; align-items: end; }
+    .pp-loc-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: clamp(40px, 5vw, 80px); align-items: center; }
     .pp-loc-grid.pp-loc-nomap { grid-template-columns: 1fr 1fr; }
     .pp-loc-nomap .pp-loc-text { grid-column: 2; }
-    .pp-map { aspect-ratio: 16 / 11; background: var(--grey-4); border: 1px solid var(--grey-3); }
-    .pp-loc-text p { font-size: 16px; text-indent: 0; text-align: center; }
-    .pp-marker { width: 22px; height: 22px; background: var(--black); transform: rotate(45deg); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+    .pp-map { aspect-ratio: 16 / 11; background: var(--grey-4); border: 1px solid var(--black); overflow: hidden; }
+    .pp-map iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .pp-loc-text { text-align: center; }
+    .pp-loc-text p { font-family: var(--display); font-size: clamp(19px, 1.7vw, 24px); line-height: 1.55; margin: 0 0 18px; }
+    .pp-gmaps { margin-top: 12px; }
+    .pps-photos-title { font-family: var(--display); font-weight: 400; font-size: 28px; letter-spacing: 0.01em; margin: 96px 0 0; text-align: center; }
+    .pps-photos { padding-top: 32px; }
 
     /* Neighbourhood recs */
     .pp-recs-head { margin-bottom: 72px; }
@@ -616,26 +717,21 @@ module.exports = async function handler(req, res) {
     footer { margin-top: 140px; }
 
     @media (max-width: 900px) {
-      .pp-titlebar { flex-direction: column; padding: 40px 0 56px; }
-      .pp-facts { grid-template-columns: repeat(2, 1fr); }
-      .pp-features { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-      .pp-section, .pp-intro { padding-top: 90px; }
-      .pp-intro, .pp-split { grid-template-columns: 1fr; gap: 28px; }
-      .pp-intro .pp-prose { grid-column: 1; }
+      .pp-top { grid-template-columns: 1fr; gap: 40px; padding-top: 40px; }
+      .pp-book { position: static; }
+      .pp-section { padding-top: 90px; }
+      .pp-split { grid-template-columns: 1fr; gap: 28px; }
       .pp-split { margin-bottom: 48px; }
       .pp-loc-grid { grid-template-columns: 1fr; gap: 28px; }
       .pp-loc-nomap .pp-loc-text { grid-column: 1; }
-      .pp-loc-text p { text-align: left; }
+      .pp-loc-text { text-align: left; }
       .pp-recs-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
       .prop-other { padding-top: 90px; }
       .prop-other-grid { grid-template-columns: 1fr 1fr; gap: 32px 20px; }
       .pp-overview .pp-h2, .pp-location .pp-h2, .pp-recs-head { margin-bottom: 36px; }
     }
     @media (max-width: 560px) {
-      .pp-hero { aspect-ratio: 4 / 5; max-height: none; }
-      .pp-name { font-size: 23px; }
-      .pp-fact-v { font-size: 19px; }
-      .pp-features { grid-template-columns: 1fr; }
+      .pp-features { grid-template-columns: repeat(2, 1fr); }
       .pp-recs-grid, .prop-other-grid { grid-template-columns: 1fr; }
       .pp-prose p { text-indent: 2em; }
     }
@@ -678,8 +774,12 @@ module.exports = async function handler(req, res) {
 
       /* Phone gutters: must stay last so they win over the base rules. */
     @media (max-width: 768px) {
-      .pp-hero-wrap, .pp, .pp-facts { padding-left: 16px; padding-right: 16px; }
-      .pp-features { padding: 20px 16px; }
+      .pp { padding-left: 16px; padding-right: 16px; }
+      /* Phones: just the first photo, with the See All button on it */
+      .pp-gallery { padding: 0; height: auto; display: block; }
+      .pp-gal-tile { display: none; aspect-ratio: 4 / 3; width: 100%; }
+      .pp-gal-tile:first-child { display: block; }
+      .pp-gal-all { right: 16px; bottom: 16px; }
       .prop-other { padding-left: 16px; padding-right: 16px; }
       .pp-cta { left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); padding: 18px 20px; }
     }
@@ -690,32 +790,24 @@ module.exports = async function handler(req, res) {
   ${nav()}
 
   <main>
-    ${heroImage ? `<div class="pp-hero-wrap"><figure class="pp-hero">${img(heroImage, 2400, '', true)}</figure></div>` : ''}
+    ${galleryHtml}
     <div class="pp">
-
-      <div class="pp-titlebar">
-        <div>
+      <div class="pp-top">
+        <div class="pp-main">
           <h1 class="pp-name">${escapeHtml(name)}</h1>
           ${location ? `<p class="pp-where">${escapeHtml(location)}</p>` : ''}
-          ${editorialTitle ? `<p class="pp-editorial">${escapeHtml(editorialTitle)}</p>` : ''}
+          ${factsHtml}
+          ${(editorialTitle || introText) ? `
+          <section class="pp-lead">
+            ${editorialTitle ? `<h2 class="pp-lead-title">${escapeHtml(editorialTitle)}</h2>` : ''}
+            ${introText ? `<div class="pp-lead-text">${paras(introText)}</div>` : ''}
+            ${hasStory ? `<button class="pp-btn pp-story-btn" type="button" data-open="story">Read the Full Story</button>` : ''}
+          </section>` : ''}
+          ${featuresHtml ? `<section class="pp-feat"><h2 class="pp-sub">What's Here</h2>${featuresHtml}</section>` : ''}
         </div>
-        <div class="pp-actions">
-          <button class="pp-share" type="button" id="pp-share">Share</button>
-          ${bookingUrl ? `<a class="pp-btn" id="pp-book" href="/go/${encodeURIComponent(slugVal)}" target="_blank" rel="noopener">Book</a>` : ''}
-        </div>
+        ${bookHtml}
       </div>
-    </div>
-
-    ${factsHtml ? `<div class="pp-band">${factsHtml}</div>` : ''}
-    ${featuresHtml ? `<div class="pp-features-band">${featuresHtml}</div>` : (factsHtml ? '<div class="pp-band"></div>' : '')}
-
-    <div class="pp">
-      ${introText ? `<section class="pp-intro"><div class="pp-prose">${paras(introText)}</div></section>` : ''}
-      ${overviewHtml}
-      ${livingHtml}
-      ${bedroomsHtml}
-      ${outdoorHtml}
-      ${viewAllHtml}
+      ${panelHtml}
       ${locationHtml}
       ${recsHtml}
     </div>
@@ -729,8 +821,9 @@ ${footer()}
 
   <script>
   (function () {
-    // Floating CTA: shows once the Book button in the title bar has scrolled
-    // out of view, hides again while the footer is on screen.
+    // Floating CTA: shows whenever the booking card is off screen (on phones that
+    // is most of the page; on desktop the card is sticky, so rarely), and hides
+    // while the footer is on screen.
     var cta = document.getElementById('pp-cta');
     var book = document.getElementById('pp-book');
     var foot = document.querySelector('footer');
@@ -743,7 +836,7 @@ ${footer()}
         cta.tabIndex = on ? 0 : -1;
       };
       new IntersectionObserver(function (es) {
-        es.forEach(function (e) { pastBook = !e.isIntersecting && e.boundingClientRect.top < 0; });
+        es.forEach(function (e) { pastBook = !e.isIntersecting; });
         update();
       }).observe(book);
       if (foot) new IntersectionObserver(function (es) {
@@ -753,61 +846,33 @@ ${footer()}
     }
   })();
   (function () {
-    // Share: native sheet on phones, copy link elsewhere
-    var share = document.getElementById('pp-share');
-    if (share) share.addEventListener('click', function () {
-      var url = window.location.href;
-      if (navigator.share) { navigator.share({ title: document.title, url: url }).catch(function () {}); return; }
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(function () {
-          share.textContent = 'Link copied';
-          setTimeout(function () { share.textContent = 'Share'; }, 2000);
-        });
-      }
-    });
-
-    // View all images
-    var open = document.getElementById('pp-viewall');
+    // Panel with Story and Photos tabs. Gallery photos open Photos at that
+    // photo; Read the Full Story opens Story.
     var box = document.getElementById('pp-lightbox');
     var close = document.getElementById('pp-lightbox-close');
+    function show(tab) {
+      if (!box.querySelector('[data-pane="' + tab + '"]')) tab = 'photos';
+      box.querySelectorAll('.pp-lb-pane').forEach(function (p) { p.hidden = p.getAttribute('data-pane') !== tab; });
+      box.querySelectorAll('.pp-lb-tabs button').forEach(function (t) { t.setAttribute('aria-selected', t.getAttribute('data-tab') === tab ? 'true' : 'false'); });
+    }
     function shut() { box.hidden = true; document.body.style.overflow = ''; }
-    if (open && box) {
-      open.addEventListener('click', function () { box.hidden = false; document.body.style.overflow = 'hidden'; });
+    if (box) {
+      document.querySelectorAll('[data-open]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          box.hidden = false; document.body.style.overflow = 'hidden';
+          show(b.getAttribute('data-open'));
+          var i = b.getAttribute('data-i');
+          var fig = i !== null && document.getElementById('pp-photo-' + i);
+          box.scrollTop = fig ? fig.offsetTop - 90 : 0;
+        });
+      });
+      box.querySelectorAll('.pp-lb-tabs button').forEach(function (t) {
+        t.addEventListener('click', function () { show(t.getAttribute('data-tab')); box.scrollTop = 0; });
+      });
       close.addEventListener('click', shut);
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) shut(); });
     }
 
-    // Location map, loaded only when it scrolls near the viewport
-    var HOUSE = ${mapData};
-    var el = document.getElementById('pp-map');
-    if (!HOUSE || !el) return;
-    var TOKEN = 'pk.eyJ1IjoibHVrZXJ5YSIsImEiOiJjbG96cmZ3OTMwMHRyMmlzNHc1bTZkZzI4In0.8Pmo8eeUh48QHBpzqHwNuQ';
-    var STYLE = 'mapbox://styles/lukerya/cmoime20s006m01r68jvia13j';
-    var started = false;
-    function start() {
-      if (started) return; started = true;
-      var css = document.createElement('link');
-      css.rel = 'stylesheet'; css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css';
-      document.head.appendChild(css);
-      var s = document.createElement('script');
-      s.src = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js';
-      s.onload = function () {
-        try {
-          mapboxgl.accessToken = TOKEN;
-          var map = new mapboxgl.Map({ container: 'pp-map', style: STYLE, center: [HOUSE.lon, HOUSE.lat], zoom: 8.6, attributionControl: true, cooperativeGestures: true });
-          map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
-          var m = document.createElement('div'); m.className = 'pp-marker';
-          new mapboxgl.Marker({ element: m }).setLngLat([HOUSE.lon, HOUSE.lat]).addTo(map);
-        } catch (e) { console.error('map error', e); }
-      };
-      document.head.appendChild(s);
-    }
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
-        if (entries.some(function (e) { return e.isIntersecting; })) { start(); io.disconnect(); }
-      }, { rootMargin: '400px' });
-      io.observe(el);
-    } else { start(); }
   })();
   </script>
 </body>
