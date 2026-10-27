@@ -124,10 +124,9 @@ module.exports = async function handler(req, res) {
   let isEmpty = false;
   let cards;
   if (isLanding) {
-    // Everything in one grid: guides newest first, then places. A place listed
-    // under two sections (e.g. Eat + Experience) appears once.
+    // Everything in one grid, guides newest first (places only if M.LIST_PLACES).
     const g = guides.filter(x => x.section && x.islandKey && (!island || x.islandKey === island));
-    const p = places.filter(x => x.islandKey && (!island || x.islandKey === island));
+    const p = !M.LIST_PLACES ? [] : places.filter(x => x.islandKey && (!island || x.islandKey === island));
     cards = g.map(M.magGuideCard).concat(p.map(M.magPlaceCard));
   } else {
     cards = M.magItems(section, guides, places, island);
