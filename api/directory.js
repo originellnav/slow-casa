@@ -1,5 +1,6 @@
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
+const { fetchUrl } = require('../lib/img');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 
@@ -93,7 +94,7 @@ function responsiveImageUrl(url, width) {
     const separator = url.indexOf('?') >= 0 ? '&' : '?';
     return url + separator + 'w=' + width + '&auto=format&fit=max&q=80';
   }
-  return url;
+  return fetchUrl(url, width);
 }
 
 function getImageUrl(record, index) {

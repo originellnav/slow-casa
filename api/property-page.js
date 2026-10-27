@@ -3,6 +3,7 @@ const { balearicIsland, gone } = require('../lib/scope');
 const { houseCard, placeOf } = require('../lib/card');
 const { icon } = require('../lib/icons');
 const { placeCategories, placeIslandName, placeLink, placeImages, placeSlug, islandOf } = require('../lib/magazine');
+const { fetchUrl } = require('../lib/img');
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const BASE_ID = 'appndrnWrdlgxRJAG';
 const PROPERTIES_TABLE = 'Properties';
@@ -140,7 +141,7 @@ function responsiveImageUrl(url, width) {
     const separator = url.indexOf('?') >= 0 ? '&' : '?';
     return url + separator + 'w=' + width + '&auto=format&fit=max&q=80';
   }
-  return url;
+  return fetchUrl(url, width);
 }
 
 // Only treat absolute http(s) links as real images. This filters out blank

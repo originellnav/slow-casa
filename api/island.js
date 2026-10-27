@@ -2,6 +2,7 @@ const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
 const M = require('../lib/magazine');
 const { titleCase } = require('../lib/titlecase');
+const { fetchUrl } = require('../lib/img');
 
 // The three islands. `intro` is placeholder copy, meant to be replaced with
 // 400-700 words of real writing per island. Everything else is derived.
@@ -70,7 +71,7 @@ function responsiveImageUrl(url, width) {
     const separator = url.indexOf('?') >= 0 ? '&' : '?';
     return url + separator + 'w=' + width + '&auto=format&fit=max&q=80';
   }
-  return url;
+  return fetchUrl(url, width);
 }
 
 function getImageUrl(record, index) {
