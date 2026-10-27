@@ -1125,6 +1125,8 @@
       if (!url) return url;
       if (url.indexOf('res.cloudinary.com') >= 0) return responsiveCloudinaryUrl(url, width);
       if (url.indexOf('cdn.sanity.io') >= 0) return responsiveSanityUrl(url, width);
+      // Photos from other sites go through Cloudinary fetch (see lib/img.js)
+      if (/^https?:\/\//i.test(url)) return 'https://res.cloudinary.com/dw1wmo2go/image/fetch/c_limit,w_' + width + ',q_auto,f_auto/' + encodeURIComponent(url);
       return url;
     }
 
