@@ -519,7 +519,8 @@ module.exports = async function handler(req, res) {
     { "@type": "ListItem", "position": 1, "name": "Slow Casa", "item": "https://slowcasa.com" },
     { "@type": "ListItem", "position": 2, "name": "Houses", "item": "https://slowcasa.com/houses" }
   ];
-  if (crumbIsland) {
+  // Only islands with their own page get a breadcrumb step (Formentera has none yet).
+  if (['mallorca', 'ibiza', 'menorca'].indexOf(crumbIsland.toLowerCase()) !== -1) {
     crumbItems.push({ "@type": "ListItem", "position": 3, "name": crumbIsland, "item": "https://slowcasa.com/" + crumbIsland.toLowerCase() });
   }
   crumbItems.push({ "@type": "ListItem", "position": crumbItems.length + 1, "name": name, "item": canonicalUrl });
