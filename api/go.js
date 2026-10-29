@@ -12,8 +12,8 @@ const CACHE_TTL_MS = 5 * 60 * 1000;
 let BOOKING_MAP_CACHE = null; // { slug: bookingUrl }
 let BOOKING_MAP_CACHED_AT = 0;
 
-async function getBookingMap() {
-  if (BOOKING_MAP_CACHE && (Date.now() - BOOKING_MAP_CACHED_AT) < CACHE_TTL_MS) {
+async function getBookingMap(fresh) {
+  if (!fresh && BOOKING_MAP_CACHE && (Date.now() - BOOKING_MAP_CACHED_AT) < CACHE_TTL_MS) {
     return BOOKING_MAP_CACHE;
   }
   const map = {};
@@ -142,8 +142,10 @@ module.exports = async function handler(req, res) {
       return res.end();
     }
 
-    const map = await getBookingMap();
-    const target = map[slug];
+    let target = (await getBookingMap())[slug];
+    // A house added in the last few minutes isn't in the saved list yet, so look again
+    // before saying "Not found".
+    if (!target) target = (await getBookingMap(true))[slug];
     if (!target) {
       res.statusCode = 404;
       res.setHeader('Content-Type', 'text/plain');
