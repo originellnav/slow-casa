@@ -213,7 +213,7 @@ module.exports = async function handler(req, res) {
   const itemListLd = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'Villas and Fincas to Rent in the Balearic Islands',
+    name: 'Villas and Fincas to Rent in Mallorca, Menorca and Ibiza',
     url: 'https://slowcasa.com/houses',
     isPartOf: { '@type': 'WebSite', name: 'Slow Casa', url: 'https://slowcasa.com' },
     mainEntity: {
@@ -237,17 +237,17 @@ module.exports = async function handler(req, res) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Villas and Fincas to Rent in the Balearic Islands | Slow Casa</title>
+  <title>Villas and Fincas to Rent in Mallorca, Menorca and Ibiza | Slow Casa</title>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Slow Casa" />
 <link rel="manifest" href="/site.webmanifest" />
-  <meta name="description" content="Every villa and finca in Slow Casa: handpicked vacation homes to rent in Mallorca, Ibiza, Menorca and Formentera, chosen for good design and quiet settings." />
+  <meta name="description" content="Every villa and finca in Slow Casa: handpicked vacation homes to rent in Mallorca, Menorca, Ibiza and Formentera, chosen for good design and quiet settings." />
   <link rel="canonical" href="https://slowcasa.com/houses" />
-  <meta property="og:title" content="Villas and Fincas to Rent in the Balearic Islands | Slow Casa" />
-  <meta property="og:description" content="Every villa and finca in Slow Casa: handpicked vacation homes to rent in Mallorca, Ibiza, Menorca and Formentera, chosen for good design and quiet settings." />
+  <meta property="og:title" content="Villas and Fincas to Rent in Mallorca, Menorca and Ibiza | Slow Casa" />
+  <meta property="og:description" content="Every villa and finca in Slow Casa: handpicked vacation homes to rent in Mallorca, Menorca, Ibiza and Formentera, chosen for good design and quiet settings." />
   <meta property="og:url" content="https://slowcasa.com/houses" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Slow Casa" />
@@ -612,7 +612,7 @@ module.exports = async function handler(req, res) {
     ${nav()}
 
   <header class="page-head">
-    <h1 class="page-title">Villas and Fincas to Rent in the Balearic Islands</h1>
+    <h1 class="page-title">Villas and Fincas to Rent in Mallorca, Menorca and Ibiza</h1>
   </header>
 
 
