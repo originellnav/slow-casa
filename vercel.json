@@ -59,6 +59,10 @@
   ],
   "rewrites": [
     {
+      "source": "/llms.txt",
+      "destination": "/api/sitemap?format=llms"
+    },
+    {
       "source": "/map",
       "destination": "/api/map"
     },

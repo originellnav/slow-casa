@@ -1,3 +1,4 @@
+const { notFound } = require('../lib/notfound');
 const { nav, footer } = require('../lib/nav');
 const { balearicIsland, gone } = require('../lib/scope');
 const { houseCard, placeOf } = require('../lib/card');
@@ -217,7 +218,7 @@ module.exports = async function handler(req, res) {
     } catch (e) {
       return res.status(500).send('Error fetching property');
     }
-    if (!record) return res.status(404).send('Property not found');
+    if (!record) return notFound(res, 'house');
     setCached(slug, record);
   }
 
@@ -483,7 +484,13 @@ module.exports = async function handler(req, res) {
 
 
   // SEO
-  const title = `${name}${location ? ' — ' + location : ''} | Slow Casa`;
+  // "Can Bibi: Villa to Rent in Es Cubells, Ibiza | Slow Casa". The house name
+  // is what people who already know it search; "villa to rent in {town}" is
+  // what everyone else searches. Type comes from Airtable (Villa, House...).
+  const typeWord = String(houseType || 'House').trim() || 'House';
+  const whereWords = [town, region].map(s => String(s || '').trim()).filter(Boolean)
+    .filter((v, i, a) => a.indexOf(v) === i).join(', ');
+  const title = `${name}: ${typeWord} to Rent${whereWords ? ' in ' + whereWords : ''} | Slow Casa`;
   const metaDescBase = description ? description.replace(/\n/g, ' ') : `${name} on Slow Casa, a curated collection of houses to rent in Mallorca, Ibiza and Menorca.`;
   const metaDesc = metaDescBase.length > 155 ? metaDescBase.substring(0, 152) + '...' : metaDescBase;
   const canonIsland = String((f['Island'] || '')).trim().toLowerCase();
@@ -513,6 +520,27 @@ module.exports = async function handler(req, res) {
     const sleepsNum = parseInt(sleeps);
     if (!isNaN(sleepsNum)) structuredData.maximumAttendeeCapacity = sleepsNum;
   }
+  // Every photo (full size), so image search and AI answers can show the house.
+  const ldImages = allImgs.slice(0, 12).map(u => responsiveImageUrl(u, 1600));
+  if (ldImages.length) structuredData.image = ldImages;
+  const bedNum = parseInt(bedrooms), bathNum = parseFloat(bathrooms);
+  if (!isNaN(bedNum)) structuredData.numberOfRooms = bedNum;
+  if (!isNaN(bedNum) || !isNaN(bathNum) || sleeps) {
+    const acc = { "@type": "Accommodation", "name": name };
+    if (!isNaN(bedNum)) acc.numberOfBedrooms = bedNum;
+    if (!isNaN(bathNum)) acc.numberOfBathroomsTotal = bathNum;
+    const occ = parseInt(sleeps);
+    if (!isNaN(occ)) acc.occupancy = { "@type": "QuantitativeValue", "maxValue": occ };
+    structuredData.containsPlace = acc;
+  }
+  if (features.length) {
+    structuredData.amenityFeature = features.map(x => ({ "@type": "LocationFeatureSpecification", "name": x, "value": true }));
+  }
+  if (['mallorca', 'ibiza', 'menorca', 'formentera'].indexOf(canonIsland) !== -1) {
+    const isl = canonIsland.charAt(0).toUpperCase() + canonIsland.slice(1);
+    structuredData.containedInPlace = { "@type": "Place", "name": isl + ", Balearic Islands, Spain" };
+  }
+  structuredData.isPartOf = { "@type": "WebSite", "name": "Slow Casa", "url": "https://slowcasa.com" };
 
   const crumbIsland = String((f['Island'] || '')).trim();
   const crumbItems = [
@@ -607,6 +635,9 @@ module.exports = async function handler(req, res) {
 
     /* Title, facts, features and intro on the left; booking card on the right */
     .pp-top { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: clamp(40px, 6vw, 96px); align-items: start; padding-top: 64px; }
+    .pp-crumbs { font-size: 13px; letter-spacing: 0.02em; color: var(--muted, #6b6b6b); margin: 0 0 14px; }
+    .pp-crumbs a { color: inherit; text-decoration: none; }
+    .pp-crumbs a:hover { text-decoration: underline; }
     .pp-name { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 3.6vw, 48px); letter-spacing: 0.02em; margin: 0 0 10px; line-height: 1.1; }
     .pp-where { font-size: 16px; letter-spacing: 0.01em; color: var(--grey-1); margin: 0; }
     .pp-facts { list-style: none; margin: 32px 0 0; padding: 24px 0; display: flex; flex-wrap: wrap; gap: 14px 36px; border-top: 1px solid var(--grey-3); border-bottom: 1px solid var(--grey-3); }
@@ -797,6 +828,7 @@ module.exports = async function handler(req, res) {
     <div class="pp">
       <div class="pp-top">
         <div class="pp-main">
+          <p class="pp-crumbs"><a href="/houses">Houses</a>${['mallorca','ibiza','menorca'].indexOf(canonIsland) !== -1 ? ` / <a href="/${canonIsland}">${escapeHtml(canonIsland.charAt(0).toUpperCase() + canonIsland.slice(1))}</a>` : ''} / <span>${escapeHtml(name)}</span></p>
           <h1 class="pp-name">${escapeHtml(name)}</h1>
           ${location ? `<p class="pp-where">${escapeHtml(location)}</p>` : ''}
           ${factsHtml}

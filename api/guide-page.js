@@ -1,3 +1,4 @@
+const { notFound } = require('../lib/notfound');
 const { nav, footer } = require('../lib/nav');
 const { houseCard, placeOf } = require('../lib/card');
 const M = require('../lib/magazine');
@@ -278,16 +279,7 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    if (!guide) {
-      // Proper 404 - not a soft 404 this time
-      res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8').send(`<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><title>Guide not found | Slow Casa</title><meta name="robots" content="noindex" /></head>
-<body style="font-family: system-ui, sans-serif;max-width:600px;margin:80px auto;padding:0 24px;text-align:center;">
-<h1>Guide Not Found</h1>
-<p>We couldn't find what you were looking for. <a href="/magazine">Browse the Magazine</a> or <a href="/">return home</a>.</p>
-</body></html>`);
-      return;
-    }
+    if (!guide) return notFound(res, 'guide');
 
     setCached(slug, guide);
   }
