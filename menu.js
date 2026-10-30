@@ -66,3 +66,46 @@
     onScroll();
   }
 })();
+
+// Island clock in the nav: "14:32 in Mallorca. Siesta."
+// Balearic local time, a line for each part of the day, and the island name
+// rotating every few seconds. Added here so every page gets it without
+// editing each copy of the nav markup. Hidden on small screens.
+(function () {
+  var bar = document.querySelector('.site-nav');
+  if (!bar || !window.Intl) return;
+  var ISLANDS = ['Mallorca', 'Ibiza', 'Menorca'];
+  // [start minute of day, line]
+  var MOMENTS = [
+    [0, 'Stars out'],
+    [6 * 60, 'Café con leche'],
+    [10 * 60, 'Swim time'],
+    [14 * 60, 'Siesta'],
+    [17 * 60, 'Aperitivo'],
+    [20 * 60, 'Late dinner']
+  ];
+  var fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', hour12: false });
+  var el = document.createElement('p');
+  el.className = 'nav-clock';
+  el.setAttribute('aria-hidden', 'true');
+  bar.appendChild(el);
+  var i = 0;
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function text() {
+    var hm = fmt.format(new Date());
+    var parts = hm.split(':');
+    var mins = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    var line = MOMENTS[0][1];
+    for (var k = 0; k < MOMENTS.length; k++) if (mins >= MOMENTS[k][0]) line = MOMENTS[k][1];
+    return hm + ' in ' + ISLANDS[i] + '. ' + line + '.';
+  }
+  function render() { el.textContent = text(); }
+  render();
+  setInterval(function () {
+    i = (i + 1) % ISLANDS.length;
+    if (still) { render(); return; }
+    el.classList.add('is-fading');
+    setTimeout(function () { render(); el.classList.remove('is-fading'); }, 400);
+  }, 5000);
+})();
