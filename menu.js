@@ -67,10 +67,11 @@
   }
 })();
 
-// Island clock in the nav: "14:32 in Mallorca. Siesta."
-// Balearic local time, a line for each part of the day, and the island name
-// rotating every few seconds. Added here so every page gets it without
-// editing each copy of the nav markup. Hidden on small screens.
+// Island clock in the nav: a small live clock face showing Balearic time,
+// next to the part of the day ("Siesta time in Mallorca"). The line follows
+// the real time through six blocks. The island changes on each visit
+// (Mallorca, then Ibiza, then Menorca). Added here so every page gets it
+// without editing each copy of the nav markup. Hidden on small screens.
 (function () {
   var bar = document.querySelector('.site-nav');
   if (!bar || !window.Intl) return;
@@ -84,28 +85,39 @@
     [17 * 60, 'Golden hour'],
     [20 * 60, 'Tapas and vino']
   ];
+  var island = ISLANDS[Math.floor(Math.random() * ISLANDS.length)];
+  try {
+    var n = (parseInt(localStorage.getItem('sc-clock') || '0', 10) || 0) + 1;
+    localStorage.setItem('sc-clock', String(n));
+    island = ISLANDS[n % ISLANDS.length];
+  } catch (e) { /* storage blocked: random island is fine */ }
+
   var fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', hour12: false });
   var el = document.createElement('p');
   el.className = 'nav-clock';
-  el.setAttribute('aria-hidden', 'true');
+  el.innerHTML =
+    '<svg class="nav-clock-face" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<circle cx="12" cy="12" r="10.5" />' +
+      '<line class="nav-clock-h" x1="12" y1="12" x2="12" y2="7" />' +
+      '<line class="nav-clock-m" x1="12" y1="12" x2="12" y2="4.5" />' +
+      '<circle class="nav-clock-dot" cx="12" cy="12" r="1" />' +
+    '</svg><span class="nav-clock-text"></span>';
   bar.appendChild(el);
-  var i = 0;
-  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hHand = el.querySelector('.nav-clock-h');
+  var mHand = el.querySelector('.nav-clock-m');
+  var label = el.querySelector('.nav-clock-text');
 
-  function text() {
+  function tick() {
     var hm = fmt.format(new Date());
-    var parts = hm.split(':');
-    var mins = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    var h = parseInt(hm.slice(0, 2), 10), m = parseInt(hm.slice(3, 5), 10);
+    var mins = h * 60 + m;
     var line = MOMENTS[0][1];
     for (var k = 0; k < MOMENTS.length; k++) if (mins >= MOMENTS[k][0]) line = MOMENTS[k][1];
-    return hm + ' in ' + ISLANDS[i] + '. ' + line + '.';
+    hHand.setAttribute('transform', 'rotate(' + ((h % 12) * 30 + m * 0.5) + ' 12 12)');
+    mHand.setAttribute('transform', 'rotate(' + (m * 6) + ' 12 12)');
+    label.textContent = line + ' in ' + island;
+    el.setAttribute('title', hm + ' in the Balearics');
   }
-  function render() { el.textContent = text(); }
-  render();
-  setInterval(function () {
-    i = (i + 1) % ISLANDS.length;
-    if (still) { render(); return; }
-    el.classList.add('is-fading');
-    setTimeout(function () { render(); el.classList.remove('is-fading'); }, 400);
-  }, 5000);
+  tick();
+  setInterval(tick, 20000);
 })();
