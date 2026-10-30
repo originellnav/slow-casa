@@ -128,22 +128,6 @@ button, input, select, textarea { font-family: inherit; }
   transition: border-color 0.2s ease;
 }
 .site-nav.is-stuck { border-bottom-color: var(--grey-3); }
-/* Island clock (built in menu.js): live clock face + part of the day, centred, desktop only */
-.nav-clock {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  display: flex; align-items: center; gap: 10px;
-  margin: 0; white-space: nowrap; cursor: default;
-  font-family: var(--brand); font-style: italic; font-size: 17px; letter-spacing: 0.01em;
-  color: var(--black);
-  transition: color 0.35s ease;
-}
-.nav-clock-face { width: 22px; height: 22px; flex: none; overflow: visible; }
-.nav-clock-face circle:first-child { fill: none; stroke: currentColor; stroke-width: 1; }
-.nav-clock-face line { stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; transition: transform 1s ease; }
-.nav-clock-face .nav-clock-m { stroke-width: 1; }
-.nav-clock-face .nav-clock-dot { fill: currentColor; }
-.nav-over .site-nav:not(.is-stuck) .nav-clock { color: #fff; }
-@media (max-width: 1000px) { .nav-clock { display: none; } }
 /* Over a full-bleed hero (add class="nav-over" to <body>): the nav sits on the
    photo with white text, then turns into the normal white bar once you scroll. */
 .nav-over .site-nav {
