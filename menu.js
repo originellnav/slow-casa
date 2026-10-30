@@ -59,7 +59,9 @@
   // Sticky nav: add a hairline under it once the page has scrolled.
   var bar = document.querySelector('.site-nav');
   if (bar) {
-    var onScroll = function () { bar.classList.toggle('is-stuck', window.scrollY > 4); };
+    // Over a hero photo the bar stays see-through a little longer before turning white.
+    var limit = document.body.classList.contains('nav-over') ? 60 : 4;
+    var onScroll = function () { bar.classList.toggle('is-stuck', window.scrollY > limit); };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   }
