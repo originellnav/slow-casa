@@ -209,6 +209,23 @@ module.exports = async function handler(req, res) {
     ? '<div class="no-results"><p>No properties found.</p></div>'
     : cardsHtml;
 
+  // ItemList of every house, so search engines and AI answers see the full set.
+  const itemListLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Villas and Fincas to Rent in the Balearic Islands',
+    url: 'https://slowcasa.com/houses',
+    isPartOf: { '@type': 'WebSite', name: 'Slow Casa', url: 'https://slowcasa.com' },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: records.length,
+      itemListElement: records.map((r, i) => ({
+        '@type': 'ListItem', position: i + 1, name: (r.fields || {})['Name'] || '',
+        url: 'https://slowcasa.com' + houseUrl(r)
+      }))
+    }
+  }).replace(/</g, '\\u003c');
+
   const searchValue = escapeHtml(locationQuery);
   const clearVisible = locationQuery ? 'visible' : '';
 
@@ -220,21 +237,22 @@ module.exports = async function handler(req, res) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Directory — Slow Casa</title>
+  <title>Villas and Fincas to Rent in the Balearic Islands | Slow Casa</title>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Slow Casa" />
 <link rel="manifest" href="/site.webmanifest" />
-  <meta name="description" content="Every design-first vacation home in the Slow Casa directory. Filter by setting — sea, mountains, farm." />
+  <meta name="description" content="Every villa and finca in Slow Casa: handpicked vacation homes to rent in Mallorca, Ibiza, Menorca and Formentera, chosen for good design and quiet settings." />
   <link rel="canonical" href="https://slowcasa.com/houses" />
-  <meta property="og:title" content="Directory — Slow Casa" />
-  <meta property="og:description" content="Every design-first vacation home in the Slow Casa directory." />
+  <meta property="og:title" content="Villas and Fincas to Rent in the Balearic Islands | Slow Casa" />
+  <meta property="og:description" content="Every villa and finca in Slow Casa: handpicked vacation homes to rent in Mallorca, Ibiza, Menorca and Formentera, chosen for good design and quiet settings." />
   <meta property="og:url" content="https://slowcasa.com/houses" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Slow Casa" />
   <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">${itemListLd}</script>
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-v17-latin-regular.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-v17-latin-regular.woff2" crossorigin />
   <link rel="stylesheet" href="/slow-casa.css" />
@@ -594,7 +612,7 @@ module.exports = async function handler(req, res) {
     ${nav()}
 
   <header class="page-head">
-    <h1 class="page-title">Handpicked Homes in the Balearic Islands</h1>
+    <h1 class="page-title">Villas and Fincas to Rent in the Balearic Islands</h1>
   </header>
 
 

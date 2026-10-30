@@ -9,8 +9,8 @@ const { fetchUrl } = require('../lib/img');
 const ISLANDS = {
   mallorca: {
     name: 'Mallorca',
-    title: 'Design houses to rent in Mallorca',
-    metaDesc: 'Design-led houses to rent across Mallorca, from the Tramuntana to the villages of the central plain, with guides to the places around them.',
+    title: 'Villas and Fincas to Rent in Mallorca',
+    metaDesc: 'Handpicked villas and fincas to rent across Mallorca, chosen for good design and quiet settings, from the Tramuntana to the villages of the central plain.',
     intro: [
       'Mallorca is the largest of the three islands and the most varied. The Tramuntana runs the length of the north-west coast in a wall of limestone, with Deia, Soller and Valldemossa stacked along it. The middle of the island, Es Pla, is flat farmland and working villages that most visitors drive straight through. The south has the quiet coves, and Palma sits in the bay with the rest of it within an hour.',
       'The houses here are mostly old: fincas, village houses, barns and mills that have been rebuilt rather than replaced. We look for the ones where that work was done carefully, and we link straight to the owner.'
@@ -18,8 +18,8 @@ const ISLANDS = {
   },
   ibiza: {
     name: 'Ibiza',
-    title: 'Design houses to rent in Ibiza',
-    metaDesc: 'Design-led houses to rent across Ibiza, from the valleys of the north to the quieter south, with guides to the villages around them.',
+    title: 'Villas and Fincas to Rent in Ibiza',
+    metaDesc: 'Handpicked villas and fincas to rent across Ibiza, chosen for good design and quiet settings, from the green north to the coves of the south west.',
     intro: [
       'Ibiza splits in two. The north, inland from Sant Joan and Sant Carles, is terraced orchards, carob and almond, dry-stone walls and roads that take longer than the map says. The south and west carry the reputation, and the island everyone argues about is mostly a few kilometres of it.',
       'The traditional Ibizan finca is thick whitewashed walls and ceilings of sabina juniper, built to stay cool without help. The best modern work on the island still starts there. Those are the houses we look for.'
@@ -27,8 +27,8 @@ const ISLANDS = {
   },
   menorca: {
     name: 'Menorca',
-    title: 'Design houses to rent in Menorca',
-    metaDesc: 'Design-led houses to rent across Menorca, from Ciutadella to Mao, with guides to the villages and beaches around them.',
+    title: 'Villas and Fincas to Rent in Menorca',
+    metaDesc: 'Handpicked villas and fincas to rent across Menorca, chosen for good design and quiet settings, from Ciutadella to Maó.',
     intro: [
       'Menorca is the quiet one, and it has stayed that way on purpose: the whole island is a UNESCO biosphere reserve, and the building rules that come with it are why the coast still looks like it does. Ciutadella sits at one end and Mao at the other, with farmland, stone walls and the Cami de Cavalls bridle path running the whole way round the edge.',
       'There is less here than on the other two islands, in every sense. Fewer houses, fewer people, and a short season. The houses worth staying in are usually old farm buildings, rebuilt in the island sandstone.'
@@ -156,7 +156,15 @@ module.exports = async function handler(req, res) {
     name: config.title,
     description: config.metaDesc,
     url: canonicalUrl,
-    isPartOf: { '@type': 'WebSite', name: 'Slow Casa', url: 'https://slowcasa.com' }
+    isPartOf: { '@type': 'WebSite', name: 'Slow Casa', url: 'https://slowcasa.com' },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: houses.length,
+      itemListElement: houses.map((r, i) => ({
+        '@type': 'ListItem', position: i + 1, name: r.fields['Name'],
+        url: `https://slowcasa.com/${key}/houses/${r.fields['Slug']}`
+      }))
+    }
   };
 
   const breadcrumbSchema = {
@@ -191,7 +199,7 @@ module.exports = async function handler(req, res) {
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Slow Casa" />
   <meta name="twitter:card" content="summary_large_image" />
-  <script type="application/ld+json">${JSON.stringify(collectionSchema)}</script>
+  <script type="application/ld+json">${JSON.stringify(collectionSchema).replace(/</g, '\\u003c')}</script>
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />

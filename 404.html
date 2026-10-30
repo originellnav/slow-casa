@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Built from lib/notfound.js. Edit that file, then regenerate this one. -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found | Slow Casa</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/slow-casa.css" />
+  <style>
+    .nf { max-width: 720px; margin: 0 auto; padding: 120px 24px 140px; text-align: center; }
+    .nf h1 { font-family: var(--display); font-weight: 400; font-size: clamp(34px, 4vw, 52px); line-height: 1.15; margin: 0 0 20px; }
+    .nf p { font-size: 18px; line-height: 1.6; margin: 0 0 36px; }
+    .nf-links { display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: center; }
+    .nf-links a { color: inherit; text-decoration: underline; text-underline-offset: 4px; }
+  </style>
+</head>
+<body>
+  <header class="site-nav">
+    <a href="/" class="wordmark">Slow Casa</a>
+    <div class="site-nav-right">
+      <a class="site-nav-link" href="/houses">The Collection</a>
+      <a class="site-nav-link" href="/magazine">Magazine</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">Menu <i class="burger" aria-hidden="true"></i></button>
+    </div>
+  </header>
+  <div class="menu-scrim" data-menu-close></div>
+  <aside class="site-menu" id="site-menu" aria-label="Menu" aria-hidden="true" inert>
+    <div class="site-menu-top">
+      <button class="menu-close" type="button" data-menu-close>Close <i class="burger is-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="site-menu-links">
+      <a href="/houses">The Collection</a>
+      <a href="/magazine">Magazine</a>
+      <a href="/map">Map</a>
+      <a href="/contact?topic=list-your-house">List Your House</a>
+    </div>
+    <a class="site-menu-contact" href="/contact">Contact</a>
+  </aside>
+  <script src="/menu.js" defer></script>
+  <main class="nf">
+    <h1>We Can't Find That Page</h1>
+    <p>It may have moved, or it's no longer listed. Here are the best places to start.</p>
+    <nav class="nf-links" aria-label="Start here">
+      <a href="/houses">All Houses</a>
+      <a href="/mallorca">Mallorca</a>
+      <a href="/ibiza">Ibiza</a>
+      <a href="/menorca">Menorca</a>
+      <a href="/magazine">The Magazine</a>
+    </nav>
+  </main>
+  <footer class="site-footer">
+    <span class="footer-copy">&copy; 2026 Slow Casa</span>
+    <div class="footer-right">
+      <form class="footer-signup" novalidate>
+        <label for="footer-email">Get the Newsletter</label>
+        <input id="footer-email" name="email" type="email" placeholder="Your email" autocomplete="email" />
+        <button type="submit" aria-label="Subscribe"><svg viewBox="0 0 9 15" aria-hidden="true"><path d="M1 1l6.5 6.5L1 14"/></svg></button>
+        <span class="footer-signup-msg" role="status" aria-live="polite"></span>
+      </form>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="https://www.instagram.com/theslowcasa/" target="_blank" rel="noopener">Instagram</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/contact">Contact</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
