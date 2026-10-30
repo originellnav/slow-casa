@@ -77,12 +77,12 @@
   var ISLANDS = ['Mallorca', 'Ibiza', 'Menorca'];
   // [start minute of day, line]
   var MOMENTS = [
-    [0, 'Stars out'],
+    [0, 'Lights out'],
     [6 * 60, 'Café con leche'],
-    [10 * 60, 'Swim time'],
-    [14 * 60, 'Siesta'],
-    [17 * 60, 'Aperitivo'],
-    [20 * 60, 'Late dinner']
+    [10 * 60, 'Morning swim'],
+    [14 * 60, 'Siesta time'],
+    [17 * 60, 'Golden hour'],
+    [20 * 60, 'Tapas and vino']
   ];
   var fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', hour12: false });
   var el = document.createElement('p');
